@@ -1,5 +1,6 @@
 import { Container, Col, Row } from "reactstrap"
 import { MainWindow } from "./MainWindow";
+import { PlayerBar } from "./PlayerBar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CommandLine } from "./CommandLine";
 
@@ -10,26 +11,21 @@ export const UI = () => {
                 maxWidth: "2100px", 
                 width: "100%", 
                 maxHeight: "1200px",
-                height: "1000px",
-                border: "10px solid red",
+                height: "100%",
+                border: "4px solid red",
                 padding: 0
             }}>
-            <Col style={{border: "10px solid green", height: "100%"}}>
-                <Row className="gx-0" style={{border: "10px solid purple", height: "100%"}}>
-                    <Col className="col-8" style={{border: "10px solid pink"}}>
-                        {/*Main Window*/}
-                        <Row className="gx-0 row-2" style={{border: "10px solid blue", height: "75%"}}>
-                            <MainWindow />
-                            <CommandLine />
-                        </Row>
-                        <Row className="gx-0 row-2" style={{border: "10px solid blue", height: "25%"}}>
-                        </Row>
+            <Col style={{border: "4px solid green", height: "100%"}}>
+                <Row className="gx-0" style={{border: "4px solid purple", height: "100%"}}>
+                    <Col style={{flex: "0 0 67%", maxWidth: "67%", border: "4px solid pink"}}>
+                        <MainWindow />
+                        <CommandLine />
+                        <PlayerBar />
                     </Col>
-                    <Col style={{border: "10px solid pink"}}>
-                    <Row className="gx-0 row-2" style={{border: "10px solid blue", height: "34%"}}>
-                    </Row>
-                    <Row className="gx-0 row-2" style={{border: "10px solid blue", height: "66%"}}>
-                        </Row>
+
+                    <Col style={{border: "4px solid pink"}}>
+                        <Row className="gx-0 row-2" style={{border: "4px solid blue", height: "34%"}}></Row>
+                        <Row className="gx-0 row-2" style={{border: "4px solid blue", height: "66%"}}></Row>
                     </Col>
                 </Row>
             </Col>

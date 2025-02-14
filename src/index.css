@@ -13,9 +13,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-p {
+p, input {
   margin: 0;
-  font-size: 14px;
+  font-size: 16px !important;
+  font-family: 'Tahoma' !important;
+  color: white;
 }
 
 a {
@@ -32,6 +34,7 @@ body {
   display: flex;
   min-width: 320px;
   min-height: 100vh;
+  background-color: black;
 }
 
 h1 {
