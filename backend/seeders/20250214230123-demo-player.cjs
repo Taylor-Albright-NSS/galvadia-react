@@ -5,6 +5,9 @@ module.exports = {
       id: 1,
       name: 'John Doe',
       area_id: 1,  // Assuming you have an area with ID 1
+      x: 0,
+      y: 0,
+      z: 0, 
       createdAt: new Date(),
       updatedAt: new Date(),
     }, {

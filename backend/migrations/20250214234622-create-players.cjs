@@ -13,6 +13,18 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      x: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      y: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      z: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
       area_id: {
         type: Sequelize.INTEGER,
         allowNull: false

@@ -1,4 +1,4 @@
-import { Sequelize } from 'sequelize';
+import { Sequelize } from "sequelize";
 
 // Connect to PostgreSQL database
 // eslint-disable-next-line no-undef

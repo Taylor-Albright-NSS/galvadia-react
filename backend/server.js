@@ -1,11 +1,13 @@
 import 'dotenv/config'; // No need for .config()
 import express from 'express';
-import { sequelize } from '../../config/db.js';
+import { sequelize } from './config/db.js';
 // import playerRoutes from './routes/playerRoutes'
-import { Area } from '../../models/area.js';
-import { Player } from '../../models/player.js';
-import db from '../../models/index.js';
+import { Area } from './models/area.js';
+import { Player } from './models/player.js';
+import { getPlayers, createPlayer, deletePlayer, putPlayer } from './controllers/playerController.js';
+import db from './models/associations.js';
 import cors from 'cors';
+import { getArea } from './controllers/areaController.js';
 
 
 const app = express();
@@ -35,37 +37,13 @@ app.get('/player/:id', async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 });
-//--------
-app.get('/', (req, res) => {
-  console.log("Attempting to hit root path")
-  res.json({ message: 'Welcome to Galvadia Server!!' });
-});
-
-app.get('/api', (req, res) => {
-  console.log("Attempting to hit /api")
-  res.json({ message: 'Server is working!' });
-  return res.json()
-});
-
-app.post('/players', async (req, res) => {
-  try {
-    const { name, level, area_id } = req.body;
-    const newPlayer = await Player.create({ name, level, area_id });
-    res.status(201).json(newPlayer);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
-app.get('/players', async (req, res) => {
-  try {
-    const players = await Player.findAll(); // Retrieves all players with all properties
-    res.status(200).json(players);
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
-});
-
+//--------PLAYERS
+app.get('/players', getPlayers);
+app.post('/players', createPlayer);
+app.put('/player/:id', putPlayer)
+app.delete('/player/:id', deletePlayer);
+//--------AREAS
+app.get('/area/:id', getArea)
 app.get('/areas', async (req, res) => {
   try {
     const areas = await Area.findAll();
@@ -74,7 +52,6 @@ app.get('/areas', async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 })
-
 app.post('/areas', async (req, res) => {
   try {
     const { name, heading, description, x, y, z } = req.body
@@ -84,9 +61,11 @@ app.post('/areas', async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 })
+//--------
 
 
-db.sequelize.sync({ force: true })  // Sync the models with the database (create tables)
+
+db.sequelize.sync()  // Sync the models with the database (create tables)
   .then(() => {
     app.listen(3000, () => {
       console.log('Server is running on http://localhost:3000');
@@ -95,3 +74,4 @@ db.sequelize.sync({ force: true })  // Sync the models with the database (create
   .catch(err => {
     console.error('Error syncing database:', err);
   });
+

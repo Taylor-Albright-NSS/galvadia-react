@@ -13,6 +13,22 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
+      heading: {
+        type: Sequelize.STRING,
+        allowNull: true,
+      },
+      x: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      y: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
+      z: {
+        type: Sequelize.INTEGER,
+        allowNull: true
+      },
       description: {
         type: Sequelize.TEXT
       },
