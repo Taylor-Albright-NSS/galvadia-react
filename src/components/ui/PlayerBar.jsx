@@ -1,5 +1,5 @@
 import { Button } from "reactstrap"
-import { testFetch, testFetch2 } from "../../managers/testFetch"
+import { getPlayers, testFetch, testFetch2 } from "../../managers/testFetch"
 
 export const PlayerBar = () => {
 
@@ -8,6 +8,7 @@ export const PlayerBar = () => {
             <div>Player Bar</div>
             <Button onClick={testFetch}>Test fetch</Button>
             <Button onClick={testFetch2}>Test fetch</Button>
+            <Button onClick={getPlayers}>Fetch players</Button>
         </div>
 
     )
