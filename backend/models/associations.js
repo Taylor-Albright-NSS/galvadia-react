@@ -6,9 +6,6 @@ import { Player } from './player.js';
 Area.hasMany(Player, { foreignKey: 'area_id' });
 Player.belongsTo(Area, { foreignKey: 'area_id' });
 
-console.log('Area associations:', Area.associations);
-console.log('Player associations:', Player.associations);
-
 const db = { sequelize, Area, Player };
 
 export default db;

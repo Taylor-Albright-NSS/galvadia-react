@@ -1,5 +1,5 @@
 import { DataTypes } from 'sequelize'
-import { sequelize } from '../config/db';
+import { sequelize } from '../config/db.js';
 
 // Define the Area model
 export const Area = sequelize.define('Area', {
@@ -20,6 +20,11 @@ export const Area = sequelize.define('Area', {
   description: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  exits: {
+    type: DataTypes.ARRAY(DataTypes.STRING),
+    allowNull: true,
+    defaultValue: [],
   },
   x: {
     type: DataTypes.INTEGER,  // Define the type as integer

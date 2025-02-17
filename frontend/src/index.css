@@ -13,11 +13,12 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-p, input {
+p, input, div {
   margin: 0;
   font-size: 16px !important;
   font-family: 'Tahoma' !important;
   color: white;
+  line-height: 20px;
 }
 
 a {

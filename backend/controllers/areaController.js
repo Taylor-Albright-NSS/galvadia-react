@@ -14,3 +14,13 @@ export const getArea = async (req, res) => {
   const area = await Area.findOne({where: {id: id}})
   res.status(200).json(area)
 }
+
+export const getAreaByCoords = async (req, res) => {
+  const { x, y } = req.query
+  if (x && y) {
+    const foundArea = await Area.findOne({ where : {x: x, y: y}})
+    res.status(200).json(foundArea)
+  } else {
+    res.status(404).json()
+  }
+}

@@ -1,18 +1,17 @@
+/* eslint-disable react/prop-types */
 import { Input } from "reactstrap"
-import { handleEnterPress } from "../../ui functions/uiFunctions"
+import { handleEnterPress } from "../../managers/uiFunctions"
+import { useContext } from "react"
+import { zGameContext } from "./zGameContext"
 
 export const CommandLine = () => {
-
-    const handleInput = () => {
-
-    }
+    const { player, setPlayer, addLog } = useContext(zGameContext)
 
     return (
         <Input 
             type="text"
             style={{border: "4px solid green", height: "30px", padding: 0}}
-            onChange={handleInput}
-            onKeyDown={(e) => {handleEnterPress(e)}}
+            onKeyDown={(e) => {handleEnterPress(e, player, setPlayer, addLog)}}
             />
     )
 }

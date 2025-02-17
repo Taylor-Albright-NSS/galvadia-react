@@ -17,6 +17,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
+      description: {
+        type: Sequelize.TEXT
+      },
+      exits: {
+        type: Sequelize.ARRAY(Sequelize.DataTypes.STRING),
+        allowNull: true,
+        defaultValue: [],  // Ensure an empty array by default
+      },
       x: {
         type: Sequelize.INTEGER,
         allowNull: true
@@ -28,9 +36,6 @@ module.exports = {
       z: {
         type: Sequelize.INTEGER,
         allowNull: true
-      },
-      description: {
-        type: Sequelize.TEXT
       },
       createdAt: {
         type: Sequelize.DATE,

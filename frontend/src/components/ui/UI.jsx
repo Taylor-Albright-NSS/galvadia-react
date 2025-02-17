@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { Container, Col, Row } from "reactstrap"
 import { MainWindow } from "./MainWindow";
 import { PlayerBar } from "./PlayerBar";

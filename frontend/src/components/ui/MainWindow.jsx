@@ -1,73 +1,42 @@
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
+import { zGameContext } from "./zGameContext";
+import { areaDisplay } from "../../managers/areaDisplay";
 
 export const MainWindow = () => {
     const containerRef = useRef(null);
-    const [messages, setMessages] = useState(["Test", "Test", "Test"]);
-    const [currentArea, setCurrentArea] = useState({})
+    const logEndRef = useRef(null)
+    const { currentArea } = useContext(zGameContext)
+    const { windowLogs, addLog } = useContext(zGameContext)
+    useEffect(() => {
+        logEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, [windowLogs]);
+
+      useEffect(() => {
+        setTimeout(() => {
+            addLog(areaDisplay(currentArea))
+        }, 1)
+      }, [currentArea])
 
     useEffect(() => {
-        const body = {
-            x: 0,
-            y: 0,
-            z: 0
-        }
-        // getArea(body)
-    }, [])
+        let test = document.getElementById("main-window")
+        test.scrollTop = test.scrollHeight;
 
-    useEffect(() => {
-        // Scroll to the bottom when messages update
-        if (containerRef.current) {
-            containerRef.current.scrollTop = containerRef.current.scrollHeight;
-        }
-    }, [messages]); // Runs whenever messages change
-
-    useEffect(() => {
-
-    })
+    }, [windowLogs]);
 
     return (
         <div 
             id="main-window"
             style={{
-                display: "flex", 
-                flexDirection: "column", 
-                overflow: "auto", 
-                border: "4px solid brown", 
+                display: "flex",
+                flexDirection: "column",
+                overflow: "auto",
+                border: "4px solid brown",
                 height: "700px",
                 alignItems: "flex-start"
             }}>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
-            <p>Test</p>
+            {windowLogs.map((element, index) => {
+                return <div key={index}>{element}</div>
+            })}
         </div>
     )
 }

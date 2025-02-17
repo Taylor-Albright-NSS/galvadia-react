@@ -4,10 +4,10 @@ import { sequelize } from './config/db.js';
 // import playerRoutes from './routes/playerRoutes'
 import { Area } from './models/area.js';
 import { Player } from './models/player.js';
-import { getPlayers, createPlayer, deletePlayer, putPlayer } from './controllers/playerController.js';
+import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords } from './controllers/playerController.js';
 import db from './models/associations.js';
 import cors from 'cors';
-import { getArea } from './controllers/areaController.js';
+import { getArea, getAreaByCoords } from './controllers/areaController.js';
 
 
 const app = express();
@@ -17,32 +17,18 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-//--------
-app.get('/player/:id', async (req, res) => {
-  try {
-    const playerId = req.params.id;
-    console.log(playerId, " Player Id")
-    
-    const player = await Player.findByPk(playerId, {
-      include: [{ model: sequelize.models.Area, as: 'Area' }]
-    });
+//--------PLAYER (SINGLE)
+app.patch('/player/:id/coordinates', playerPatchCoords)
+app.get('/player/:id', getPlayer1API);
 
-    if (!player) {
-      return res.status(404).json({ message: 'Player not found' });
-    }
-
-    res.json(player); // Send player data to the frontend
-  } catch (error) {
-    console.error('Error fetching player:', error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
-});
 //--------PLAYERS
 app.get('/players', getPlayers);
 app.post('/players', createPlayer);
 app.put('/player/:id', putPlayer)
+app.put('/player')
 app.delete('/player/:id', deletePlayer);
 //--------AREAS
+app.get('/area', getAreaByCoords)
 app.get('/area/:id', getArea)
 app.get('/areas', async (req, res) => {
   try {
@@ -61,6 +47,7 @@ app.post('/areas', async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 })
+
 //--------
 
 
@@ -68,7 +55,6 @@ app.post('/areas', async (req, res) => {
 db.sequelize.sync()  // Sync the models with the database (create tables)
   .then(() => {
     app.listen(3000, () => {
-      console.log('Server is running on http://localhost:3000');
     });
   })
   .catch(err => {
