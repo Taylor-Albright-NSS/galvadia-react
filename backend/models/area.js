@@ -17,14 +17,18 @@ export const Area = sequelize.define('Area', {
     type: DataTypes.STRING,
     allowNull: true
   },
+  headingColor: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   description: {
     type: DataTypes.STRING,
     allowNull: true
   },
-  exits: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
+  exitsBool: {
+    type: DataTypes.JSON,
     allowNull: true,
-    defaultValue: [],
+    defaultValue: {}
   },
   x: {
     type: DataTypes.INTEGER,  // Define the type as integer

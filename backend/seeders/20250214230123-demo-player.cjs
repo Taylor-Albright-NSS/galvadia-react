@@ -1,6 +1,5 @@
-// seeders/20250214-demo-player.js
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     await queryInterface.bulkInsert('Players', [{
       id: 1,
       name: 'John Doe',
@@ -21,7 +20,7 @@ module.exports = {
     }], {});
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface) => {
     // Undo the seed by deleting all players
     await queryInterface.bulkDelete('Players', null, {});
   }

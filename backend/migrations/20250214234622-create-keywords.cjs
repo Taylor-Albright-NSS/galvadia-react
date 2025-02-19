@@ -2,22 +2,32 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Areas', {
+    await queryInterface.createTable('Keywords', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false
       },
+      area_id: {
+        type: Sequelize.INTEGER,
+        allowNull: false
+      },
+      actionAreaId: {
+        type: Sequelize.INTEGER,
+      },
+      actionDirections: {
+        type: Sequelize.STRING,
+      },
       name: {
         type: Sequelize.STRING,
         allowNull: false
       },
-      heading: {
+      refName: {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      headingColor: {
+      color: {
         type: Sequelize.STRING,
         allowNull: true,
       },
@@ -25,22 +35,13 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      exitsBool: {
-        type: Sequelize.JSON,
+      action: {
+        type: Sequelize.TEXT,
         allowNull: true,
-        defaultValue: {}
       },
-      x: {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      },
-      y: {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      },
-      z: {
-        type: Sequelize.INTEGER,
-        allowNull: true
+      methodCode: {  // This field will store the specific action code for each keyword
+        type: Sequelize.STRING,  // Store the method's name or a code reference
+        allowNull: true,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -54,6 +55,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Areas');
+    await queryInterface.dropTable('Keywords');
   }
 };

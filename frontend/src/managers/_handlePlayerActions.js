@@ -6,7 +6,7 @@ import { zGameContext } from "../components/ui/zGameContext"
 import { actionList } from "./actionList"
 
 
-export const handleEnterPress = (e, player, setPlayer, addLog) => {
+export const handleEnterPress = (e, player, setPlayer, addLog, currentArea, npcs, enemies, setCurrentArea) => {
     if (e.keyCode != 13) {return}
     let rawInput = e.target.value
     if (rawInput[0] === "'") {
@@ -23,16 +23,18 @@ export const handleEnterPress = (e, player, setPlayer, addLog) => {
         command4: userInput[3],
         player: player,
         setPlayer: setPlayer,
-        addLog: addLog
+        addLog: addLog,
+        currentArea: currentArea,
+        npcs: npcs,
+        enemies: enemies,
+        setCurrentArea: setCurrentArea,
     }
-    console.log(commandObject, " COMMAND OBJECT")
     actionList(commandObject)
     e.target.value = ""
 }
 
 export const normalizeInput = (input) => {
     const trimmedInput = input.toLowerCase().trim().split(" ").filter(element => element.length > 0)
-    console.log(trimmedInput, " trimmed input")
     return trimmedInput
 }
 

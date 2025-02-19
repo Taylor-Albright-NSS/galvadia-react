@@ -1,7 +1,15 @@
 import { getAreaByCoords } from "./areas"
 import { playerUpdateCoordinates } from "./playerUpdateCoordinates"
 
-export const moveDirection = async (player, setPlayer, inputDirection) => {
+export const moveDirection = async (player, setPlayer, inputDirection, currentArea, addLog) => {
+    if (currentArea.exitsBool[inputDirection] == "locked") {
+        addLog("You cannot move in this direction. The door is locked.")
+        return
+    }
+    if (currentArea.exitsBool[inputDirection] == "blocked") {
+        addLog("The way forward is blocked.")
+        return
+    }
     const directionCoordsList = {
         north: { x: 0, y: 1},
         east: { x: 1, y: 0 },

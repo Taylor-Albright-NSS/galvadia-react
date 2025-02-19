@@ -7,7 +7,8 @@ import { Player } from './models/player.js';
 import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords } from './controllers/playerController.js';
 import db from './models/associations.js';
 import cors from 'cors';
-import { getArea, getAreaByCoords } from './controllers/areaController.js';
+import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js';
+import { getNpc, getNpcDialogue, getNpcs } from './controllers/npcController.js';
 
 
 const app = express();
@@ -16,7 +17,10 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
-
+//--------NPCS
+app.get('/npcs', getNpcs)
+app.get('/npc/:id', getNpc)
+app.get('/npc/:id/dialogue', getNpcDialogue)
 //--------PLAYER (SINGLE)
 app.patch('/player/:id/coordinates', playerPatchCoords)
 app.get('/player/:id', getPlayer1API);
@@ -28,6 +32,7 @@ app.put('/player/:id', putPlayer)
 app.put('/player')
 app.delete('/player/:id', deletePlayer);
 //--------AREAS
+app.put('/area/:id/unlock', unlockDirection)
 app.get('/area', getAreaByCoords)
 app.get('/area/:id', getArea)
 app.get('/areas', async (req, res) => {

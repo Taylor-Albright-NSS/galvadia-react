@@ -1,12 +1,17 @@
-// seeders/20250214-demo-player.js
 module.exports = {
-  up: async (queryInterface, Sequelize) => {
+  up: async (queryInterface) => {
     await queryInterface.bulkInsert('Areas', [{
       id: 1,
       name: 'Town Square',
       heading: "Town Square",
-      description: "This is the Town Square. It's the central area in Galvaida",
-      exits: ['North', 'East', 'South', 'West'],
+      headingColor: "galvadia-town",
+      description: "This is the Town Square of Galvadia. It's the central area in Galvadia. There is a lever here.",
+      exitsBool: JSON.stringify({
+        north: true,
+        east: true,
+        south: 'locked',
+        west: true
+      }),
       x: 0,
       y: 0,
       z: 0,
@@ -17,7 +22,9 @@ module.exports = {
       name: 'North',
       heading: "North Of The Town Square",
       description: "North of the town square",
-      exits: ['South'],
+      exitsBool: JSON.stringify({
+        south: true,
+      }),
       x: 0,
       y: 1,
       z: 0,
@@ -28,7 +35,9 @@ module.exports = {
       name: 'East',
       heading: "East Of The Town Square",
       description: "East of the town square",
-      exits: ['West'],
+      exitsBool: JSON.stringify({
+        west: true,
+      }),
       x: 1,
       y: 0,
       z: 0,
@@ -39,7 +48,9 @@ module.exports = {
       name: 'South',
       heading: "South Of The Town Square",
       description: "South of the town square",
-      exits: ['North'],
+      exitsBool: JSON.stringify({
+        north: true,
+      }),
       x: 0,
       y: -1,
       z: 0,
@@ -50,7 +61,9 @@ module.exports = {
       name: 'West',
       heading: "Eest Of The Town Square",
       description: "West of the town square",
-      exits: ['East'],
+      exitsBool: JSON.stringify({
+        east: true,
+      }),
       x: 0,
       y: -1,
       z: 0,
@@ -60,7 +73,6 @@ module.exports = {
   },
 
   down: async (queryInterface, Sequelize) => {
-    // Undo the seed by deleting all players
     await queryInterface.bulkDelete('Areas', null, {});
   }
 };
