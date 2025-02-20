@@ -3,6 +3,7 @@ import { keywordMethods } from "../keywordMethods/keywordMethods";
 const api = "http://localhost:3000"
 
 export const getCurrentArea = async (areaId) => {
+    console.log(areaId, " AREA ID")
     const response = await fetch(`${api}/area/${areaId}`)
     const data = await response.json()
     if (data.Keywords.length > 0) {

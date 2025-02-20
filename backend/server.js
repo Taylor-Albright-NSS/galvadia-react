@@ -9,6 +9,8 @@ import db from './models/associations.js';
 import cors from 'cors';
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js';
 import { getNpc, getNpcDialogue, getNpcs } from './controllers/npcController.js';
+import { enemyTakesDamage, getAllEnemiesInRoom } from './controllers/enemyController.js';
+import { getItems } from './controllers/itemController.js';
 
 
 const app = express();
@@ -17,6 +19,8 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use(express.json());
+//--------ITEMS
+app.get('/items', getItems)
 //--------NPCS
 app.get('/npcs', getNpcs)
 app.get('/npc/:id', getNpc)
@@ -53,7 +57,9 @@ app.post('/areas', async (req, res) => {
   }
 })
 
-//--------
+//--------ENEMIES
+app.get('/enemies/:area_id', getAllEnemiesInRoom)
+app.patch('/enemy/:id', enemyTakesDamage)
 
 
 

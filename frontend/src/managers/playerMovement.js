@@ -1,4 +1,5 @@
-import { getAreaByCoords } from "./areas"
+import { areaDisplay } from "./areaDisplay"
+import { getAreaByCoords, getCurrentArea } from "./areas"
 import { playerUpdateCoordinates } from "./playerUpdateCoordinates"
 
 export const moveDirection = async (player, setPlayer, inputDirection, currentArea, addLog) => {
@@ -29,4 +30,5 @@ export const moveDirection = async (player, setPlayer, inputDirection, currentAr
     combinedCoords.area_id = newAreaIfExists.id
     const newPlayerCoords = await playerUpdateCoordinates(player, combinedCoords)
     setPlayer(prevState => ({...prevState, area_id: combinedCoords.area_id, x: newPlayerCoords.x, y:newPlayerCoords.y}))
+
 }

@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize'
-import { sequelize } from '../config/db.js'
+import { sequelize } from '../config/db.js' // Import the sequelize instance from your db.js
 
-export const Npc = sequelize.define('Npc', {
+export const Enemy = sequelize.define('Enemy', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -19,10 +19,9 @@ export const Npc = sequelize.define('Npc', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  dialogue: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
+  health: {
+    type: DataTypes.INTEGER,
     allowNull: true,
-    defaultValue: []
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -33,7 +32,6 @@ export const Npc = sequelize.define('Npc', {
     defaultValue: DataTypes.NOW,
   },
 }, {
-
-  timestamps: true, 
+  timestamps: true,
 });
 

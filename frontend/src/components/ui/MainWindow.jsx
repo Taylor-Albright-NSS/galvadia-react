@@ -1,21 +1,22 @@
-import { useContext, useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef } from "react"
 import { zGameContext } from "./zGameContext";
 import { areaDisplay } from "../../managers/areaDisplay";
+import { getCurrentArea } from "../../managers/areas";
+import { getPlayer1 } from "../../managers/testFetch";
 
 export const MainWindow = () => {
-    const containerRef = useRef(null);
     const logEndRef = useRef(null)
-    const { currentArea } = useContext(zGameContext)
-    const { windowLogs, addLog } = useContext(zGameContext)
-    useEffect(() => {
-        logEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, [windowLogs]);
+    const { windowLogs, addLog, player, currentArea, setPlayer } = useContext(zGameContext)
 
-      useEffect(() => {
-        setTimeout(() => {
-            addLog(areaDisplay(currentArea))
-        }, 1)
-      }, [currentArea])
+    useEffect(() => {
+        async function fetchData() {
+            const player = await getPlayer1()
+            setPlayer(player)
+            const area = await getCurrentArea(player.area_id);
+            addLog(areaDisplay(area));
+        }
+        fetchData()
+    }, [player.area_id])
 
     useEffect(() => {
         let test = document.getElementById("main-window")

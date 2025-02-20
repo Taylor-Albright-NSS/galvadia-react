@@ -1,27 +1,51 @@
 import { Button } from "reactstrap"
 import { getPlayer1, getPlayers } from "../../managers/testFetch"
-import { useContext } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { zGameContext } from "./zGameContext"
 import { fetchNpcs } from "../../fetches/npcs/npcs"
 import { fetchAreas } from "../../fetches/areas/areas"
 import { getCurrentArea } from "../../managers/areas"
+import { enemyTakesDamage } from "../../fetches/enemies/enemies"
 
 export const PlayerBar = () => {
+    const ref = useRef()
+    const { currentArea, enemies } = useContext(zGameContext)
+    const { addLog } = useContext(zGameContext)
+    const [reset, setReset] = useState(0)
 
-    const { currentArea } = useContext(zGameContext)
+    useEffect(() => {
+        ref.interval2 = setInterval(() => {
+            addLog("Interval 1")
+        }, 1000)
+
+    }, [])
+
     function testMethod() {
-        getCurrentArea(1).then(areas => {
-        })
+        ref.interval = setInterval(() => {
+            addLog("Interval 2")
+        }, 1000)
     }
 
+    function stopInterval() {
+        console.log(ref)
+        clearInterval(ref.interval)
+        clearInterval(ref.interval2)
+    }
+
+    function attackEnemy() {
+        const enemyToAttack = currentArea.Enemies[0]
+        const damage = 1
+        enemyTakesDamage(damage, enemyToAttack.id)
+        
+    }
+
+    
     return (
         <div style={{border: "4px solid yellow", height: "264px"}}>
             <div>Player Bar</div>
-            <Button onClick={getPlayers}>Fetch players</Button>
-            <Button onClick={getPlayer1}>Fetch main player</Button>
-            <Button onClick={fetchAreas}>Fetch All Areas</Button>
-            <Button onClick={fetchNpcs}>Fetch NPCS</Button>
-            <Button onClick={testMethod}>Test The Method</Button>
+            <Button onClick={testMethod}>Start a timeout</Button>
+            <Button onClick={stopInterval}>Stop interval</Button>
+            <Button onClick={attackEnemy}>Attack Enemy</Button>
         </div>
 
     )

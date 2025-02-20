@@ -1,4 +1,6 @@
 import { Area } from "../models/area.js";
+import { Enemy } from "../models/enemy.js";
+import { Item } from "../models/item.js";
 import { Keyword } from "../models/keyword.js";
 import { Npc } from "../models/npc.js";
 import { Player } from "../models/player.js";
@@ -22,15 +24,20 @@ export const getAreas = async (req, res) => {
 export const getArea = async (req, res) => {
   console.log("get by ID")
   const { id } = req.params
+  console.log(id, " ID")
   const area = await Area.findOne({
     where: {id: id},
-    include: [{ 
+    include: [{
         model: Npc,
         attributes: ['id', 'name']
       },{
         model: Player
       }, {
         model: Keyword
+      }, {
+        model: Enemy
+      }, {
+        model: Item
       }
     ]})
   res.status(200).json(area)

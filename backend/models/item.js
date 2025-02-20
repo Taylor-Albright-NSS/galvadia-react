@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize'
 import { sequelize } from '../config/db.js'
 
-export const Npc = sequelize.define('Npc', {
+export const Item = sequelize.define('Item', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -9,20 +9,18 @@ export const Npc = sequelize.define('Npc', {
   },
   area_id: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
     references: {
       model: 'Area',
       key: 'id'
     }
   },
+  playerId: {
+    type: DataTypes.INTEGER,
+  },
   name: {
     type: DataTypes.STRING,
     allowNull: true,
-  },
-  dialogue: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
-    allowNull: true,
-    defaultValue: []
   },
   createdAt: {
     type: DataTypes.DATE,

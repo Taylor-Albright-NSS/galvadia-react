@@ -29,6 +29,12 @@ export const areaDisplay = (area) => {
                 {area.Npcs.map((npc, index) => {return <p className="mx-1 green" key={index}>{npc.name}</p>})}
             </span>
             }
+            {area?.Enemies?.length > 0 && 
+            <span className="d-flex">
+                <p>Enemies: </p>
+                {area.Enemies.map((npc, index) => {return <p className="mx-1 green" key={index}>{npc.name}</p>})}
+            </span>
+            }
         </div>
     )
 }
