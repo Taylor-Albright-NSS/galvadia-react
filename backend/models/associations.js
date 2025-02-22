@@ -19,10 +19,6 @@ Enemy.belongsTo(Area, { foreignKey: 'area_id' });
 Area.hasMany(Keyword, { foreignKey: 'area_id' });
 Keyword.belongsTo(Area, { foreignKey: 'area_id' });
 
-Area.hasMany(Item, { foreignKey: 'area_id' });
-Item.belongsTo(Area, { foreignKey: 'area_id' });
-
-
-const db = { sequelize, Area, Npc, Player, Keyword, Enemy, Item };
+const db = { sequelize, Area, Npc, Player, Keyword, Enemy };
 
 export default db;

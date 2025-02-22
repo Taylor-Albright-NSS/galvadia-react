@@ -1,7 +1,7 @@
 const api = "http://localhost:3000"
 
-export const fetchNpcs = async () => {
-    const response = await fetch(`${api}/npcs`)
+export const fetchCurrentAreaNpcs = async (areaId) => {
+    const response = await fetch(`${api}/npcs/${areaId}`)
     const data = await response.json()
     return data
 }

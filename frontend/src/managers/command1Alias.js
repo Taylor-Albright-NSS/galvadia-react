@@ -11,7 +11,8 @@ export const command1Alias = (command1) => {
         l: "look",
         i: "inventory",
         talk: "speak",
-        ex: "examine"
+        ex: "examine",
+        g: "get",
         
     }
     return command1Alias[command1] || command1

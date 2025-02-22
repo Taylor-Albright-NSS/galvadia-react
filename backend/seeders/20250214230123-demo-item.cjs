@@ -3,8 +3,15 @@ module.exports = {
     await queryInterface.bulkInsert('Items', [{
       id: 1,
       name: 'Sword',
-      area_id: 1, 
-      playerId: 1,
+      ownerId: 1, 
+      ownerType: "player",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, {
+      id: 2,
+      name: 'Dagger',
+      ownerId: 1, 
+      ownerType: "area",
       createdAt: new Date(),
       updatedAt: new Date(),
     }], {});

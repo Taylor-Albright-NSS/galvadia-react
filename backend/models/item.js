@@ -7,20 +7,15 @@ export const Item = sequelize.define('Item', {
     primaryKey: true,
     autoIncrement: true,
   },
-  area_id: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-    references: {
-      model: 'Area',
-      key: 'id'
-    }
-  },
-  playerId: {
-    type: DataTypes.INTEGER,
-  },
   name: {
     type: DataTypes.STRING,
     allowNull: true,
+  },
+  ownerId: {
+    type: DataTypes.INTEGER
+  },
+  ownerType: {
+    type: DataTypes.ENUM("player, enemy, area")
   },
   createdAt: {
     type: DataTypes.DATE,

@@ -2,8 +2,7 @@ import { keywordMethods } from "../keywordMethods/keywordMethods";
 
 const api = "http://localhost:3000"
 
-export const getCurrentArea = async (areaId) => {
-    console.log(areaId, " AREA ID")
+export const fetchCurrentArea = async (areaId) => {
     const response = await fetch(`${api}/area/${areaId}`)
     const data = await response.json()
     if (data.Keywords.length > 0) {
@@ -18,7 +17,5 @@ export const getCurrentArea = async (areaId) => {
 export const getAreaByCoords = async (coords) => {
     const response = await fetch(`${api}/area?x=${coords.x}&y=${coords.y}`)
     const data = await response.json()
-    console.log(data)
-
     return data
 }

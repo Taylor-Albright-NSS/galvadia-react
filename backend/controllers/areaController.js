@@ -1,6 +1,5 @@
 import { Area } from "../models/area.js";
 import { Enemy } from "../models/enemy.js";
-import { Item } from "../models/item.js";
 import { Keyword } from "../models/keyword.js";
 import { Npc } from "../models/npc.js";
 import { Player } from "../models/player.js";
@@ -22,24 +21,11 @@ export const getAreas = async (req, res) => {
 }
 
 export const getArea = async (req, res) => {
-  console.log("get by ID")
   const { id } = req.params
-  console.log(id, " ID")
   const area = await Area.findOne({
     where: {id: id},
-    include: [{
-        model: Npc,
-        attributes: ['id', 'name']
-      },{
-        model: Player
-      }, {
-        model: Keyword
-      }, {
-        model: Enemy
-      }, {
-        model: Item
-      }
-    ]})
+    include: {model: Keyword}
+  })
   res.status(200).json(area)
 }
 
@@ -53,11 +39,9 @@ export const unlockDirection = async (req, res) => {
       return res.status(404).json({ error: "Area not found" })
     }
     let bool = area.exitsBool[direction]
-    console.log(bool, " BEFORE")
     if (bool == "locked") {bool = true}
     else
     if (bool == true) {bool = "locked"}
-    console.log(bool, " AFTER")
     await area.update({
       exitsBool: {
         ...area.exitsBool,
@@ -71,15 +55,17 @@ export const unlockDirection = async (req, res) => {
 }
 
 export const getAreaByCoords = async (req, res) => {
-  console.log("get by COORDS")
-  const { x, y } = req.query
-  if (x && y) {
+  try {
+    const { x, y } = req.query
     const foundArea = await Area.findOne({ 
       where : {x: x, y: y},
       include: [{ model: Npc }, { model: Player }, { model: Keyword }]
     })
-    res.status(200).json(foundArea)
-  } else {
-    res.status(404).json()
+    if (foundArea == null) {
+      return res.status(404).json({message: "Area not found"})
+    }
+    return res.status(200).json(foundArea)
+  } catch(error) {
+    return res.status(500).json({error: error.message})
   }
 }

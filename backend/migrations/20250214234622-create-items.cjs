@@ -9,17 +9,15 @@ module.exports = {
         primaryKey: true,
         allowNull: false
       },
-      area_id: {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      },
-      playerId: {
-        type: Sequelize.INTEGER,
-        allowNull: true
-      },
       name: {
         type: Sequelize.STRING,
         allowNull: false
+      },
+      ownerId: {
+        type: Sequelize.INTEGER
+      },
+      ownerType: {
+        type: Sequelize.ENUM('player', 'enemy', 'area'),
       },
       createdAt: {
         type: Sequelize.DATE,

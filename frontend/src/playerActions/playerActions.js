@@ -1,21 +1,22 @@
 import { fetchNpcDialogue } from "../fetches/npcs/npcs"
-import { getCurrentArea } from "../managers/areas"
+import { fetchCurrentArea } from "../managers/areas"
 import { areaDisplay } from "../managers/areaDisplay"
 import { npcSpeaks } from "./npcActions"
+import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems, fetchCurrentAreaItemsToPlayer } from "../fetches/items/items"
 
 export const playerSpeakToNpc = async (npcs, command2, addLog) => {
     if (!command2) {
         if (npcs.length === 0) {
-            console.log("There is nobody in the room to speak with")
+            addLog("There is nobody in the room to speak with")
             return
         }
         if (npcs.length > 1) {
-            console.log("You must specify who you want to speak with")
+            addLog("You must specify who you want to speak with")
             return
         }
         if (npcs.length === 1) {
             const npcDialogue = await fetchNpcDialogue(npcs[0])
-            console.log(`Npc dialogue: ${npcDialogue[0]}`)
+            addLog(npcDialogue)
             return
         }
         return
@@ -29,9 +30,9 @@ export const playerSpeakToNpc = async (npcs, command2, addLog) => {
     }
 }
 
-export const playerLook = async (player, addLog) => {
-    const playerCurrentArea = await getCurrentArea(player.area_id);
-    addLog(areaDisplay(playerCurrentArea));
+export const playerLook = async (addLog, currentArea, enemies, npcs, items) => {
+    // const playerCurrentArea = await fetchCurrentArea(player.area_id);
+    addLog(areaDisplay(currentArea, enemies, npcs, items));
 }
 
 export const playerExamine = async (command2, currentArea, addLog) => {
@@ -60,10 +61,24 @@ export const playerPull = async (command2, currentArea, setCurrentArea, addLog) 
         addLog(`You pull the ${foundKeyword.refName}`)
         const response = await foundKeyword[foundKeyword.methodCode](currentArea, foundKeyword)
         await setCurrentArea(prev => ({...prev, exitsBool: response.updatedArea.exitsBool}))
-        console.log(response)
     }
     if (!foundKeyword) {
         addLog(`You do not see a ${command2} to pull`)
         return
+    }
+}
+
+export const playerGet = async (command2, currentArea, setItems, player, addLog, setPlayerItems) => {
+    if (command2 != "all") {
+        addLog("Please specify all")
+        return
+    }
+    if (command2 === "all") {
+        const currentAreaItems = await fetchCurrentAreaItems(currentArea.id)
+        await fetchCurrentAreaItemsToPlayer(currentAreaItems, player.id)
+        setItems(prev => prev.filter(item => item.ownerId != player.id && item.ownerType != "player"))
+        const updatedPlayerInventory = await fetchAllItemsThatBelongToPlayer(player.id)
+        setPlayerItems(updatedPlayerInventory)
+        addLog(`You pick up all the items in the room`)
     }
 }

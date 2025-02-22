@@ -1,5 +1,6 @@
 import { Player } from "../models/player.js";
 import { sequelize } from "../config/db.js";
+import { Item } from "../models/item.js";
 
  export const createPlayer = async (req, res) => {
   const { name, area_id } = req.body;
@@ -12,29 +13,37 @@ import { sequelize } from "../config/db.js";
 };
 
 export const playerPatchCoords = async (req, res) => {
-  const { id } = req.params
-  const { x, y, area_id } = req.body
-  console.log(x)
-  console.log(y)
-  console.log(area_id, " area id")
-  const player = await Player.findOne({where: { id: id }})
-  if (!player) {
-    return res.status(404).json({ message: "Player not found" })
+  try {
+    const { id } = req.params
+    const { x, y, area_id } = req.body
+    const player = await Player.findOne({where: { id: id }})
+    if (!player) {
+      return res.status(404).json({ message: "Player not found" })
+    }
+    player.x = x
+    player.y = y
+    player.area_id = area_id
+    if (!area_id) {
+      return res.status(404).json({message: "Area does not exist"})
+    }
+    await player.save()
+    return res.json(player)
+  } catch(error) {
+    return res.status(500).json({message: "Failed to update player coordinates"})
   }
-  player.x = x
-  player.y = y
-  player.area_id = area_id
-  await player.save()
-  return res.json(player)
 }
+
 
 export const getPlayer1API = async (req, res) => {
   try {
-    const playerId = req.params.id;    
+    const playerId = req.params.id
     const player = await Player.findByPk(playerId, {
-      include: [{ model: sequelize.models.Area, as: 'Area' }]
+      include: [
+        {model: sequelize.models.Area, as: 'Area'},
+      ]
     });
-
+    const playerItems = await Item.findAll({where: {ownerId: playerId, ownerType: "player"}})
+    player.dataValues.items = playerItems
     if (!player) {
       return res.status(404).json({ message: 'Player not found' });
     }
@@ -81,5 +90,25 @@ export const putPlayer = async (req, res) => {
     res.status(200).json(playerToChange)
   } catch(error) {
     res.status(500).json({ error: "Internal server error" })
+  }
+}
+
+export const getAllPlayerItems = async (req, res) => {
+  try {
+    const { playerId } = req.params
+    const playerItems = await Item
+    .findAll({
+      where: {
+        ownerId: playerId, ownerType: "player"
+      }
+    })
+    if (!playerItems) {
+      return res.status(204).json({error: "Player items not found"})
+    }
+    console.log(playerItems)
+    return res.status(200).json(playerItems)
+  } catch(error) {
+    console.error(`Error fetching items`, error)
+    return res.status(500).json({error: "Internal server error"})
   }
 }

@@ -4,6 +4,7 @@ import { MainWindow } from "./MainWindow";
 import { PlayerBar } from "./PlayerBar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CommandLine } from "./CommandLine";
+import { DevWindow } from "./DevWindow";
 
 export const UI = () => {
     return (
@@ -21,6 +22,7 @@ export const UI = () => {
                     <Col style={{flex: "0 0 67%", maxWidth: "67%", border: "4px solid pink"}}>
                         <MainWindow />
                         <CommandLine />
+                        <DevWindow />
                         <PlayerBar />
                     </Col>
 
