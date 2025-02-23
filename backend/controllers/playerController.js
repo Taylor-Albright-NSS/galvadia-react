@@ -105,7 +105,6 @@ export const getAllPlayerItems = async (req, res) => {
     if (!playerItems) {
       return res.status(204).json({error: "Player items not found"})
     }
-    console.log(playerItems)
     return res.status(200).json(playerItems)
   } catch(error) {
     console.error(`Error fetching items`, error)

@@ -3,6 +3,7 @@ import { fetchCurrentArea } from "../managers/areas"
 import { areaDisplay } from "../managers/areaDisplay"
 import { npcSpeaks } from "./npcActions"
 import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems, fetchCurrentAreaItemsToPlayer } from "../fetches/items/items"
+import { socket } from "../websocket"
 
 export const playerSpeakToNpc = async (npcs, command2, addLog) => {
     if (!command2) {

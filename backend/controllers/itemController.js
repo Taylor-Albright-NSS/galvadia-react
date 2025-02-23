@@ -1,5 +1,7 @@
 import { npcDTO } from "../models/dtos/npcDTO.js";
 import { Item } from "../models/item.js";
+import { wss } from "../server.js";
+
 
 export const getItems = async (req, res) => {
   try {
@@ -19,13 +21,15 @@ export const getCurrentAreaItems = async (req, res) => {
   }
 }
 export const putCurrentAreaItemsToPlayer = async (req, res) => {
+  console.log(`Current WebSocket Clients: ${wss.clients.size}`);
   try {
     const itemsArray = req.body
     const { playerId } = req.query
     if (itemsArray.length === 0) {
+      console.log(`Current WebSocket Clients: ${wss.clients.size}`);
       return res.status(404).json({message: "No items to pick up"})
     }
-    console.log(itemsArray, " Items to transfer to player")
+    console.log(`Current WebSocket Clients: ${wss.clients.size}`);
 
     const updatedItems = await Promise.all(
       itemsArray.map(async (item) => {
@@ -36,10 +40,19 @@ export const putCurrentAreaItemsToPlayer = async (req, res) => {
         return updatedItem;
       })
     );
+    console.log(`Current WebSocket Clients: ${wss.clients.size}`);
 
-    console.log(updatedItems, " Updated items successfully added to player")
-
-    res.status(200).json(updatedItems)
+    wss.clients.forEach(client => {
+      console.log("Websocket is OPEN!")
+      if (client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify({
+          event: "itemRemoved",
+          pickedBy: playerId
+        }));
+      }
+    });
+    
+    return res.status(200).json(updatedItems)
   } catch(error) {
     res.status(500).json({ error: error.message })
   }
@@ -52,7 +65,6 @@ export const postNewItem = async (req, res) => {
       ownerId: 1,
       ownerType: "area"
     })
-    console.log(item, " new item on backend")
     return res.status(201).json(item)
   } catch (error) {
     return res.status(500).json({message: "Internal error"})

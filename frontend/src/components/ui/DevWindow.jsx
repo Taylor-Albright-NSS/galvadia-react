@@ -4,9 +4,11 @@ import { useContext, useState } from "react"
 import { fetchCurrentArea } from "../../managers/areas"
 import { zGameContext } from "./zGameContext"
 import { fetchCreateItem, fetchCurrentAreaItems } from "../../fetches/items/items"
+import { pickupItem, joshTest } from "../../websocket"
+import { socket } from "../../websocket"
 
 export const DevWindow = () => {
-    const { currentArea, enemies, player, setEnemies, setItems } = useContext(zGameContext)
+    const { currentArea, enemies, player, setEnemies, setItems, addLog } = useContext(zGameContext)
     const [enemyId, setEnemyId] = useState(0)
 
     function inputHandler(e) {
@@ -44,6 +46,27 @@ export const DevWindow = () => {
     function checkInventory() {
         console.log(player.items)
     }
+
+    async function websocketPickupItem() {
+        pickupItem(1)
+        console.log("websocket pick up item")
+    }
+    async function websocketJoshTest() {
+        joshTest()
+        socket.onmessage = (event) => {
+            console.log('???')
+            const data = JSON.parse(event.data);
+            console.log(event.data)
+            if (data.type === "joshCommand") {
+                console.log("ALMOST THERE!")
+                console.log(data.message)
+                const p = document.createElement('p')
+                console.log(p, " paragrasph")
+                addLog(data.message)
+            }
+        }
+        console.log("JOSH HAS BEEN TESTED")
+    }
     return (
         <Container>
             <Input style={{width: "80px"}} type="number" onChange={inputHandler}/>
@@ -53,6 +76,8 @@ export const DevWindow = () => {
             <Button onClick={retrieveAllItems}>Get All Items</Button>
             <Button onClick={createItem}>Create New Item</Button>
             <Button onClick={checkInventory}>Check Player Inventory</Button>
+            <Button onClick={websocketPickupItem}>Websocket pickup item</Button>
+            <Button onClick={websocketJoshTest}>Websocket Josh Test</Button>
         </Container>
     )
 }
