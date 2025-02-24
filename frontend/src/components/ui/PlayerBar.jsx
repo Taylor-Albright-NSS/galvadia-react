@@ -21,8 +21,8 @@ export const PlayerBar = () => {
     return (
         <div style={{border: "4px solid yellow", height: "264px"}}>
             <div>Player Bar</div>
-            <Button onClick={attackEnemy}>Attack Enemy</Button>
-            <Button onClick={() => {console.log(enemies)}}>Check all enemies</Button>
+            {/* <Button onClick={attackEnemy}>Attack Enemy</Button>
+            <Button onClick={() => {console.log(enemies)}}>Check all enemies</Button> */}
         </div>
 
     )

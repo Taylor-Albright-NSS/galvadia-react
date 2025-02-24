@@ -7,8 +7,8 @@ import { getPlayer1 } from "../../managers/testFetch";
 export const MainWindow = () => {
     const { windowLogs, addLog, player, currentArea, setPlayer, setEnemies, enemies } = useContext(zGameContext)
     useEffect(() => {
-        let test = document.getElementById("main-window")
-        test.scrollTop = test.scrollHeight;
+        let mainWindow = document.getElementById("main-window")
+        mainWindow.scrollTop = mainWindow.scrollHeight;
     }, [windowLogs]);
 
     return (
@@ -23,7 +23,7 @@ export const MainWindow = () => {
                 alignItems: "flex-start"
             }}>
             {windowLogs.map((element, index) => {
-                return element
+                return <div key={index}>{element}</div>
             })}
         </div>
     )

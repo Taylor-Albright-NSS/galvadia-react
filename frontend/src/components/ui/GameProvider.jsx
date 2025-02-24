@@ -6,8 +6,11 @@ import { fetchEnemiesInRoom } from "../../fetches/enemies/enemies";
 import { areaDisplay } from "../../managers/areaDisplay";
 import { fetchCurrentAreaNpcs } from "../../fetches/npcs/npcs";
 import { fetchCurrentAreaItems, fetchEveryItem } from "../../fetches/items/items";
+import { socket } from "../../websocket";
+import { useFormState } from "react-dom";
 
 export const GameProvider = ({ children }) => {
+  const [playerId, setPlayerId] = useState(null)
   const [player, setPlayer] = useState({});
   const [currentArea, setCurrentArea] = useState({});
   const [npcs, setNpcs] = useState([]);
@@ -18,6 +21,8 @@ export const GameProvider = ({ children }) => {
   const addLog = (message) => {
       setWindowLogs(prev => [...prev, message])
   }
+
+
   
   const contextValue = useMemo(() => ({
     player, setPlayer, currentArea, setCurrentArea,
@@ -26,7 +31,6 @@ export const GameProvider = ({ children }) => {
     addLog, playerItems, setPlayerItems
   }), [player, currentArea, npcs, enemies, items, windowLogs, playerItems])
 
-
   useEffect(() => {
     const fetchData = async () => {
       let enemies
@@ -34,7 +38,7 @@ export const GameProvider = ({ children }) => {
       let items
       const player = await getPlayer1()
       setPlayer(player)
-
+      setPlayerId(player.id)
       setPlayerItems(player.items.sort())
 
       const area = await fetchCurrentArea(player.area_id)
@@ -47,13 +51,28 @@ export const GameProvider = ({ children }) => {
       setNpcs(npcs)
 
       items = await fetchCurrentAreaItems(player.area_id)
-      console.log(items, " current area items")
       setItems(items)
 
       addLog(areaDisplay(area, enemies, npcs, items))
     }
     fetchData()
   }, [player.area_id])
+  
+  useEffect(() => {
+    if (player.id) {
+      if (socket.readyState === WebSocket.OPEN) {
+        addLog("SOCKET ALREADY OPEN -> SENDING NOW")
+        socket.send(JSON.stringify({ type: "join", playerId: playerId }))
+      }
+      socket.onopen = () => {
+        addLog("SOCKET OPEN -> SENDING NOW")
+        socket.send(JSON.stringify({ type: "join", playerId: playerId}));
+      }
+    }
+  }, [player.id])
+
+
+
 
   return (
     <zGameContext.Provider value={contextValue}>

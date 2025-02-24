@@ -1,6 +1,6 @@
 import { npcDTO } from "../models/dtos/npcDTO.js";
 import { Item } from "../models/item.js";
-import { wss } from "../server.js";
+import { wss } from "../websocket.js";
 
 
 export const getItems = async (req, res) => {

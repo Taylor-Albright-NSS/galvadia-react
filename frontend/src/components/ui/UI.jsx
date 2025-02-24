@@ -23,7 +23,7 @@ export const UI = () => {
                         <MainWindow />
                         <CommandLine />
                         <DevWindow />
-                        <PlayerBar />
+                        {/* <PlayerBar /> */}
                     </Col>
 
                     <Col style={{border: "4px solid pink"}}>
