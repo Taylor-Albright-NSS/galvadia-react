@@ -2,13 +2,13 @@ import 'dotenv/config'; // No need for .config()
 import express from 'express';
 // import playerRoutes from './routes/playerRoutes'
 import { Area } from './models/area.js';
-import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords, getAllPlayerItems } from './controllers/playerController.js';
+import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords, getAllPlayerItems, getPlayersInRoom } from './controllers/playerController.js';
 import db from './models/associations.js';
 import cors from 'cors';
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js';
-import { getCurrentAreaNpcs, getNpcById, getNpcDialogue, getEveryNpc } from './controllers/npcController.js';
+import { getCurrentAreaNpcs, getNpcById, getNpcDialogue, getEveryNpc, getNpcDialogueAll } from './controllers/npcController.js';
 import { createEnemy, deleteEnemy, enemyTakesDamage, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './controllers/enemyController.js';
-import { getCurrentAreaItems, getItems, postNewItem, putCurrentAreaItemsToPlayer } from './controllers/itemController.js';
+import { deleteAllItems, getCurrentAreaItems, getItems, postCrossbow, postDagger, postNewItem, postOnehandedSword, postTwohandedSword, putCurrentAreaItemsToPlayer } from './controllers/itemController.js';
 import { app, server }  from './websocket.js';
 import { getUser } from './controllers/userController.js';
 // const app = express();
@@ -17,26 +17,37 @@ import { getUser } from './controllers/userController.js';
 app.use(express.json())
 app.use(cors());
 
-
+//--------NPC DIALOGUE
+app.get('/npcdialogue/:npcId', getNpcDialogue)
+app.get('/npcdialogueAll', getNpcDialogueAll)
 //--------USER
 app.get('/user/:id', getUser)
 //--------ITEMS
+// (MULTIPLE)
 app.get('/items', getItems)
 app.get('/items/player/:playerId', getAllPlayerItems)
 app.get('/items/area/:areaId', getCurrentAreaItems)
 app.put('/items', putCurrentAreaItemsToPlayer)
+app.delete('/items', deleteAllItems)
+// (SINGLE)
 app.post('/item', postNewItem)
+app.post('/item/twohandedsword/:areaId', postTwohandedSword)
+app.post('/item/onehandedsword/:areaId', postOnehandedSword)
+app.post('/item/dagger/:areaId', postDagger)
+app.post('/item/crossbow/:areaId', postCrossbow)
 //--------NPCS
 app.get('/npcs', getEveryNpc)
 app.get('/npcs/:areaId', getCurrentAreaNpcs)
 app.get('/npc/:id', getNpcById)
 app.get('/npc/:id/dialogue', getNpcDialogue)
-//--------PLAYER (SINGLE)
+//--------PLAYERS 
+// (SINGLE)
 app.patch('/player/:id/coordinates', playerPatchCoords)
 app.get('/player/:id', getPlayer1API);
 
-//--------PLAYERS
+// (MULTIPLE)
 app.get('/players', getPlayers);
+app.get('/players/:areaId', getPlayersInRoom)
 app.post('/players', createPlayer);
 app.put('/player/:id', putPlayer)
 app.put('/player')
@@ -78,6 +89,7 @@ db.sequelize.sync()  // Sync the models with the database (create tables)
   .then(() => {
     app.listen(3000, () => {
     });
+    console.log(`Node.js server running on 3000`)
   })
   .catch(err => {
     console.error('Error syncing database:', err);

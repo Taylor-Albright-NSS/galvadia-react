@@ -1,37 +1,71 @@
 import express from 'express'
 import http from 'http'
 import { WebSocket, WebSocketServer } from 'ws';
+import { getPlayersInRoom } from './controllers/playerController.js';
+import { players } from './controllers/playerController.js';
 
 export const app = express();
 export const server = http.createServer(app)
 export const wss = new WebSocketServer({ server });
 
-let players = {}; // Store connected players
+let playersWS = {}
+
+
 
 wss.on("connection", (ws) => {
-    console.log("A new client connected!")
     ws.on("message", (message) => {
-        console.log(2)
         const data = JSON.parse(message)
-        data.players = players
-        if (data.type === "setPlayerArea") {
-            players[data.player]
+        //data.players is just to see what players looks like as an object on the frontend
+        if (data.type === "playerMoves") {
+            //playerId and areaId of player who is moving
+            const { playerId } = data
+            const { areaId } = data
+            let counter = 1
+            //do something for each connected client
+            wss.clients.forEach(client => {
+                //if player's are in the same room as player leaving
+                if (players?.[counter]?.areaId === areaId && ws !=client) {
+                    console.log("Player's are in the same room")
+                    if (client.readyState === WebSocket.OPEN) {
+                        console.log("This client is not the player who moves")
+                        // client.send(JSON.stringify({type: "playerMoves", message: "LEAVES THE ROOM"}))
+                    }
+                }
+                counter++
+            })
         }
         if (data.type === "join") {
-            console.log(data.playerId, " PLAYER ID")
-            players[data.playerId] = ws;
-            broadcast({ type: "playerJoined", playerId: data.playerId, player: players });
+            console.log("CLIENT HAS JOINED")
+            playersWS[data.playerId] = ws;
+            players[data.playerId] = {}
+            players[data.playerId].areaId = data.areaId
+            players[data.playerId].id = data.playerId
+            players[data.playerId].name = data.name
+            console.log(players)
+            broadcast({ type: "playerJoined", playerId: data.playerId, player: playersWS });
         }
-        if (data.type === "pickupItem") {
-            broadcast({
-                type: "itemPickedUp",
-                itemId: data.itemId,
-                playerId: data.playerId
-            });
+        if (data.type === "playerDialogue") {
+            const playerName = data.playerName
+            const playerAreaId = data.areaId
+            const playerDialogue = data.playerDialogue
+            const dialogueToPlayer = `You say, "${playerDialogue}"`
+            const dialogueToOthers = `${playerName} says, "${playerDialogue}"`
+            
+            let counter = 1
+            wss.clients.forEach(client => {
+                if (client.readyState === WebSocket.OPEN) {
+                    if (client === ws) {
+                        client.send(JSON.stringify({type: "playerDialogue", dialogue: dialogueToPlayer})) 
+                    } else if (players?.[counter]?.areaId === playerAreaId) {
+                        client.send(JSON.stringify({type: "playerDialogue", dialogue: dialogueToOthers}))
+                    }
+                }
+                counter++
+            })
+            // broadcast({ type: "playerDialogue",  })
         }
         if (data.type === "josh") {
-            console.log(3)
-            wss.clients.forEach((client, index) => {
+            wss.clients.forEach((client) => {
                 if (client.readyState === WebSocket.OPEN) {
                     let message
                     if (client === ws) {
@@ -39,7 +73,6 @@ wss.on("connection", (ws) => {
                     } else {
                         message = `Josh claims he is Josh`
                     }
-                    console.log(4)
                     client.send(JSON.stringify({
                         type: "joshCommand",
                         id: 44,
@@ -70,9 +103,10 @@ function broadcast(message) {
     });
 }
 
+
 const PORT = 3001;
 server.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`WSS Server running on http://localhost:${PORT}`);
 });
 
 // console.log("WebSocket server running on ws://localhost:8080");

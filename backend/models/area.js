@@ -2,6 +2,10 @@ import { DataTypes } from 'sequelize'
 import { sequelize } from '../config/db.js';
 
 // Define the Area model
+class Area extends Models {
+  
+}
+
 export const Area = sequelize.define('Area', {
   // Define the fields (similar to C# properties)
   id: {
