@@ -4,7 +4,7 @@ module.exports = {
       id: 1,
       npcId: 1,
       dialogueStage: 1,
-      dialogue: [`"First sentence in stage 1 dialogue"`, `"Second sentence in stage 1 dialogue"`],
+      dialogue: [`"Hello, my name is Joch!"`, `"I am a weaponsmith, but I have not yet been programmed to sell weapons!"`],
       createdAt: new Date(),
       updatedAt: new Date(),
     }, {

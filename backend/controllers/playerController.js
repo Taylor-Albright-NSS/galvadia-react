@@ -1,6 +1,4 @@
-import { Player } from "../models/player.js";
-import { sequelize } from "../config/db.js";
-import { Item } from "../models/item.js";
+import Player from "../models/player.js";
 import { Op, Sequelize } from "sequelize";
 import { wss } from "../websocket.js";
 
@@ -15,6 +13,16 @@ export let players = {}
     res.status(500).json({ error: 'Failed to create player' });
   }
 };
+
+export const playerGainsExperience = async (req, res) => {
+  const { playerId } = req.params
+  const { experienceGain } = req.body
+  const player = Player.findByPk(playerId)
+  if (!player) {
+    return res.status(404).json({message: "Player not found"})
+  }
+  player.experience += experienceGain
+}
 
 export const playerPatchCoords = async (req, res) => {
   try {

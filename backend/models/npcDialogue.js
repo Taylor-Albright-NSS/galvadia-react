@@ -1,4 +1,4 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/db.js";
 
 export const NpcDialogue = sequelize.define("NpcDialogues", {
@@ -27,3 +27,20 @@ export const NpcDialogue = sequelize.define("NpcDialogues", {
     defaultValue: DataTypes.NOW,
 },
 })
+
+// class NpcDialogue extends Model {}
+
+// NpcDialogue.init({
+//     id: {
+//         type: DataTypes.INTEGER,
+//         primaryKey: true,
+//         autoIncrement: true
+//     },
+//     npcId: {
+//         type: DataTypes.INTEGER
+//     }
+// }, {
+//     sequelize,
+//     modelName: "NpcDialogue",
+//     timestamps: true
+// })

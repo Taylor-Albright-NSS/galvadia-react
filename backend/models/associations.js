@@ -1,12 +1,11 @@
 import { sequelize } from '../config/db.js';
-import { Area } from './area.js';
+import Area from './area.js';
 import { Enemy } from './enemy.js';
 import { Item } from './item.js';
 import { Keyword } from './keyword.js';
 import { Npc } from './npc.js';
 import { NpcDialogue } from './npcDialogue.js';
-import { Player } from './player.js';
-
+import Player from './player.js';
 // Define associations AFTER importing models
 Area.hasMany(Npc, { foreignKey: 'area_id' });
 Npc.belongsTo(Area, { foreignKey: 'area_id' });

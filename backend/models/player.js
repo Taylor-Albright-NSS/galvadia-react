@@ -1,53 +1,98 @@
-import { DataTypes } from 'sequelize'
-import { sequelize } from '../config/db.js' // Import the sequelize instance from your db.js
+import { DataTypes, Model } from 'sequelize'
+import { sequelize } from '../config/db.js'
 
-// Define the Player model
-export const Player = sequelize.define('Player', {
-  // Define the fields (similar to C# properties)
+
+class Player extends Model {
+  get level() {
+    const experience = this.experience
+    const level = Math.floor(Math.sqrt(experience / 100))
+    return level
+  }
+}
+
+Player.init({
   id: {
-    type: DataTypes.INTEGER,  // Define the type as integer
-    primaryKey: true,         // Mark this field as the primary key
-    autoIncrement: true,      // Auto increment the ID
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
   },
   name: {
-    type: DataTypes.STRING,   // Define the type as string
-    allowNull: true,         // Set validation to make this field required
+    type: DataTypes.STRING,
+  },
+  experience: {
+    type: DataTypes.INTEGER,
+    defaultValue: 0,
   },
   x: {
     type: DataTypes.STRING,
-    allowNull: true,
   },
   y: {
     type: DataTypes.STRING,
-    allowNull: true,
   },
   z: {
     type: DataTypes.STRING,
-    allowNull: true,
   },
   area_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    // references: {
-    //     model: Area, // reference the Areas table
-    //     key: 'id',      // reference the ID of the area
-    //   },
   },
   level: {
-    type: DataTypes.INTEGER,  // Define the type as integer
-    allowNull: true,         // Set validation to make this field required
+    type: DataTypes.INTEGER,
   },
   createdAt: {
-    type: DataTypes.DATE,     // Define the type as date
-    defaultValue: DataTypes.NOW,  // Set default value to current timestamp
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
   },
   updatedAt: {
-    type: DataTypes.DATE,     // Define the type as date
-    defaultValue: DataTypes.NOW,  // Set default value to current timestamp
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
   },
-}, {
-  // Additional configuration options can go here
-  timestamps: true,  // Enable timestamps (createdAt, updatedAt)
-});
+}, 
+{
+  sequelize,
+  modelName: "Player",
+  timestamps: true,
+})
 
-// Player.belongsTo(Area, { foreignKey: 'area_id' });
+export default Player
+
+//OLD WAY OF INITIALIZING MODEL
+// export const Player = sequelize.define('Player', {
+//   id: {
+//     type: DataTypes.INTEGER,
+//     primaryKey: true,
+//     autoIncrement: true,
+//   },
+//   name: {
+//     type: DataTypes.STRING,
+//   },
+//   level: {
+//     type: DataTypes.INTEGER
+//   },
+//   x: {
+//     type: DataTypes.STRING,
+//   },
+//   y: {
+//     type: DataTypes.STRING,
+//   },
+//   z: {
+//     type: DataTypes.STRING,
+//   },
+//   area_id: {
+//     type: DataTypes.INTEGER,
+//     allowNull: false,
+//   },
+//   level: {
+//     type: DataTypes.INTEGER,
+//   },
+//   createdAt: {
+//     type: DataTypes.DATE,
+//     defaultValue: DataTypes.NOW,
+//   },
+//   updatedAt: {
+//     type: DataTypes.DATE,
+//     defaultValue: DataTypes.NOW,
+//   },
+// }, {
+//   timestamps: true,
+// });

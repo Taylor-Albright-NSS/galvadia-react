@@ -1,6 +1,6 @@
 import { DataTypes, Sequelize } from 'sequelize'
 import { sequelize } from '../config/db.js' // Import the sequelize instance from your db.js
-import { Area } from './area.js';
+import Area from './area.js';
 
 export const Keyword = sequelize.define('Keyword', {
   // Define the fields (similar to C# properties)

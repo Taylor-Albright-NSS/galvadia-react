@@ -1,8 +1,8 @@
 import 'dotenv/config'; // No need for .config()
 import express from 'express';
 // import playerRoutes from './routes/playerRoutes'
-import { Area } from './models/area.js';
-import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords, getAllPlayerItems, getPlayersInRoom } from './controllers/playerController.js';
+import Area from './models/area.js';
+import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords, getAllPlayerItems, getPlayersInRoom, playerGainsExperience } from './controllers/playerController.js';
 import db from './models/associations.js';
 import cors from 'cors';
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js';
@@ -43,6 +43,7 @@ app.get('/npc/:id/dialogue', getNpcDialogue)
 //--------PLAYERS 
 // (SINGLE)
 app.patch('/player/:id/coordinates', playerPatchCoords)
+app.patch('/player/:id/experience', playerGainsExperience)
 app.get('/player/:id', getPlayer1API);
 
 // (MULTIPLE)

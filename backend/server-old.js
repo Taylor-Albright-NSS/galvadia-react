@@ -3,7 +3,7 @@ import express from 'express';
 import { sequelize } from './config/db.js';
 // import playerRoutes from './routes/playerRoutes'
 import { Area } from './models/area.js';
-import { Player } from './models/player.js';
+import Player from './models/player.js';
 import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords, getAllPlayerItems } from './controllers/playerController.js';
 import db from './models/associations.js';
 import cors from 'cors';
