@@ -1,6 +1,8 @@
 import Player from "../models/player.js";
 import { Op, Sequelize } from "sequelize";
 import { wss } from "../websocket.js";
+import { sequelize } from "../config/db.js";
+import { Item } from "../models/item.js";
 
 export let players = {}
 
@@ -17,11 +19,20 @@ export let players = {}
 export const playerGainsExperience = async (req, res) => {
   const { playerId } = req.params
   const { experienceGain } = req.body
-  const player = Player.findByPk(playerId)
+  console.log(playerId, " playerId")
+  console.log(experienceGain, " experienceGain")
+  const player = await Player.findByPk(playerId)
+  console.log(player, " PLAYER")
+  console.log(player.level, " player.level")
+  console.log(player.levelCalc, " player.levelCalc")
   if (!player) {
     return res.status(404).json({message: "Player not found"})
   }
-  player.experience += experienceGain
+  player.experience = Math.max(player.experience + experienceGain, 0)
+  console.log(experienceGain, " experienceGain")
+  player.level = player.levelCalc
+  player.save()
+  return res.status(200).json(player)
 }
 
 export const playerPatchCoords = async (req, res) => {

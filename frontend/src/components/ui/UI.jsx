@@ -5,8 +5,11 @@ import { PlayerBar } from "./PlayerBar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CommandLine } from "./CommandLine";
 import { DevWindow } from "./DevWindow";
+import { useContext } from "react";
+import { zGameContext } from "./zGameContext";
 
 export const UI = () => {
+    const { player } = useContext(zGameContext)
     return (
         <Container 
             style={{
@@ -22,13 +25,22 @@ export const UI = () => {
                     <Col style={{flex: "0 0 67%", maxWidth: "67%", border: "4px solid pink"}}>
                         <MainWindow />
                         <CommandLine />
-                        <DevWindow />
-                        {/* <PlayerBar /> */}
+                        <PlayerBar />
+                        <div className="d-flex flex-column">
+                            <p>
+                                Level: {player?.level}
+                            </p>
+                            <p>
+                                Experience: {player?.experience}
+                            </p>
+                        </div>
                     </Col>
 
                     <Col style={{border: "4px solid pink"}}>
                         <Row className="gx-0 row-2" style={{border: "4px solid blue", height: "34%"}}></Row>
-                        <Row className="gx-0 row-2" style={{border: "4px solid blue", height: "66%"}}></Row>
+                        <Row className="gx-0 row-2" style={{border: "4px solid blue", height: "66%"}}>
+                            <DevWindow />
+                        </Row>
                     </Col>
                 </Row>
             </Col>

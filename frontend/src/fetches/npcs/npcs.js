@@ -12,8 +12,24 @@ export const fetchNpc = async (npcId) => {
     return data
 }
 
-export const fetchNpcDialogue = async (npc) => {
-    const response = await fetch(`${api}/npc/${npc.id}/dialogue`)
+export const fetchNpcDialogue = async (playerId, npcId) => {
+    console.log(playerId, " Player ID")
+    console.log(npcId, " Npc ID")
+    const response = await fetch(`${api}/npcdialogue/${npcId}?playerId=${playerId}`)
     const data = await response.json()
+    console.log(data, " DATA")
     return data
 }
+export const fetchNpcQuestDialogue = async (playerId, npcId) => {
+    console.log(playerId, " playerId")
+    console.log(npcId, " npcId")
+    const response = await fetch(`${api}/npcquestdialogue/${npcId}?playerId=${playerId}`)
+    const data = await response.json()
+    console.log(data, " DATA")
+    return data
+}
+// export const fetchNpcDialogue = async (npcId, stage) => {
+//     const response = await fetch(`${api}/npcdialogue/${npcId}?stage=${stage}`)
+//     const data = await response.json()
+//     return data
+// }

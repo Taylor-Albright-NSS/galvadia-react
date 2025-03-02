@@ -6,12 +6,21 @@ import { zGameContext } from "../components/ui/zGameContext"
 import { actionList } from "./actionList"
 
 
-export const handleEnterPress = (e, player, setPlayer, addLog, currentArea, npcs, enemies, setCurrentArea, items, setItems, playerItems, setPlayerItems) => {
+export const handleEnterPress = (e, player, setPlayer, addLog, 
+    currentArea, npcs, enemies, setCurrentArea, items, setItems, 
+    playerItems, setPlayerItems, sendMessage, socket, players,
+    setPlayers, setNpcs, setEnemies, playerStatus
+    ) => {
+    //You can just use sendMessage to use the shorthand version. I'm using socket.send to
+    //  get practice with typing it out
     if (e.keyCode != 13) {return}
     let rawInput = e.target.value
     if (rawInput[0] === "'") {
-        rawInput = `${player.name} says, "${rawInput.slice(1)}"`
-        addLog(rawInput)
+        let normalizedInput = rawInput.slice(1)
+        // sendMessage(rawInput)
+        socket.send(JSON.stringify({type: "playerDialogue", playerId: player.id, areaId: player.area_id, playerName: player.name, playerDialogue: normalizedInput}))
+        // rawInput = `${player.name} says, "${rawInput.slice(1)}"`
+        // addLog(rawInput)
         e.target.value = ""
         return
     }
@@ -31,7 +40,13 @@ export const handleEnterPress = (e, player, setPlayer, addLog, currentArea, npcs
         items: items,
         setItems: setItems,
         playerItems: playerItems,
-        setPlayerItems: setPlayerItems
+        setPlayerItems: setPlayerItems,
+        players: players,
+        setPlayers: setPlayers,
+        setNpcs: setNpcs,
+        setEnemies: setEnemies,
+        socket: socket,
+        playerStatus: playerStatus
     }
     actionList(commandObject)
     e.target.value = ""

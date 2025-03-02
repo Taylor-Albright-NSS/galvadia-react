@@ -1,6 +1,7 @@
 import { moveDirection } from "./playerMovement"
-import { playerExamine, playerGet, playerLook, playerPull, playerSpeakToNpc } from "../playerActions/playerActions"
+import { playerExamine, playerGet, playerLook, playerPull, playerSpeakToNpc, playerSpeakToNpcQuest } from "../playerActions/playerActions"
 import { playerInventoryDisplay } from "./playerInventoryDisplay";
+import { toggleStatusFalse, toggleStatusTrue } from "../playerStatus/playerStatus";
 
 const movementDirections = new Set(["north", "northeast", "east", "southeast" , "south", "southwest", "west", "northwest"])
 
@@ -8,12 +9,15 @@ export const commandActions = {
     // commandObject properties = 
     // { command1, command2, command3, command4, player, 
     //   setPlayer, addLog, currentArea, npcs, enemies
-    //   items, setItems, playerItems, setPlayerItems
+    //   items, setItems, playerItems, setPlayerItems,
+    //   players, setPlayers, setNpcs, setEnemies, socket,
+    //   playerStatus
     // }
-    look: async ({ addLog, currentArea, enemies, npcs, items}) => {
-        playerLook(addLog, currentArea, enemies, npcs, items)
+    look: async ({ addLog, player, setCurrentArea, setNpcs, setEnemies, setItems, setPlayers}) => {
+        playerLook(addLog, player, setCurrentArea, setNpcs, setEnemies, setItems, setPlayers)
     },
-    speak: async ({npcs, command2, addLog}) => {playerSpeakToNpc(npcs, command2, addLog)},
+    speak: async ({npcs, command2, addLog, player}) => {playerSpeakToNpc(npcs, command2, addLog, player)},
+    quest: async ({npcs, command2, addLog, player, playerStatus}) => {playerSpeakToNpcQuest(npcs, command2, addLog, player, playerStatus)},
     examine: async ({ command2, currentArea, addLog }) => {playerExamine(command2, currentArea, addLog)},
     pull: async ({ command2, currentArea, setCurrentArea, addLog }) => {playerPull(command2, currentArea, setCurrentArea, addLog)},
     get: async ({ command2, currentArea, setItems, player, addLog, setPlayerItems }) => {playerGet(command2, currentArea, setItems, player, addLog, setPlayerItems)},
@@ -21,8 +25,8 @@ export const commandActions = {
 };
 
 movementDirections.forEach(direction => {
-    commandActions[direction] = ({ player, setPlayer, command1, currentArea, addLog }) =>
-        moveDirection(player, setPlayer, command1, currentArea, addLog);
+    commandActions[direction] = ({ player, setPlayer, command1, currentArea, addLog, socket, playerStatus }) =>
+        moveDirection(player, setPlayer, command1, currentArea, addLog, socket, playerStatus);
 });
 
 export const actionList = async (commandObject) => {

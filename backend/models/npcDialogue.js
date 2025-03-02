@@ -15,8 +15,6 @@ export const NpcDialogue = sequelize.define("NpcDialogues", {
   },
   dialogue: {
     type: DataTypes.ARRAY(DataTypes.STRING),
-    allowNull: true,
-    defaultValue: []
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -28,19 +26,3 @@ export const NpcDialogue = sequelize.define("NpcDialogues", {
 },
 })
 
-// class NpcDialogue extends Model {}
-
-// NpcDialogue.init({
-//     id: {
-//         type: DataTypes.INTEGER,
-//         primaryKey: true,
-//         autoIncrement: true
-//     },
-//     npcId: {
-//         type: DataTypes.INTEGER
-//     }
-// }, {
-//     sequelize,
-//     modelName: "NpcDialogue",
-//     timestamps: true
-// })

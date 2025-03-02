@@ -1,11 +1,14 @@
-import { fetchNpcDialogue } from "../fetches/npcs/npcs"
+import { fetchCurrentAreaNpcs, fetchNpcDialogue, fetchNpcQuestDialogue } from "../fetches/npcs/npcs"
 import { fetchCurrentArea } from "../managers/areas"
 import { areaDisplay } from "../managers/areaDisplay"
 import { npcSpeaks } from "./npcActions"
 import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems, fetchCurrentAreaItemsToPlayer } from "../fetches/items/items"
-import { socket } from "../websocket"
+import { fetchEnemiesInRoom } from "../fetches/enemies/enemies"
+import { fetchPlayersInRoom } from "../fetches/players/players"
+import { toggleStatusFalse, toggleStatusTrue } from "../playerStatus/playerStatus"
 
-export const playerSpeakToNpc = async (npcs, command2, addLog) => {
+export const playerSpeakToNpc = async (npcs, command2, addLog, player) => {
+    const playerId = player.id
     if (!command2) {
         if (npcs.length === 0) {
             addLog("There is nobody in the room to speak with")
@@ -16,7 +19,8 @@ export const playerSpeakToNpc = async (npcs, command2, addLog) => {
             return
         }
         if (npcs.length === 1) {
-            const npcDialogue = await fetchNpcDialogue(npcs[0])
+            const npcId = npcs[0].id
+            const npcDialogue = await fetchNpcDialogue(playerId, npcId)
             addLog(npcDialogue)
             return
         }
@@ -24,16 +28,80 @@ export const playerSpeakToNpc = async (npcs, command2, addLog) => {
     }
     if (command2) {
         const npc = npcs.find(npc => npc.name.toLowerCase() === command2)
-        const npcDialogue = await fetchNpcDialogue(npc)
-        const dialogueJSX = npcSpeaks(npc, npcDialogue.dialogue[0])
+        const npcId = npc.id
+        const npcDialogue = await fetchNpcDialogue(playerId, npcId)
+        const dialogueJSX = npcSpeaks(npc, npcDialogue)
         addLog(dialogueJSX)
         return
     }
 }
 
-export const playerLook = async (addLog, currentArea, enemies, npcs, items) => {
-    // const playerCurrentArea = await fetchCurrentArea(player.area_id);
-    addLog(areaDisplay(currentArea, enemies, npcs, items));
+const wait = async (milliseconds) => {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve()
+        }, milliseconds)
+    })
+}
+
+export const playerSpeakToNpcQuest = async (npcs, command2, addLog, player, playerStatus) => {
+    toggleStatusTrue(playerStatus, "isTalking")
+    const playerId = player.id
+    if (!command2) {
+        if (npcs.length === 0) {
+            addLog("There is nobody in the room offering a quest")
+            return
+        }
+        if (npcs.length > 1) {
+            addLog("You must specify whose quest you wish to see")
+            return
+        }
+        if (npcs.length === 1) {
+            const npc = npcs[0]
+            const npcDialogue = await fetchNpcQuestDialogue(playerId, npc.id)
+            npcDialogue.forEach(paragraph => {
+                const dialogueJSX = npcSpeaks(npc, paragraph)
+                addLog(dialogueJSX)
+            })
+        }
+    }
+    if (command2) {
+        const npc = npcs.find(npc => npc.name.toLowerCase() === command2)
+        const npcId = npc.id
+        const npcDialogue = await fetchNpcQuestDialogue(playerId, npcId)
+        for (const paragraph of npcDialogue) {
+            const dialogueJSX = npcSpeaks(npc, paragraph)
+            await wait(200)
+            if (!playerStatus.current.isTalking) {return}
+            addLog(dialogueJSX)
+        }
+    }
+    toggleStatusFalse(playerStatus, "isTalking")
+}
+
+export const playerLook = async (addLog, player, setCurrentArea, setNpcs, setEnemies, setItems, setPlayers) => {
+          let enemies
+          let npcs
+          let items
+          let players
+          let areaId = !player.area_id ? 1 : player.area_id
+          let playerId = player.id
+          const area = await fetchCurrentArea(areaId)
+          setCurrentArea(area)
+      
+          enemies = await fetchEnemiesInRoom(areaId)
+          setEnemies(enemies)
+      
+          npcs = await fetchCurrentAreaNpcs(areaId)
+          setNpcs(npcs)
+          
+          items = await fetchCurrentAreaItems(areaId)
+          setItems(items)
+    
+          players = await fetchPlayersInRoom(areaId, playerId)
+          setPlayers(players)
+          
+          addLog(areaDisplay(area, enemies, npcs, items, players))
 }
 
 export const playerExamine = async (command2, currentArea, addLog) => {

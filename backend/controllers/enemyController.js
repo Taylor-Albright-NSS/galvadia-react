@@ -27,10 +27,11 @@ export const getEnemy = async (req, res) => {
 }
 
 export const createEnemy = async (req, res) => {
+  const { areaId } = req.params
   try {
     const enemy = await Enemy.create({
       name: "Kobold",
-      area_id: 1,
+      area_id: areaId,
       health: 50
     })
     return res.status(201).json(enemy)

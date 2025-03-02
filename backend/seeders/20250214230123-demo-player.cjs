@@ -5,6 +5,7 @@ module.exports = {
       name: 'John Doe',
       area_id: 1,  // Assuming you have an area with ID 1
       level: 1,
+      experience: 0,
       x: 0,
       y: 0,
       z: 0, 
@@ -15,6 +16,10 @@ module.exports = {
       name: 'Jane Smith',
       area_id: 1,  // Assuming you have an area with ID 2
       level: 1,
+      experience: 0,
+      x: 0,
+      y: 0,
+      z: 0, 
       createdAt: new Date(),
       updatedAt: new Date(),
     }], {});

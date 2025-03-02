@@ -17,11 +17,6 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      dialogue: {
-        type: Sequelize.ARRAY(Sequelize.DataTypes.STRING),
-        allowNull: true,
-        defaultValue: [],
-      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false

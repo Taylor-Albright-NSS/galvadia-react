@@ -3,9 +3,9 @@ import { sequelize } from '../config/db.js'
 
 
 class Player extends Model {
-  get level() {
+  get levelCalc() {
     const experience = this.experience
-    const level = Math.floor(Math.sqrt(experience / 100))
+    const level = Math.max(Math.floor(Math.sqrt(experience / 100)), 1)
     return level
   }
 }
@@ -19,25 +19,29 @@ Player.init({
   name: {
     type: DataTypes.STRING,
   },
+  level: {
+    type: DataTypes.INTEGER,
+    defaultValue: 1,
+  },
   experience: {
     type: DataTypes.INTEGER,
     defaultValue: 0,
   },
   x: {
     type: DataTypes.STRING,
+    defaultValue: 0,
   },
   y: {
     type: DataTypes.STRING,
+    defaultValue: 0,
   },
   z: {
     type: DataTypes.STRING,
+    defaultValue: 0,
   },
   area_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
-  },
-  level: {
-    type: DataTypes.INTEGER,
   },
   createdAt: {
     type: DataTypes.DATE,
@@ -52,6 +56,11 @@ Player.init({
   sequelize,
   modelName: "Player",
   timestamps: true,
+  hooks: {
+    beforeSave(player) {
+      player.level = player.levelCalc;  // Set the level based on the experience
+    },
+  },
 })
 
 export default Player

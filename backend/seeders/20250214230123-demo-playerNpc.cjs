@@ -13,8 +13,8 @@ module.exports = {
     }, 
     {
       id: 2,
-      playerId: 2,
-      npcId: 1,
+      playerId: 1,
+      npcId: 2,
       dialogueStage: 2,
       dialogueIndex: 0,
       questStage: 1,

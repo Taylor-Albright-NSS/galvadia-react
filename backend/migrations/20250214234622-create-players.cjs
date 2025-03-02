@@ -15,19 +15,20 @@ module.exports = {
       },
       level: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        defaultValue: 1,
+      },
+      experience: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0,
       },
       x: {
         type: Sequelize.INTEGER,
-        allowNull: true
       },
       y: {
         type: Sequelize.INTEGER,
-        allowNull: true
       },
       z: {
         type: Sequelize.INTEGER,
-        allowNull: true
       },
       area_id: {
         type: Sequelize.INTEGER,

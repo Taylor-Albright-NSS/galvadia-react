@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getPlayer1 } from "../../managers/testFetch";
 import { zGameContext } from "./zGameContext";
 import { fetchCurrentArea } from "../../managers/areas";
@@ -6,11 +6,18 @@ import { fetchEnemiesInRoom } from "../../fetches/enemies/enemies";
 import { areaDisplay } from "../../managers/areaDisplay";
 import { fetchCurrentAreaNpcs } from "../../fetches/npcs/npcs";
 import { fetchCurrentAreaItems, fetchEveryItem } from "../../fetches/items/items";
-import { socket } from "../../websocket";
-import { useFormState } from "react-dom";
+import { fetchPlayersInRoom } from "../../fetches/players/players";
 
 export const GameProvider = ({ children }) => {
-  const [playerId, setPlayerId] = useState(null)
+  const playerStatus = useRef({
+    isTalking: false,
+    isInCombat: false,
+    isSwinging: false,
+    isAdvancing: false,
+    isRetreating: false,
+    isResting: false,
+  })
+  // const [playerId, setPlayerId] = useState(null)
   const [player, setPlayer] = useState({});
   const [currentArea, setCurrentArea] = useState({});
   const [npcs, setNpcs] = useState([]);
@@ -18,61 +25,57 @@ export const GameProvider = ({ children }) => {
   const [items, setItems] = useState([])
   const [playerItems, setPlayerItems] = useState([])
   const [windowLogs, setWindowLogs] = useState([])
+  const [players, setPlayers] = useState([])
+
   const addLog = (message) => {
+    console.log(message)
       setWindowLogs(prev => [...prev, message])
   }
 
-
-  
   const contextValue = useMemo(() => ({
     player, setPlayer, currentArea, setCurrentArea,
     npcs, setNpcs, enemies, setEnemies,
     items, setItems, windowLogs, setWindowLogs,
-    addLog, playerItems, setPlayerItems
-  }), [player, currentArea, npcs, enemies, items, windowLogs, playerItems])
+    addLog, playerItems, setPlayerItems, players,
+    setPlayers, playerStatus
+  }), [player, currentArea, npcs, enemies, items, windowLogs, playerItems, players])
 
   useEffect(() => {
-    const fetchData = async () => {
+     (async () => {
+        const player = await getPlayer1()
+        setPlayer(player)
+      })()
+  }, [])
+
+
+  useEffect(() => {
+    const updateAll = async () => {
       let enemies
       let npcs
       let items
-      const player = await getPlayer1()
-      setPlayer(player)
-      setPlayerId(player.id)
-      setPlayerItems(player.items.sort())
-
-      const area = await fetchCurrentArea(player.area_id)
+      let players
+      let areaId = !player.area_id ? 1 : player.area_id
+      let playerId = player.id
+      const area = await fetchCurrentArea(areaId)
       setCurrentArea(area)
-
-      enemies = await fetchEnemiesInRoom(player.area_id)
+  
+      enemies = await fetchEnemiesInRoom(areaId)
       setEnemies(enemies)
-
-      npcs = await fetchCurrentAreaNpcs(player.area_id)
+  
+      npcs = await fetchCurrentAreaNpcs(areaId)
       setNpcs(npcs)
-
-      items = await fetchCurrentAreaItems(player.area_id)
+      console.log(npcs)
+      
+      items = await fetchCurrentAreaItems(areaId)
       setItems(items)
 
-      addLog(areaDisplay(area, enemies, npcs, items))
+      players = await fetchPlayersInRoom(areaId, playerId)
+      setPlayers(players)
+      
+      addLog(areaDisplay(area, enemies, npcs, items, players))
     }
-    fetchData()
+    updateAll()
   }, [player.area_id])
-  
-  useEffect(() => {
-    if (player.id) {
-      if (socket.readyState === WebSocket.OPEN) {
-        addLog("SOCKET ALREADY OPEN -> SENDING NOW")
-        socket.send(JSON.stringify({ type: "join", playerId: playerId }))
-      }
-      socket.onopen = () => {
-        addLog("SOCKET OPEN -> SENDING NOW")
-        socket.send(JSON.stringify({ type: "join", playerId: playerId}));
-      }
-    }
-  }, [player.id])
-
-
-
 
   return (
     <zGameContext.Provider value={contextValue}>

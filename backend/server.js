@@ -6,7 +6,7 @@ import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playe
 import db from './models/associations.js';
 import cors from 'cors';
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js';
-import { getCurrentAreaNpcs, getNpcById, getNpcDialogue, getEveryNpc, getNpcDialogueAll } from './controllers/npcController.js';
+import { getCurrentAreaNpcs, getNpcById, getNpcDialogue, getEveryNpc, getNpcDialogueAll, getNpcQuestDialogue, getNpcQuest } from './controllers/npcController.js';
 import { createEnemy, deleteEnemy, enemyTakesDamage, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './controllers/enemyController.js';
 import { deleteAllItems, getCurrentAreaItems, getItems, postCrossbow, postDagger, postNewItem, postOnehandedSword, postTwohandedSword, putCurrentAreaItemsToPlayer } from './controllers/itemController.js';
 import { app, server }  from './websocket.js';
@@ -16,9 +16,13 @@ import { getUser } from './controllers/userController.js';
 // export const wss = new WebSocketServer({ server });
 app.use(express.json())
 app.use(cors());
+//--------ROUTE TESTING
+app.get('/npcquest/:npcId/:questStage', getNpcQuest)
 
+//--------NPC QUEST
 //--------NPC DIALOGUE
 app.get('/npcdialogue/:npcId', getNpcDialogue)
+app.get('/npcquestdialogue/:npcId', getNpcQuestDialogue)
 app.get('/npcdialogueAll', getNpcDialogueAll)
 //--------USER
 app.get('/user/:id', getUser)
@@ -43,7 +47,7 @@ app.get('/npc/:id/dialogue', getNpcDialogue)
 //--------PLAYERS 
 // (SINGLE)
 app.patch('/player/:id/coordinates', playerPatchCoords)
-app.patch('/player/:id/experience', playerGainsExperience)
+app.patch('/player/:playerId/experience', playerGainsExperience)
 app.get('/player/:id', getPlayer1API);
 
 // (MULTIPLE)
@@ -77,7 +81,7 @@ app.post('/areas', async (req, res) => {
 
 //--------ENEMIES
 app.delete('/enemy/:id', deleteEnemy)
-app.post('/enemy/', createEnemy)
+app.post('/enemy/:areaId', createEnemy)
 
 app.get('/enemies/:areaId', getAllEnemiesInRoom)
 app.get('/enemies/', getAllEnemiesInDatabase)
