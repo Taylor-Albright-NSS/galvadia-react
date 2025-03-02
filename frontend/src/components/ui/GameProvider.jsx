@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getPlayer1 } from "../../managers/testFetch";
+import { getPlayer1 } from "../../fetches/players/players";
 import { zGameContext } from "./zGameContext";
-import { fetchCurrentArea } from "../../managers/areas";
+import { fetchCurrentArea } from "../../fetches/areas/areas";
 import { fetchEnemiesInRoom } from "../../fetches/enemies/enemies";
 import { areaDisplay } from "../../managers/areaDisplay";
 import { fetchCurrentAreaNpcs } from "../../fetches/npcs/npcs";
-import { fetchCurrentAreaItems, fetchEveryItem } from "../../fetches/items/items";
+import { fetchCurrentAreaItems } from "../../fetches/items/items";
 import { fetchPlayersInRoom } from "../../fetches/players/players";
 
 export const GameProvider = ({ children }) => {

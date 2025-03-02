@@ -1,7 +1,7 @@
-import { areaDisplay } from "./areaDisplay"
-import { getAreaByCoords, fetchCurrentArea } from "./areas"
-import { playerUpdateCoordinates } from "./playerUpdateCoordinates"
-import { toggleStatusFalse } from "../playerStatus/playerStatus"
+import { areaDisplay } from "../DOMrenders/areaDisplay"
+import { getAreaByCoords } from "../fetches/areas/areas"
+import { playerUpdateCoordinates } from "../fetches/players/playerUpdateCoordinates"
+import { toggleStatusFalse } from "../utils/playerStatus"
 
 export const moveDirection = async (player, setPlayer, inputDirection, currentArea, addLog, socket, playerStatus) => {
     toggleStatusFalse(playerStatus, "isTalking")

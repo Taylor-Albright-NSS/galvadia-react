@@ -1,12 +1,12 @@
 import { Button, Col, Container, Input, Row } from "reactstrap"
 import { createEnemy, enemyDies, enemyTakesDamage, fetchAllEnemies, fetchEnemiesInRoom } from "../../fetches/enemies/enemies"
 import { useContext, useState } from "react"
-import { fetchCurrentArea } from "../../managers/areas"
+import { fetchCurrentArea } from "../../fetches/areas/areas"
 import { zGameContext } from "./zGameContext"
 import { fetchCreateCrossbow, fetchCreateDagger, fetchCreateItem, fetchCreateOnehandedSword, fetchCreateTwohandedSword, fetchCurrentAreaItems, fetchEveryItem } from "../../fetches/items/items"
 // import { pickupItem, joshTest } from "../../websocket"
 // import { socket } from "../../websocket"
-import { getPlayer1, getPlayer2 } from "../../managers/testFetch"
+import { getPlayer1, getPlayer2 } from "../../fetches/players/players"
 import { fetchIncreasePlayerExperience } from "../../fetches/players/players"
 
 export const DevWindow = () => {

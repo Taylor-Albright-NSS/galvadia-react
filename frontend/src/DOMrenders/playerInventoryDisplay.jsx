@@ -1,4 +1,5 @@
-export const playerInventoryDisplay = (playerItems, addLog) => {
+export const playerInventoryDisplay = (commandObject) => {
+    const { playerItems, addLog } = commandObject
     console.log(playerItems, " BEFORE SORT")
     const playerInventory = playerItems.sort((a, b) => {
         return a.name - b.name

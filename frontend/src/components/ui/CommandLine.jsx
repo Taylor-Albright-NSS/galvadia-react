@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Input } from "reactstrap"
-import { handleEnterPress } from "../../managers/_handlePlayerActions"
+import { handleEnterPress } from "../../utils/handlePlayerActions"
 import { useContext } from "react"
 import { zGameContext } from "./zGameContext"
 import { WebSocketContext } from "./WebSocketContext"

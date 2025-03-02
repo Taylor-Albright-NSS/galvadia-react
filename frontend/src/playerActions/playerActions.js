@@ -1,13 +1,14 @@
 import { fetchCurrentAreaNpcs, fetchNpcDialogue, fetchNpcQuestDialogue } from "../fetches/npcs/npcs"
-import { fetchCurrentArea } from "../managers/areas"
-import { areaDisplay } from "../managers/areaDisplay"
-import { npcSpeaks } from "./npcActions"
+import { fetchCurrentArea } from "../fetches/areas/areas"
+import { areaDisplay } from "../DOMrenders/areaDisplay"
+import { npcSpeaks } from "../DOMrenders/npcActions"
 import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems, fetchCurrentAreaItemsToPlayer } from "../fetches/items/items"
 import { fetchEnemiesInRoom } from "../fetches/enemies/enemies"
 import { fetchPlayersInRoom } from "../fetches/players/players"
-import { toggleStatusFalse, toggleStatusTrue } from "../playerStatus/playerStatus"
+import { toggleStatusFalse, toggleStatusTrue } from "../utils/playerStatus"
 
-export const playerSpeakToNpc = async (npcs, command2, addLog, player) => {
+export const playerSpeakToNpc = async (commandObject) => {
+    const { npcs, command2, addLog, player } = commandObject
     const playerId = player.id
     if (!command2) {
         if (npcs.length === 0) {
@@ -44,7 +45,8 @@ const wait = async (milliseconds) => {
     })
 }
 
-export const playerSpeakToNpcQuest = async (npcs, command2, addLog, player, playerStatus) => {
+export const playerSpeakToNpcQuest = async (commandObject) => {
+    const { npcs, command2, addLog, player, playerStatus } = commandObject
     toggleStatusTrue(playerStatus, "isTalking")
     const playerId = player.id
     if (!command2) {
@@ -79,32 +81,34 @@ export const playerSpeakToNpcQuest = async (npcs, command2, addLog, player, play
     toggleStatusFalse(playerStatus, "isTalking")
 }
 
-export const playerLook = async (addLog, player, setCurrentArea, setNpcs, setEnemies, setItems, setPlayers) => {
-          let enemies
-          let npcs
-          let items
-          let players
-          let areaId = !player.area_id ? 1 : player.area_id
-          let playerId = player.id
-          const area = await fetchCurrentArea(areaId)
-          setCurrentArea(area)
-      
-          enemies = await fetchEnemiesInRoom(areaId)
-          setEnemies(enemies)
-      
-          npcs = await fetchCurrentAreaNpcs(areaId)
-          setNpcs(npcs)
-          
-          items = await fetchCurrentAreaItems(areaId)
-          setItems(items)
+export const playerLook = async (commandObject) => {
+    const { addLog, player, setCurrentArea, setNpcs, setEnemies, setItems, setPlayers } = commandObject
+    let enemies
+    let npcs
+    let items
+    let players
+    let areaId = !player.area_id ? 1 : player.area_id
+    let playerId = player.id
+    const area = await fetchCurrentArea(areaId)
+    setCurrentArea(area)
+
+    enemies = await fetchEnemiesInRoom(areaId)
+    setEnemies(enemies)
+
+    npcs = await fetchCurrentAreaNpcs(areaId)
+    setNpcs(npcs)
     
-          players = await fetchPlayersInRoom(areaId, playerId)
-          setPlayers(players)
-          
-          addLog(areaDisplay(area, enemies, npcs, items, players))
+    items = await fetchCurrentAreaItems(areaId)
+    setItems(items)
+
+    players = await fetchPlayersInRoom(areaId, playerId)
+    setPlayers(players)
+    
+    addLog(areaDisplay(area, enemies, npcs, items, players))
 }
 
-export const playerExamine = async (command2, currentArea, addLog) => {
+export const playerExamine = async (commandObject) => {
+    const { command2, currentArea, addLog } = commandObject
     if (!command2) {
         addLog("You must specify what you want to examine")
         return
@@ -120,7 +124,8 @@ export const playerExamine = async (command2, currentArea, addLog) => {
     }
 }
 
-export const playerPull = async (command2, currentArea, setCurrentArea, addLog) => {
+export const playerPull = async (commandObject) => {
+    const { command2, currentArea, setCurrentArea, addLog } = commandObject
     if (!command2) {
         addLog("You must specify what you want to pull")
         return
@@ -137,7 +142,8 @@ export const playerPull = async (command2, currentArea, setCurrentArea, addLog) 
     }
 }
 
-export const playerGet = async (command2, currentArea, setItems, player, addLog, setPlayerItems) => {
+export const playerGet = async (commandObject) => {
+    const { command2, currentArea, setItems, player, addLog, setPlayerItems } = commandObject
     if (command2 != "all") {
         addLog("Please specify all")
         return

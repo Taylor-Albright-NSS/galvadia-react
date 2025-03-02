@@ -1,8 +1,6 @@
-import { Button } from "reactstrap"
-import { getPlayer1, getPlayers } from "../../managers/testFetch"
-import { useContext, useEffect, useRef, useState } from "react"
+import { useContext, useRef, useState } from "react"
 import { zGameContext } from "./zGameContext"
-import { enemyTakesDamage, fetchEnemiesInRoom } from "../../fetches/enemies/enemies"
+import { enemyTakesDamage } from "../../fetches/enemies/enemies"
 
 export const PlayerBar = () => {
     const ref = useRef()
