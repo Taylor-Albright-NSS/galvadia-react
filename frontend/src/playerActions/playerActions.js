@@ -42,6 +42,7 @@ export const playerOffersQuest = async (commandObject) => {
         } 
     }
 }
+//test
 
 export const playerSpeakToNpc = async (commandObject) => {
     const { npcs, command2, addLog, player } = commandObject
