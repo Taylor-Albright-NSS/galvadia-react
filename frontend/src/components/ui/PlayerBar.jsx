@@ -1,12 +1,10 @@
-import { Button } from "reactstrap"
-import { getPlayer1, getPlayers } from "../../managers/testFetch"
-import { useContext, useEffect, useRef, useState } from "react"
+import { useContext, useRef, useState } from "react"
 import { zGameContext } from "./zGameContext"
-import { enemyTakesDamage, fetchEnemiesInRoom } from "../../fetches/enemies/enemies"
+import { enemyTakesDamage } from "../../fetches/enemies/enemies"
 
 export const PlayerBar = () => {
     const ref = useRef()
-    const { currentArea, setEnemies, enemies, addLog } = useContext(zGameContext)
+    const { currentArea, setEnemies, enemies, addLog, player } = useContext(zGameContext)
     const [reset, setReset] = useState(0)
 
 
@@ -19,10 +17,12 @@ export const PlayerBar = () => {
 
     
     return (
-        <div style={{border: "4px solid yellow", height: "264px"}}>
+        <div style={{border: "4px solid yellow", height: "100px"}}>
             <div>Player Bar</div>
-            <Button onClick={attackEnemy}>Attack Enemy</Button>
-            <Button onClick={() => {console.log(enemies)}}>Check all enemies</Button>
+            <div>{player?.name}</div>
+            
+            {/* <Button onClick={attackEnemy}>Attack Enemy</Button>
+            <Button onClick={() => {console.log(enemies)}}>Check all enemies</Button> */}
         </div>
 
     )

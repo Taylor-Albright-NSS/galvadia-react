@@ -1,6 +1,10 @@
-import { Player } from "../models/player.js";
+import Player from "../models/player.js";
+import { Op, Sequelize } from "sequelize";
+import { wss } from "../websocket.js";
 import { sequelize } from "../config/db.js";
 import { Item } from "../models/item.js";
+
+export let players = {}
 
  export const createPlayer = async (req, res) => {
   const { name, area_id } = req.body;
@@ -12,20 +16,64 @@ import { Item } from "../models/item.js";
   }
 };
 
+export const playerGainsExperience = async (req, res) => {
+  const { playerId } = req.params
+  const { experienceGain } = req.body
+  console.log(playerId, " playerId")
+  console.log(experienceGain, " experienceGain")
+  const player = await Player.findByPk(playerId)
+  console.log(player, " PLAYER")
+  console.log(player.level, " player.level")
+  console.log(player.levelCalc, " player.levelCalc")
+  if (!player) {
+    return res.status(404).json({message: "Player not found"})
+  }
+  player.experience = Math.max(player.experience + experienceGain, 0)
+  console.log(experienceGain, " experienceGain")
+  player.level = player.levelCalc
+  player.save()
+  return res.status(200).json(player)
+}
+
 export const playerPatchCoords = async (req, res) => {
   try {
     const { id } = req.params
-    const { x, y, area_id } = req.body
+    const { x, y, area_id, oldAreaId } = req.body
+    const playerOldAreaId = oldAreaId
+    let counter = 1
+    wss.clients.forEach(client => {
+      console.log(players[counter].name)
+      let player = players[counter]
+      if (player.id != parseInt(id)) {
+        if (player.areaId === area_id) {
+          client.send(JSON.stringify({type: "playerMoves", message: "Player enters the room"}))
+        }
+      }
+      counter++
+    })
+    
     const player = await Player.findOne({where: { id: id }})
     if (!player) {
       return res.status(404).json({ message: "Player not found" })
     }
-    player.x = x
-    player.y = y
-    player.area_id = area_id
     if (!area_id) {
       return res.status(404).json({message: "Area does not exist"})
     }
+    player.x = x
+    player.y = y
+    player.area_id = area_id
+    players[id].areaId = area_id
+    console.log(playerOldAreaId, " old area id")
+    counter = 1
+    wss.clients.forEach(client => {
+      if (players[counter].id != parseInt(id)) {
+        if (playerOldAreaId === players[counter].areaId) {
+          client.send(JSON.stringify({type: "playerMoves", message: "Player leaves the room"}))
+          console.log("Player leaves the room should be triggered")
+        }
+      }
+      counter++
+    })
     await player.save()
     return res.json(player)
   } catch(error) {
@@ -58,6 +106,23 @@ export const getPlayer1API = async (req, res) => {
 export const getPlayers = async (req, res) => {
   try {
     const players = await Player.findAll()
+    res.status(200).json(players)
+  } catch(error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+export const getPlayersInRoom = async (req, res) => {
+  const { playerId } = req.query
+  const { areaId } = req.params
+  try {
+    const players = await Player.findAll({
+      where: {
+        area_id: areaId, 
+        id: {
+          [Op.ne]: playerId
+        }
+      }
+    })
     res.status(200).json(players)
   } catch(error) {
     res.status(500).json({ error: error.message })

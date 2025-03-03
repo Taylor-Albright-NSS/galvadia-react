@@ -5,6 +5,11 @@ export const fetchEnemiesInRoom = async (areaId) => {
     const data = await response.json()
     return data
 }
+export const fetchAllEnemies = async () => {
+    const response = await fetch(`${api}/enemies/`)
+    const data = await response.json()
+    return data
+}
 
 export const enemyTakesDamage = async (damage, enemyId, setEnemies, addLog) => {
     const response = await fetch(`${api}/enemy/${enemyId}`, {
@@ -12,14 +17,18 @@ export const enemyTakesDamage = async (damage, enemyId, setEnemies, addLog) => {
         headers: {
             "Content-Type": "application/json",
         },
-        body: JSON.stringify({damage})
+        body: JSON.stringify({ damage })
     })
-    const enemy = await response.json()
-    if (enemy.health <= 0) {
-        setEnemies((prev) => prev.filter(filterEnemy => enemy.id !== filterEnemy.id))
-        addLog(`${enemy.name} has been slain!`)
+    const updatedEnemy = await response.json()
+    console.log(updatedEnemy)
+    if (updatedEnemy.health <= 0) {
+        setEnemies((prev) => prev.filter(enemy => {
+            console.log(enemy)
+            return updatedEnemy.id !== enemy.id
+        }))
+        addLog(`${updatedEnemy.name} has been slain!`)
     } else {
-        setEnemies((prev) => prev.map(enemy => enemy.id === enemy.id ? { ...enemy, health: enemy.health } : enemy))
+        setEnemies((prev) => prev.map(enemy => enemy.id === updatedEnemy.id ? { ...enemy, health: updatedEnemy.health } : enemy))
     }
 }
 
@@ -32,8 +41,8 @@ export const enemyDies = async (enemyId) => {
     return data
 }
 
-export const createEnemy = async () => {
-    const response = await fetch(`${api}/enemy`, {
+export const createEnemy = async (areaId) => {
+    const response = await fetch(`${api}/enemy/${areaId}`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json"

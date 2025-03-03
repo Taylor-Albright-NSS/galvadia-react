@@ -1,0 +1,2 @@
+export const toggleStatusTrue = (playerStatus, statusType) => !playerStatus.current[statusType] && (playerStatus.current[statusType] = true)
+export const toggleStatusFalse = (playerStatus, statusType) => playerStatus.current[statusType] && (playerStatus.current[statusType] = false)

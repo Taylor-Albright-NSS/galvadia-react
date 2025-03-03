@@ -14,6 +14,13 @@ module.exports = {
       ownerType: "area",
       createdAt: new Date(),
       updatedAt: new Date(),
+    }, {
+      id: 3,
+      name: 'Crossbow',
+      ownerId: 2, 
+      ownerType: "area",
+      createdAt: new Date(),
+      updatedAt: new Date(),
     }], {});
   },
 

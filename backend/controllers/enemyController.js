@@ -4,7 +4,7 @@ import { Enemy } from "../models/enemy.js";
 export const getAllEnemiesInRoom = async (req, res) => {
   try {
     const { areaId } = req.params
-    console.log(areaId, " get all enemies -> area id")
+    // console.log(areaId, " get all enemies -> area id")
     if (!areaId || isNaN(areaId)) {
       return res.status(400).json({ message: "Invalid area id"})
     }
@@ -27,10 +27,11 @@ export const getEnemy = async (req, res) => {
 }
 
 export const createEnemy = async (req, res) => {
+  const { areaId } = req.params
   try {
     const enemy = await Enemy.create({
       name: "Kobold",
-      area_id: 1,
+      area_id: areaId,
       health: 50
     })
     return res.status(201).json(enemy)
@@ -48,7 +49,7 @@ export const deleteEnemy = async (req, res) => {
       return res.status(404).json()
       
     }
-    enemy.destroy()
+    await enemy.destroy()
     return res.status(200).json({message: "Enemy was destroyed", enemy: enemy})
     
   } catch(error) {
@@ -66,7 +67,7 @@ export const enemyDies = async (enemy, res) => {
     }
     console.log(`Enemy ID of dead enemy: ${enemy.id} `)
     res.status(200).json(enemy)
-    enemy.destroy()
+    await enemy.destroy()
     
   } catch(error) {
     return res.status(500).json({message: "Failed to delete enemy"})

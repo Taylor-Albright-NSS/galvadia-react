@@ -46,3 +46,36 @@ export const fetchCreateItem = async () => {
     console.log(data, " created item")
     return data
 }
+
+//Spawns item in the room the player is in
+export const fetchCreateTwohandedSword = async (areaId) => {
+    const response = await fetch(`${api}/item/twohandedsword/${areaId}`, {method: "POST"})
+    const data = await response.json()
+    console.log(data, " created item")
+    return data
+}
+export const fetchCreateOnehandedSword = async (areaId) => {
+    const response = await fetch(`${api}/item/onehandedsword/${areaId}`, {method: "POST"})
+    const data = await response.json()
+    console.log(data, " created item")
+    return data
+}
+export const fetchCreateDagger = async (areaId) => {
+    const response = await fetch(`${api}/item/dagger/${areaId}`, {method: "POST"})
+    const data = await response.json()
+    console.log(data, " created item")
+    return data
+}
+export const fetchCreateCrossbow = async (areaId) => {
+    const response = await fetch(`${api}/item/crossbow/${areaId}`, {method: "POST"})
+    const data = await response.json()
+    console.log(data, " created item")
+    return data
+}
+
+export const fetchDeleteAllItems = async () => {
+    const response = await fetch(`${api}/items`, {method: "DELETE"})
+    const data = await response.json()
+    console.log(data)
+    return data
+}

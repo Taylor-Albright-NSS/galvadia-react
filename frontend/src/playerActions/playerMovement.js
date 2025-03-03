@@ -1,8 +1,10 @@
-import { areaDisplay } from "./areaDisplay"
-import { getAreaByCoords, fetchCurrentArea } from "./areas"
-import { playerUpdateCoordinates } from "./playerUpdateCoordinates"
+import { areaDisplay } from "../DOMrenders/areaDisplay"
+import { getAreaByCoords } from "../fetches/areas/areas"
+import { playerUpdateCoordinates } from "../fetches/players/playerUpdateCoordinates"
+import { toggleStatusFalse } from "../utils/playerStatus"
 
-export const moveDirection = async (player, setPlayer, inputDirection, currentArea, addLog) => {
+export const moveDirection = async (player, setPlayer, inputDirection, currentArea, addLog, socket, playerStatus) => {
+    toggleStatusFalse(playerStatus, "isTalking")
     if (currentArea.exitsBool[inputDirection] == "locked") {
         addLog("You cannot move in this direction. The door is locked.")
         return
@@ -28,6 +30,10 @@ export const moveDirection = async (player, setPlayer, inputDirection, currentAr
         return
     }
     combinedCoords.area_id = newAreaIfExists.id
+    combinedCoords.oldAreaId = player.area_id
+    //send websocket before player's coordinates change so websocket will broadcast to all players
+    //   in the room the the player is leaving
+    socket.send(JSON.stringify({type: "playerMoves", playerId: player.id, areaId: player.area_id}))
     const newPlayerCoords = await playerUpdateCoordinates(player, combinedCoords)
     if (!newPlayerCoords) {
         addLog("Cannot move in that direction (AREA DOES NOT EXIST)")

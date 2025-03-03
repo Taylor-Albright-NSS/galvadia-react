@@ -1,8 +1,8 @@
-import { Area } from "../models/area.js";
+import Area from "../models/area.js";
 import { Enemy } from "../models/enemy.js";
 import { Keyword } from "../models/keyword.js";
 import { Npc } from "../models/npc.js";
-import { Player } from "../models/player.js";
+import Player from "../models/player.js";
 
 export const getAreas = async (req, res) => {
   try {

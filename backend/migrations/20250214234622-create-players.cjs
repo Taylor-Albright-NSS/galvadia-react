@@ -15,19 +15,20 @@ module.exports = {
       },
       level: {
         type: Sequelize.INTEGER,
-        allowNull: true
+        defaultValue: 1,
       },
+      experience: {type: Sequelize.INTEGER},
+      gold: {type: Sequelize.INTEGER},
+      skillPoints: {type: Sequelize.INTEGER},
+      attributePoints: {type: Sequelize.INTEGER},
       x: {
         type: Sequelize.INTEGER,
-        allowNull: true
       },
       y: {
         type: Sequelize.INTEGER,
-        allowNull: true
       },
       z: {
         type: Sequelize.INTEGER,
-        allowNull: true
       },
       area_id: {
         type: Sequelize.INTEGER,
