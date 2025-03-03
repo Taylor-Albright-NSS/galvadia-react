@@ -1,5 +1,5 @@
 import { moveDirection } from "../playerActions/playerMovement"
-import { playerExamine, playerGet, playerLook, playerPull, playerSpeakToNpc, playerSpeakToNpcQuest } from "../playerActions/playerActions"
+import { playerExamine, playerGet, playerLook, playerOffersQuest, playerPull, playerSpeakToNpc, playerSpeakToNpcQuest } from "../playerActions/playerActions"
 import { playerInventoryDisplay } from "../DOMrenders/playerInventoryDisplay";
 
 export const actionList = async (commandObject) => {
@@ -23,7 +23,8 @@ export const commandActions = {
     examine: async (commandObject) => {playerExamine(commandObject)},
     pull: async (commandObject) => {playerPull(commandObject)},
     get: async (commandObject) => {playerGet(commandObject)},
-    inventory: async (commandObject) => {playerInventoryDisplay(commandObject)}
+    inventory: async (commandObject) => {playerInventoryDisplay(commandObject)},
+    offer: async (commandObject) => {playerOffersQuest(commandObject)}
 };
 
 movementDirections.forEach(direction => {

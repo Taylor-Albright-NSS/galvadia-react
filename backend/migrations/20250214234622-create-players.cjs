@@ -17,10 +17,10 @@ module.exports = {
         type: Sequelize.INTEGER,
         defaultValue: 1,
       },
-      experience: {
-        type: Sequelize.INTEGER,
-        defaultValue: 0,
-      },
+      experience: {type: Sequelize.INTEGER},
+      gold: {type: Sequelize.INTEGER},
+      skillPoints: {type: Sequelize.INTEGER},
+      attributePoints: {type: Sequelize.INTEGER},
       x: {
         type: Sequelize.INTEGER,
       },

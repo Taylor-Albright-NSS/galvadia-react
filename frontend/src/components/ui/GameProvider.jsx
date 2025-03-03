@@ -3,9 +3,9 @@ import { getPlayer1 } from "../../fetches/players/players";
 import { zGameContext } from "./zGameContext";
 import { fetchCurrentArea } from "../../fetches/areas/areas";
 import { fetchEnemiesInRoom } from "../../fetches/enemies/enemies";
-import { areaDisplay } from "../../managers/areaDisplay";
+import { areaDisplay } from "../../DOMrenders/areaDisplay";
 import { fetchCurrentAreaNpcs } from "../../fetches/npcs/npcs";
-import { fetchCurrentAreaItems } from "../../fetches/items/items";
+import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems } from "../../fetches/items/items";
 import { fetchPlayersInRoom } from "../../fetches/players/players";
 
 export const GameProvider = ({ children }) => {
@@ -40,19 +40,15 @@ export const GameProvider = ({ children }) => {
     setPlayers, playerStatus
   }), [player, currentArea, npcs, enemies, items, windowLogs, playerItems, players])
 
-  useEffect(() => {
-     (async () => {
-        const player = await getPlayer1()
-        setPlayer(player)
-      })()
-  }, [])
-
 
   useEffect(() => {
     const updateAll = async () => {
+      const player = await getPlayer1()
+      setPlayer(player)
       let enemies
       let npcs
       let items
+      let playerItems
       let players
       let areaId = !player.area_id ? 1 : player.area_id
       let playerId = player.id
@@ -68,6 +64,9 @@ export const GameProvider = ({ children }) => {
       
       items = await fetchCurrentAreaItems(areaId)
       setItems(items)
+
+      playerItems = await fetchAllItemsThatBelongToPlayer(playerId)
+      setPlayerItems(playerItems)
 
       players = await fetchPlayersInRoom(areaId, playerId)
       setPlayers(players)

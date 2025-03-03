@@ -2,7 +2,6 @@ import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/db.js";
 
 class NpcQuest extends Model {}
-
 NpcQuest.init({
     id: {
         type: DataTypes.INTEGER,
@@ -15,7 +14,6 @@ NpcQuest.init({
     completionDialogue: {type: DataTypes.ARRAY(DataTypes.STRING)},
     requirements: {type: DataTypes.JSON},
     rewards: {type: DataTypes.JSON},
-    isQuestAvailable: {type: DataTypes.BOOLEAN},
     repeatable: false,
 }, 
 {

@@ -14,7 +14,6 @@ module.exports = {
       completionDialogue: {type: Sequelize.ARRAY(Sequelize.DataTypes.STRING)},
       requirements: {type: Sequelize.JSON},
       rewards: {type: Sequelize.JSON},
-      isQuestAvailable: {type: Sequelize.BOOLEAN},
       repeatable: {type: Sequelize.BOOLEAN},
       createdAt: {type: Sequelize.DATE},
       updatedAt: {type: Sequelize.DATE}

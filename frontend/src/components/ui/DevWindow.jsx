@@ -45,108 +45,110 @@ export const DevWindow = () => {
         })
     }
 
-       async function attackEnemy() {
-            const enemyToAttack = enemies[0]
-            const damage = 9
-            if (!enemyToAttack) {
-                addLog("There is no enemy in the room to attack")
-                return
-            }
-            addLog(`You swing at the enemy and hit it for ${damage} damage!`)
-            enemyTakesDamage(damage, enemyToAttack.id, setEnemies, addLog)
+    async function attackEnemy() {
+    console.log(enemies)
+    console.log(enemies[0])
+        const enemyToAttack = enemies[0]
+        const damage = 9
+        if (!enemyToAttack) {
+            addLog("There is no enemy in the room to attack")
+            return
         }
-        
-        function setPlayer1() {
-            getPlayer1().then(player => {
-                setPlayer(player)
-                setPlayerItems(player.items.sort())
-            })
-        }
-        function setPlayer2() {
-            getPlayer2().then(player => {
-                setPlayer(player)
-                setPlayerItems(player.items.sort())
-            })
-        }
-        function retrieveCurrentPlayer() {
-            console.log(player)
-        }
+        addLog(`You swing at the enemy and hit it for ${damage} damage!`)
+        enemyTakesDamage(damage, enemyToAttack.id, setEnemies, addLog)
+    }
+    
+    function setPlayer1() {
+        getPlayer1().then(player => {
+            setPlayer(player)
+            setPlayerItems(player.items.sort())
+        })
+    }
+    function setPlayer2() {
+        getPlayer2().then(player => {
+            setPlayer(player)
+            setPlayerItems(player.items.sort())
+        })
+    }
+    function retrieveCurrentPlayer() {
+        console.log(player)
+    }
 
-        function spawnTwohandedSword() {
-            fetchCreateTwohandedSword(player.area_id).then(item => {
-                setItems(prev => [...prev, item])
-                const test = 
-                <div style={{color: "green"}}>
-                    <p>A <span className="green">{item.name}</span> has spawned</p>
-                </div>
-                addLog(test) 
-            })
-        }
-        function spawnOnehandedSword() {
-            fetchCreateOnehandedSword(player.area_id).then(item => {
-                setItems(prev => [...prev, item])
-                const test = 
-                <div style={{color: "green"}}>
-                    <p>A <span className="green">{item.name}</span> has spawned</p>
-                </div>
-                addLog(test)           
-            })
-        }
-        function spawnDagger() {
-            fetchCreateDagger(player.area_id).then(item => {
-                setItems(prev => [...prev, item])
-                const test = 
-                <div style={{color: "green"}}>
-                    <p>A <span className="green">{item.name}</span> has spawned</p>
-                </div>
-                addLog(test)            
-            })
-        }
-        function spawnCrossbow() {
-            fetchCreateCrossbow(player.area_id).then(item => {
-                setItems(prev => [...prev, item])
-                const test = 
-                <div style={{color: "green"}}>
-                    <p>A <span className="green">{item.name}</span> has spawned</p>
-                </div>
-                addLog(test) 
-            })
-        }
+    function spawnTwohandedSword() {
+        fetchCreateTwohandedSword(player.area_id).then(item => {
+            setItems(prev => [...prev, item])
+            const test = 
+            <div style={{color: "green"}}>
+                <p>A <span className="green">{item.name}</span> has spawned</p>
+            </div>
+            addLog(test) 
+        })
+    }
+    function spawnOnehandedSword() {
+        fetchCreateOnehandedSword(player.area_id).then(item => {
+            setItems(prev => [...prev, item])
+            const test = 
+            <div style={{color: "green"}}>
+                <p>A <span className="green">{item.name}</span> has spawned</p>
+            </div>
+            addLog(test)           
+        })
+    }
+    function spawnDagger() {
+        fetchCreateDagger(player.area_id).then(item => {
+            setItems(prev => [...prev, item])
+            const test = 
+            <div style={{color: "green"}}>
+                <p>A <span className="green">{item.name}</span> has spawned</p>
+            </div>
+            addLog(test)            
+        })
+    }
+    function spawnCrossbow() {
+        fetchCreateCrossbow(player.area_id).then(item => {
+            setItems(prev => [...prev, item])
+            const test = 
+            <div style={{color: "green"}}>
+                <p>A <span className="green">{item.name}</span> has spawned</p>
+            </div>
+            addLog(test) 
+        })
+    }
 
-        async function experienceGain() {
-            const playerId = player.id
-            const experienceGain = 100
-            const playerPreviousLevel = player.level
-            console.log(playerPreviousLevel, " playerPreviousLevel")
-            const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
-            if (updatedPlayer) {
-                addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
-                setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
-                console.log(updatedPlayer.level, " updatedPlayer.level")
-                if (updatedPlayer.level > playerPreviousLevel) {
-                    addLog("YOU LEVELED UP!")
-                }
-            } else {
-                addLog(`Player didn't gain any experience for some reason`)
+    async function experienceGain() {
+        const playerId = player.id
+        const experienceGain = 100
+        const playerPreviousLevel = player.level
+        console.log(playerPreviousLevel, " playerPreviousLevel")
+        const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
+        if (updatedPlayer) {
+            addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
+            setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
+            console.log(updatedPlayer.level, " updatedPlayer.level")
+            if (updatedPlayer.level > playerPreviousLevel) {
+                addLog("YOU LEVELED UP!")
             }
+        } else {
+            addLog(`Player didn't gain any experience for some reason`)
         }
-        async function experienceLoss() {
-            const playerId = player.id
-            const experienceGain = -100
-            const playerPreviousLevel = player.level
-            console.log(playerPreviousLevel, " playerPreviousLevel")
-            const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
-            if (updatedPlayer) {
-                addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
-                setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
-                console.log(updatedPlayer.level, " updatedPlayer.level")
-                if (updatedPlayer.level < playerPreviousLevel) {
-                    addLog("YOU DELEVELED!")
-                }
-            } else {
-                addLog(`Player didn't gain any experience for some reason`)
+    }
+    async function experienceLoss() {
+        const playerId = player.id
+        const experienceGain = -100
+        const playerPreviousLevel = player.level
+        console.log(playerPreviousLevel, " playerPreviousLevel")
+        const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
+        if (updatedPlayer) {
+            addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
+            setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
+            console.log(updatedPlayer.level, " updatedPlayer.level")
+            if (updatedPlayer.level < playerPreviousLevel) {
+                addLog("YOU DELEVELED!")
             }
+        } else {
+            addLog(`Player didn't gain any experience for some reason`)
         }
+    }
 
         return (
             <Container className="d-flex">

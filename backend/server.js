@@ -6,10 +6,10 @@ import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playe
 import db from './models/associations.js';
 import cors from 'cors';
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js';
-import { getCurrentAreaNpcs, getNpcById, getNpcDialogue, getEveryNpc, getNpcDialogueAll, getNpcQuestDialogue, getNpcQuest } from './controllers/npcController.js';
+import { getCurrentAreaNpcs, getNpcById, getNpcDialogue, getEveryNpc, getNpcDialogueAll, getNpcQuestDialogue, getNpcQuest, postNpcRequirements, patchDecrementQuestStage, patchIncrementQuestStage } from './controllers/npcController.js';
 import { createEnemy, deleteEnemy, enemyTakesDamage, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './controllers/enemyController.js';
 import { deleteAllItems, getCurrentAreaItems, getItems, postCrossbow, postDagger, postNewItem, postOnehandedSword, postTwohandedSword, putCurrentAreaItemsToPlayer } from './controllers/itemController.js';
-import { app, server }  from './websocket.js';
+import { app }  from './websocket.js';
 import { getUser } from './controllers/userController.js';
 // const app = express();
 // const server = http.createServer(app)
@@ -17,9 +17,12 @@ import { getUser } from './controllers/userController.js';
 app.use(express.json())
 app.use(cors());
 //--------ROUTE TESTING
-app.get('/npcquest/:npcId/:questStage', getNpcQuest)
+app.get('/npcquest/:npcId/:playerId', getNpcQuest)
 
 //--------NPC QUEST
+app.post('/questcomplete', postNpcRequirements)
+app.patch('/queststage/decrement/:npcId/:playerId', patchDecrementQuestStage)
+app.patch('/queststage/increment/:npcId/:playerId', patchIncrementQuestStage)
 //--------NPC DIALOGUE
 app.get('/npcdialogue/:npcId', getNpcDialogue)
 app.get('/npcquestdialogue/:npcId', getNpcQuestDialogue)

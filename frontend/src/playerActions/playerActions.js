@@ -1,4 +1,4 @@
-import { fetchCurrentAreaNpcs, fetchNpcDialogue, fetchNpcQuestDialogue } from "../fetches/npcs/npcs"
+import { fetchCurrentAreaNpcs, fetchNpcDialogue, fetchNpcQuestDialogue, questRequirementCheck } from "../fetches/npcs/npcs"
 import { fetchCurrentArea } from "../fetches/areas/areas"
 import { areaDisplay } from "../DOMrenders/areaDisplay"
 import { npcSpeaks } from "../DOMrenders/npcActions"
@@ -6,44 +6,58 @@ import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems, fetchCurrentAre
 import { fetchEnemiesInRoom } from "../fetches/enemies/enemies"
 import { fetchPlayersInRoom } from "../fetches/players/players"
 import { toggleStatusFalse, toggleStatusTrue } from "../utils/playerStatus"
+import { wait } from "../utils/wait"
+import { findNpcByName } from "../PlayerActionChecks/npcChecks"
+
+export const playerOffersQuest = async (commandObject) => {
+    const { npcs, player, setPlayer, playerItems, command2, addLog, setPlayerItems } = commandObject
+    let body = {
+        npcId: 0,
+        playerId: player.id,
+        playerLevel: player.level,
+        playerInventory: playerItems,
+        //add player kill list here
+    }
+    if (npcs.length === 0) {return addLog("There is nobody in the room offering quests.")}
+    if (npcs.length > 1 && !command2) {return addLog("You must specify whose quest you wish to see.")}
+    if (npcs.length === 1) {
+        body.npcId = npcs[0].id
+        const questNpc = await questRequirementCheck(body)
+        return
+    }
+    if (npcs.length > 1) {
+        const foundNpc = findNpcByName(npcs, command2)
+        body.npcId = foundNpc.id
+        const questOffering = await questRequirementCheck(body)
+        if (questOffering.message === "404") {return addLog(`${foundNpc.name} does not have a quest for you to make an offer to.`)}
+        if (questOffering.message === "level") {return addLog(`You do not meet the level requirement for this quest.`)}
+        if (questOffering.message === "item") {return addLog(`You have not offered the correct item(s) required for this quest.`)}
+        if (questOffering.player) {
+            addLog(questOffering.completionDialogue)
+            const { player } = questOffering
+            console.log(player)
+            setPlayer(player)
+            const playerUpdatedItems = await fetchAllItemsThatBelongToPlayer(player.id)
+            setPlayerItems(playerUpdatedItems)
+        } 
+    }
+}
 
 export const playerSpeakToNpc = async (commandObject) => {
     const { npcs, command2, addLog, player } = commandObject
     const playerId = player.id
-    if (!command2) {
-        if (npcs.length === 0) {
-            addLog("There is nobody in the room to speak with")
-            return
-        }
-        if (npcs.length > 1) {
-            addLog("You must specify who you want to speak with")
-            return
-        }
-        if (npcs.length === 1) {
-            const npcId = npcs[0].id
-            const npcDialogue = await fetchNpcDialogue(playerId, npcId)
-            addLog(npcDialogue)
-            return
-        }
-        return
-    }
-    if (command2) {
-        const npc = npcs.find(npc => npc.name.toLowerCase() === command2)
-        const npcId = npc.id
-        const npcDialogue = await fetchNpcDialogue(playerId, npcId)
-        const dialogueJSX = npcSpeaks(npc, npcDialogue)
+    if (npcs.length === 0) {return addLog("There is nobody in the room to speak with")}
+    if (npcs.length > 1 && !command2) {return addLog("You must specify who you want to speak with")}
+    if (npcs.length > 1) {
+        const foundNpc = findNpcByName(npcs, command2)
+        const npcDialogue = await fetchNpcDialogue(playerId, foundNpc.id)
+        const dialogueJSX = npcSpeaks(foundNpc, npcDialogue)
         addLog(dialogueJSX)
         return
     }
 }
 
-const wait = async (milliseconds) => {
-    return new Promise(resolve => {
-        setTimeout(() => {
-            resolve()
-        }, milliseconds)
-    })
-}
+
 
 export const playerSpeakToNpcQuest = async (commandObject) => {
     const { npcs, command2, addLog, player, playerStatus } = commandObject

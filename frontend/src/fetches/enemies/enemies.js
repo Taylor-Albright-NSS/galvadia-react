@@ -22,10 +22,13 @@ export const enemyTakesDamage = async (damage, enemyId, setEnemies, addLog) => {
     const updatedEnemy = await response.json()
     console.log(updatedEnemy)
     if (updatedEnemy.health <= 0) {
-        setEnemies((prev) => prev.filter(filterEnemy => updatedEnemy.id !== filterEnemy.id))
+        setEnemies((prev) => prev.filter(enemy => {
+            console.log(enemy)
+            return updatedEnemy.id !== enemy.id
+        }))
         addLog(`${updatedEnemy.name} has been slain!`)
     } else {
-        setEnemies((prev) => prev.map(enemy => enemy.id === updatedEnemy.id ? { ...enemy, health: updatedEnemy.health } : updatedEnemy))
+        setEnemies((prev) => prev.map(enemy => enemy.id === updatedEnemy.id ? { ...enemy, health: updatedEnemy.health } : enemy))
     }
 }
 

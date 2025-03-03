@@ -6,6 +6,9 @@ module.exports = {
       area_id: 1,  // Assuming you have an area with ID 1
       level: 1,
       experience: 0,
+      gold: 0,
+      skillPoints: 0,
+      attributePoints: 0,
       x: 0,
       y: 0,
       z: 0, 
@@ -17,6 +20,9 @@ module.exports = {
       area_id: 1,  // Assuming you have an area with ID 2
       level: 1,
       experience: 0,
+      gold: 0,
+      skillPoints: 0,
+      attributePoints: 0,
       x: 0,
       y: 0,
       z: 0, 
