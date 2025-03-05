@@ -33,6 +33,7 @@ export const GameProvider = ({ children }) => {
   }
 
   const contextValue = useMemo(() => ({
+    test: () => console.log("USE MEMO"),
     player, setPlayer, currentArea, setCurrentArea,
     npcs, setNpcs, enemies, setEnemies,
     items, setItems, windowLogs, setWindowLogs,

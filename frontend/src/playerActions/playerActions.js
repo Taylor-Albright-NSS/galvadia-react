@@ -42,7 +42,6 @@ export const playerOffersQuest = async (commandObject) => {
         } 
     }
 }
-//test
 
 export const playerSpeakToNpc = async (commandObject) => {
     const { npcs, command2, addLog, player } = commandObject
@@ -172,3 +171,4 @@ export const playerGet = async (commandObject) => {
         addLog(`You pick up all the items in the room`)
     }
 }
+

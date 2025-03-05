@@ -32,6 +32,7 @@ export const fetchCurrentAreaItemsToPlayer = async (itemsArray, playerId) => {
         console.error(`No items to pick up`)
     }
 }
+//
 
 export const fetchAllItemsThatBelongToPlayer = async (playerId) => {
     const response = await fetch(`${api}/items/player/${playerId}`)
