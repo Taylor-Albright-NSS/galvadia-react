@@ -13,7 +13,7 @@ export const fetchCurrentAreaItems = async (areaId) => {
     console.log(data, " all items in area")
     return data
 }
-
+//
 export const fetchCurrentAreaItemsToPlayer = async (itemsArray, playerId) => {
     try {
         const response = await fetch(`${api}/items?playerId=${playerId}`, {
