@@ -3,7 +3,9 @@ import { getAreaByCoords } from "../fetches/areas/areas"
 import { playerUpdateCoordinates } from "../fetches/players/playerUpdateCoordinates"
 import { toggleStatusFalse } from "../utils/playerStatus"
 
-export const moveDirection = async (player, setPlayer, inputDirection, currentArea, addLog, socket, playerStatus) => {
+export const moveDirection = async (gameData, setGameData, inputDirection, addLog, socket, playerStatus) => {
+    const { currentArea, player } = gameData
+    console.log(gameData)
     toggleStatusFalse(playerStatus, "isTalking")
     if (currentArea.exitsBool[inputDirection] == "locked") {
         addLog("You cannot move in this direction. The door is locked.")
@@ -36,8 +38,20 @@ export const moveDirection = async (player, setPlayer, inputDirection, currentAr
     socket.send(JSON.stringify({type: "playerMoves", playerId: player.id, areaId: player.area_id}))
     const newPlayerCoords = await playerUpdateCoordinates(player, combinedCoords)
     if (!newPlayerCoords) {
+        console.log(newPlayerCoords)
         addLog("Cannot move in that direction (AREA DOES NOT EXIST)")
         return
     }
-    setPlayer(prevState => ({...prevState, area_id: combinedCoords.area_id, x: newPlayerCoords.x, y:newPlayerCoords.y}))
+    setGameData(prev => {
+        console.log("Updating gameData...", prev)
+        return {
+        ...prev,
+        player: {
+            ...prev.player,
+            area_id: combinedCoords.area_id,
+            x: newPlayerCoords.x,
+            y: newPlayerCoords.y
+        }
+    }
+    })
 }

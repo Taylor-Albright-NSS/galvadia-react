@@ -10,9 +10,10 @@ import { getPlayer1, getPlayer2 } from "../../fetches/players/players"
 import { fetchIncreasePlayerExperience } from "../../fetches/players/players"
 
 export const DevWindow = () => {
-    const { currentArea, enemies, player, setEnemies, setItems, addLog, setPlayer, setPlayerItems } = useContext(zGameContext)
+    const { gameData, setGameData, addLog } = useContext(zGameContext)
+    const { currentArea, enemies, player, npcs, items, playerItems, players } = gameData
     const [enemyId, setEnemyId] = useState(0)
-    console.log(player)
+    console.log(setGameData)
 
     function retrieveAllEnemies() {
         fetchAllEnemies().then(enemies => {
@@ -27,7 +28,11 @@ export const DevWindow = () => {
 
     function fetchCreateEnemy() {
         createEnemy(player.area_id).then(enemy => {
-            setEnemies(prev => ([...prev, enemy]))
+            setGameData(prev => ({
+                ...prev,
+                enemies: [...prev.enemies, enemy]
+            }))
+            // setEnemies(prev => ([...prev, enemy]))
         })
     }
     function retrieveCurrentArea() {
@@ -60,14 +65,27 @@ export const DevWindow = () => {
     
     function setPlayer1() {
         getPlayer1().then(player => {
-            setPlayer(player)
-            setPlayerItems(player.items.sort())
+            setGameData(prev => {
+                console.log(prev)
+                return ({
+                    ...prev,
+                    player: player
+                })
+            })
+            setGameData(prev => ({...prev, playerItems: player.items.sort()}))
         })
     }
     function setPlayer2() {
         getPlayer2().then(player => {
-            setPlayer(player)
-            setPlayerItems(player.items.sort())
+            console.log(player)
+            setGameData(prev => {
+                console.log(prev)
+                return ({
+                    ...prev,
+                    player: player
+                })
+            })
+            setGameData(prev => ({...prev, playerItems: player.items.sort()}))
         })
     }
     function retrieveCurrentPlayer() {
@@ -76,7 +94,11 @@ export const DevWindow = () => {
 
     function spawnTwohandedSword() {
         fetchCreateTwohandedSword(player.area_id).then(item => {
-            setItems(prev => [...prev, item])
+            setGameData(prev => ({
+                ...prev,
+                items: [...prev.items, item]
+            }))
+            // setItems(prev => [...prev, item])
             const test = 
             <div style={{color: "green"}}>
                 <p>A <span className="green">{item.name}</span> has spawned</p>

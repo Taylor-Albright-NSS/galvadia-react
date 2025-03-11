@@ -39,8 +39,10 @@ export const playerPatchCoords = async (req, res) => {
   try {
     const { id } = req.params
     const { x, y, area_id, oldAreaId } = req.body
+    console.log(id, x, y)
     const playerOldAreaId = oldAreaId
     let counter = 1
+    console.log("Does run???")
     wss.clients.forEach(client => {
       console.log(players[counter].name)
       let player = players[counter]
@@ -51,7 +53,6 @@ export const playerPatchCoords = async (req, res) => {
       }
       counter++
     })
-    
     const player = await Player.findOne({where: { id: id }})
     if (!player) {
       return res.status(404).json({ message: "Player not found" })

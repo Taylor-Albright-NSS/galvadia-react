@@ -1,6 +1,7 @@
 import "../styles/colors.css"
 
 export const areaDisplay = (area, enemies, npcs, items, players) => {
+    console.log(area, enemies, npcs, items, players)
     const splitDescription = area.description ? area.description.split(" ") : ""
     return (
         <div className="my-2">

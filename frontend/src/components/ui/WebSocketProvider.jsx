@@ -5,8 +5,9 @@ import { WebSocketContext } from "./WebSocketContext";
 export const WebSocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
     const [messages, setMessages] = useState([]); // Store received messages
-    const { addLog, player } = useContext(zGameContext)
-
+    const { addLog, gameData } = useContext(zGameContext)
+    const { player } = gameData
+    console.log(player)
     useEffect(() => {
         if (player.id) {
             if (socket.readyState === WebSocket.OPEN) {

@@ -96,27 +96,33 @@ export const playerSpeakToNpcQuest = async (commandObject) => {
 }
 
 export const playerLook = async (commandObject) => {
-    const { addLog, player, setCurrentArea, setNpcs, setEnemies, setItems, setPlayers } = commandObject
-    let enemies
-    let npcs
-    let items
-    let players
+    console.log(commandObject)
+    const { player, setCurrentArea, setNpcs, setEnemies, setItems, setPlayers } = commandObject.gameData
+    const { setGameData, addLog } = commandObject
+
     let areaId = !player.area_id ? 1 : player.area_id
     let playerId = player.id
-    const area = await fetchCurrentArea(areaId)
-    setCurrentArea(area)
+    const [ area, enemies, npcs, items, players ] = await Promise.all([
+        fetchCurrentArea(areaId),
+        fetchEnemiesInRoom(areaId),
+        fetchCurrentAreaNpcs(areaId),
+        fetchCurrentAreaItems(areaId),
+        fetchPlayersInRoom(areaId, playerId)
+    ])
+    // setGameData(prev => ({...prev, currentArea: area}))
+    // setGameData(prev => ({...prev, enemies: enemies}))
+    // setGameData(prev => ({...prev, npcs: npcs}))
+    // setGameData(prev => ({...prev, items: items}))
+    // setGameData(prev => ({...prev, players: players}))
 
-    enemies = await fetchEnemiesInRoom(areaId)
-    setEnemies(enemies)
-
-    npcs = await fetchCurrentAreaNpcs(areaId)
-    setNpcs(npcs)
-    
-    items = await fetchCurrentAreaItems(areaId)
-    setItems(items)
-
-    players = await fetchPlayersInRoom(areaId, playerId)
-    setPlayers(players)
+    setGameData(prev => ({
+        ...prev,
+        currentArea: area,
+        enemies: enemies,
+        npcs: npcs,
+        items: items,
+        players: players
+    }))
     
     addLog(areaDisplay(area, enemies, npcs, items, players))
 }
@@ -157,7 +163,11 @@ export const playerPull = async (commandObject) => {
 }
 
 export const playerGet = async (commandObject) => {
-    const { command2, currentArea, setItems, player, addLog, setPlayerItems } = commandObject
+    console.log(commandObject)
+    const { gameData, setGameData, addLog, command2 } = commandObject
+    const { player, currentArea } = gameData
+    console.log(commandObject)
+    console.log(command2)
     if (command2 != "all") {
         addLog("Please specify all")
         return
@@ -165,9 +175,17 @@ export const playerGet = async (commandObject) => {
     if (command2 === "all") {
         const currentAreaItems = await fetchCurrentAreaItems(currentArea.id)
         await fetchCurrentAreaItemsToPlayer(currentAreaItems, player.id)
-        setItems(prev => prev.filter(item => item.ownerId != player.id && item.ownerType != "player"))
+        // setItems(prev => prev.filter(item => item.ownerId != player.id && item.ownerType != "player"))
+        setGameData(prev => ({
+            ...prev,
+            items: prev.filter(item => item.ownerId != player.id && item.ownerType != "player")
+        }))
         const updatedPlayerInventory = await fetchAllItemsThatBelongToPlayer(player.id)
-        setPlayerItems(updatedPlayerInventory)
+        // setPlayerItems(updatedPlayerInventory)
+        setGameData(prev => ({
+            ...prev,
+            playerItems: updatedPlayerInventory
+        }))
         addLog(`You pick up all the items in the room`)
     }
 }
