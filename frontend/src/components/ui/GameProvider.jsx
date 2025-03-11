@@ -9,6 +9,17 @@ import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems } from "../../fe
 import { fetchPlayersInRoom } from "../../fetches/players/players";
 
 export const GameProvider = ({ children }) => {
+
+  const [gameData, setGameData] = useState({
+    player: {},
+    currentArea: {},
+    npcs: [],
+    enemies: [],
+    items: [],
+    playerItems: [],
+    players: []
+  })
+
   const playerStatus = useRef({
     isTalking: false,
     isInCombat: false,
@@ -32,50 +43,84 @@ export const GameProvider = ({ children }) => {
       setWindowLogs(prev => [...prev, message])
   }
 
-  const contextValue = useMemo(() => ({
-    test: () => console.log("USE MEMO"),
+  const contextValue = {
     player, setPlayer, currentArea, setCurrentArea,
     npcs, setNpcs, enemies, setEnemies,
     items, setItems, windowLogs, setWindowLogs,
     addLog, playerItems, setPlayerItems, players,
     setPlayers, playerStatus
-  }), [player, currentArea, npcs, enemies, items, windowLogs, playerItems, players])
+  }
 
+  
 
   useEffect(() => {
     const updateAll = async () => {
-      const player = await getPlayer1()
-      setPlayer(player)
-      let enemies
-      let npcs
-      let items
-      let playerItems
-      let players
-      let areaId = !player.area_id ? 1 : player.area_id
-      let playerId = player.id
-      const area = await fetchCurrentArea(areaId)
-      setCurrentArea(area)
+      try {
+        const player = await getPlayer1();
+        const areaId = player.area_id;
+        const playerId = player.id;
   
-      enemies = await fetchEnemiesInRoom(areaId)
-      setEnemies(enemies)
+        const [area, enemies, npcs, items, playerItems, players] = await Promise.all([
+          fetchCurrentArea(areaId),
+          fetchEnemiesInRoom(areaId),
+          fetchCurrentAreaNpcs(areaId),
+          fetchCurrentAreaItems(areaId),
+          fetchAllItemsThatBelongToPlayer(playerId),
+          fetchPlayersInRoom(areaId, playerId),
+        ]);
   
-      npcs = await fetchCurrentAreaNpcs(areaId)
-      setNpcs(npcs)
-      console.log(npcs)
-      
-      items = await fetchCurrentAreaItems(areaId)
-      setItems(items)
+        setGameData({
+          player,
+          currentArea: area,
+          npcs,
+          enemies,
+          items,
+          playerItems,
+          players
+        });
+  
+        addLog(areaDisplay(area, enemies, npcs, items, players));
+      } catch (error) {
+        console.error("Error updating data:", error);
+      }
+    };
+  
+    updateAll();
+  }, [gameData.player.area_id]);
 
-      playerItems = await fetchAllItemsThatBelongToPlayer(playerId)
-      setPlayerItems(playerItems)
-
-      players = await fetchPlayersInRoom(areaId, playerId)
-      setPlayers(players)
-      
-      addLog(areaDisplay(area, enemies, npcs, items, players))
-    }
-    updateAll()
-  }, [player.area_id])
+  // useEffect(() => {
+  //   const updateAll = async () => {
+  //     try {
+  //       const player = await getPlayer1();
+  //       setPlayer(player);
+  
+  //       const areaId = player.area_id
+  //       const playerId = player.id;
+  
+  //       const [area, enemies, npcs, items, playerItems, players] = await Promise.all([
+  //         fetchCurrentArea(areaId),
+  //         fetchEnemiesInRoom(areaId),
+  //         fetchCurrentAreaNpcs(areaId),
+  //         fetchCurrentAreaItems(areaId),
+  //         fetchAllItemsThatBelongToPlayer(playerId),
+  //         fetchPlayersInRoom(areaId, playerId),
+  //       ]);
+  
+  //       setCurrentArea(area);
+  //       setEnemies(enemies);
+  //       setNpcs(npcs);
+  //       setItems(items);
+  //       setPlayerItems(playerItems);
+  //       setPlayers(players);
+  
+  //       addLog(areaDisplay(area, enemies, npcs, items, players));
+  //     } catch (error) {
+  //       console.error("Error updating data:", error);
+  //     }
+  //   };
+  
+  //   updateAll();
+  // }, [player.area_id]);
 
   return (
     <zGameContext.Provider value={contextValue}>
