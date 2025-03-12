@@ -22,6 +22,9 @@ module.exports = {
       location: {
         type: Sequelize.STRING
       },
+      isTwoHanded: {
+        type: Sequelize.BOOLEAN
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false

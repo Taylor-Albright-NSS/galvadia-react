@@ -21,6 +21,10 @@ export const Item = sequelize.define('Item', {
     //If ownerType is anything but player, value is null
     type: DataTypes.STRING,
   },
+  isTwoHanded: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

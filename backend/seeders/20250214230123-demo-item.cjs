@@ -6,6 +6,7 @@ module.exports = {
       ownerId: 1, 
       ownerType: "player",
       location: null,
+      isTwoHanded: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     }, {
@@ -14,6 +15,7 @@ module.exports = {
       ownerId: 1, 
       ownerType: "area",
       location: null,
+      isTwoHanded: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     }, {
@@ -22,6 +24,7 @@ module.exports = {
       ownerId: 2, 
       ownerType: "area",
       location: null,
+      isTwoHanded: false,
       createdAt: new Date(),
       updatedAt: new Date(),
     }], {});

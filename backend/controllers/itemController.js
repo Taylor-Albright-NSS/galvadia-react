@@ -34,7 +34,7 @@ export const putCurrentAreaItemsToPlayer = async (req, res) => {
     const updatedItems = await Promise.all(
       itemsArray.map(async (item) => {
         const updatedItem = await Item.update(
-          { ownerId: playerId, ownerType: "player" },
+          { ownerId: playerId, ownerType: "player", location: "inventory" },
           { where: { id: item.id }, returning: true }
         );
         return updatedItem;
@@ -72,7 +72,7 @@ export const postTwohandedSword = async (req, res) => {
   const { areaId } = req.params
   console.log(areaId, " AREA ID")
   try {    
-    const item = await Item.create({name: "Twohanded Sword", ownerId: areaId, ownerType: "area"})
+    const item = await Item.create({name: "Twohanded Sword", ownerId: areaId, ownerType: "area", isTwoHanded: true})
     return res.status(201).json(item)
   } catch (error) {
     return res.status(500).json({message: "Internal error"})
@@ -104,7 +104,7 @@ export const postCrossbow = async (req, res) => {
   const { areaId } = req.params
   console.log(areaId, " AREA ID")
   try {    
-    const item = await Item.create({name: "Crossbow", ownerId: areaId, ownerType: "area"})
+    const item = await Item.create({name: "Crossbow", ownerId: areaId, ownerType: "area", isTwoHanded: true})
     return res.status(201).json(item)
   } catch (error) {
     return res.status(500).json({message: "Internal error"})
