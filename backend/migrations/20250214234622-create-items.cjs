@@ -17,7 +17,10 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       ownerType: {
-        type: Sequelize.ENUM('player', 'enemy', 'area'),
+        type: Sequelize.STRING,
+      },
+      location: {
+        type: Sequelize.STRING
       },
       createdAt: {
         type: Sequelize.DATE,

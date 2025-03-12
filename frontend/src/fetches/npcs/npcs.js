@@ -1,6 +1,7 @@
 const api = "http://localhost:3000"
 
 export const questRequirementCheck = async (body) => {
+    console.log(body)
     const response = await fetch(`${api}/questcomplete`, {
         method: "POST",
         headers: {

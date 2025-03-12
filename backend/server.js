@@ -48,12 +48,12 @@ app.get('/npcs/:areaId', getCurrentAreaNpcs)
 app.get('/npc/:id', getNpcById)
 app.get('/npc/:id/dialogue', getNpcDialogue)
 //--------PLAYERS 
-// (SINGLE)
+  //(SINGLE)
 app.patch('/player/:id/coordinates', playerPatchCoords)
 app.patch('/player/:playerId/experience', playerGainsExperience)
 app.get('/player/:id', getPlayer1API);
 
-// (MULTIPLE)
+  //(MULTIPLE)
 app.get('/players', getPlayers);
 app.get('/players/:areaId', getPlayersInRoom)
 app.post('/players', createPlayer);

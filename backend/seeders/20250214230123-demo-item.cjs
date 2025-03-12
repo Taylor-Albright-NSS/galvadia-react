@@ -5,6 +5,7 @@ module.exports = {
       name: 'Sword',
       ownerId: 1, 
       ownerType: "player",
+      location: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     }, {
@@ -12,6 +13,7 @@ module.exports = {
       name: 'Dagger',
       ownerId: 1, 
       ownerType: "area",
+      location: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     }, {
@@ -19,6 +21,7 @@ module.exports = {
       name: 'Crossbow',
       ownerId: 2, 
       ownerType: "area",
+      location: null,
       createdAt: new Date(),
       updatedAt: new Date(),
     }], {});

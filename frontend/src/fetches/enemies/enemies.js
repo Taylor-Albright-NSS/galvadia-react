@@ -11,7 +11,7 @@ export const fetchAllEnemies = async () => {
     return data
 }
 
-export const enemyTakesDamage = async (damage, enemyId, setEnemies, addLog) => {
+export const enemyTakesDamage = async (damage, enemyId, setGameData, addLog) => {
     const response = await fetch(`${api}/enemy/${enemyId}`, {
         method: "PATCH",
         headers: {
@@ -22,13 +22,21 @@ export const enemyTakesDamage = async (damage, enemyId, setEnemies, addLog) => {
     const updatedEnemy = await response.json()
     console.log(updatedEnemy)
     if (updatedEnemy.health <= 0) {
-        setEnemies((prev) => prev.filter(enemy => {
-            console.log(enemy)
-            return updatedEnemy.id !== enemy.id
+        setGameData(prev => ({
+            ...prev,
+            enemies: [...prev.enemies.filter(enemy => updatedEnemy.id !== enemy.id)]
         }))
+        // setEnemies((prev) => prev.filter(enemy => {
+        //     console.log(enemy)
+        //     return updatedEnemy.id !== enemy.id
+        // }))
         addLog(`${updatedEnemy.name} has been slain!`)
     } else {
-        setEnemies((prev) => prev.map(enemy => enemy.id === updatedEnemy.id ? { ...enemy, health: updatedEnemy.health } : enemy))
+        setGameData(prev => ({
+            ...prev,
+            enemies: [...prev.enemies.map(enemy => enemy.id === updatedEnemy.id ? { ...enemy, health: updatedEnemy.health } : enemy)]
+        }))
+        // setEnemies((prev) => prev.map(enemy => enemy.id === updatedEnemy.id ? { ...enemy, health: updatedEnemy.health } : enemy))
     }
 }
 

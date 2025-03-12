@@ -34,5 +34,5 @@ export const PlayerNpc = sequelize.define("PlayerNpc", {
         defaultValue: DataTypes.NOW,
     },
     }, {
-        timstamps: true,
+        timestamps: true,
     })

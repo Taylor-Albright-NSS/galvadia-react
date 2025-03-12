@@ -10,6 +10,7 @@ import { fetchPlayersInRoom } from "../../fetches/players/players";
 
 export const GameProvider = ({ children }) => {
 
+  const [windowLogs, setWindowLogs] = useState([])
   const [gameData, setGameData] = useState({
     player: {},
     currentArea: {},
@@ -28,7 +29,6 @@ export const GameProvider = ({ children }) => {
     isRetreating: false,
     isResting: false,
   })
-  const [windowLogs, setWindowLogs] = useState([])
 
   const addLog = (message) => {
     console.log(message)
@@ -39,24 +39,20 @@ export const GameProvider = ({ children }) => {
 
   useEffect(() => {
     const updateAll = async () => {
-      // if (!gameData.player.id) {return}
       try {
         console.log(gameData.player)
         let player
         if (gameData.player.id == 1) {player = await getPlayer1()}
         if (gameData.player.id == 2) {player = await getPlayer2()}
-        // else {return}
-        const areaId = player.area_id;
-        const playerId = player.id;
   
         const [area, enemies, npcs, items, playerItems, players] = await Promise.all([
-          fetchCurrentArea(areaId),
-          fetchEnemiesInRoom(areaId),
-          fetchCurrentAreaNpcs(areaId),
-          fetchCurrentAreaItems(areaId),
-          fetchAllItemsThatBelongToPlayer(playerId),
-          fetchPlayersInRoom(areaId, playerId),
-        ]);
+          fetchCurrentArea(player.area_id),
+          fetchEnemiesInRoom(player.area_id),
+          fetchCurrentAreaNpcs(player.area_id),
+          fetchCurrentAreaItems(player.area_id),
+          fetchAllItemsThatBelongToPlayer(player.id),
+          fetchPlayersInRoom(player.area_id, player.id),
+        ])
   
         setGameData({
           player,
@@ -66,11 +62,11 @@ export const GameProvider = ({ children }) => {
           items,
           playerItems,
           players
-        });
+        })
         console.log(players, " players")
-        addLog(areaDisplay(area, enemies, npcs, items, players));
+        addLog(areaDisplay(area, enemies, npcs, items, players))
       } catch (error) {
-        console.error("Error updating data:", error);
+        console.error("Error updating data:", error)
       }
     };
     updateAll();

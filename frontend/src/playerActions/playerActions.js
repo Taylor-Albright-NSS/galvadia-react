@@ -10,7 +10,9 @@ import { wait } from "../utils/wait"
 import { findNpcByName } from "../PlayerActionChecks/npcChecks"
 
 export const playerOffersQuest = async (commandObject) => {
-    const { npcs, player, setPlayer, playerItems, command2, addLog, setPlayerItems } = commandObject
+    const { setGameData } = commandObject
+    const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
+    const { command2, addLog } = commandObject
     let body = {
         npcId: 0,
         playerId: player.id,
@@ -18,6 +20,7 @@ export const playerOffersQuest = async (commandObject) => {
         playerInventory: playerItems,
         //add player kill list here
     }
+    console.log(body)
     if (npcs.length === 0) {return addLog("There is nobody in the room offering quests.")}
     if (npcs.length > 1 && !command2) {return addLog("You must specify whose quest you wish to see.")}
     if (npcs.length === 1) {
@@ -35,16 +38,24 @@ export const playerOffersQuest = async (commandObject) => {
         if (questOffering.player) {
             addLog(questOffering.completionDialogue)
             const { player } = questOffering
-            console.log(player)
-            setPlayer(player)
+            setGameData(prev => ({
+                ...prev,
+                player: player
+            }))
+            // setPlayer(player)
             const playerUpdatedItems = await fetchAllItemsThatBelongToPlayer(player.id)
-            setPlayerItems(playerUpdatedItems)
+            setGameData(prev => ({
+                ...prev,
+                playerItems: playerUpdatedItems
+            }))
+            // setPlayerItems(playerUpdatedItems)
         } 
     }
 }
 
 export const playerSpeakToNpc = async (commandObject) => {
-    const { npcs, command2, addLog, player } = commandObject
+    const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
+    const { command2, addLog } = commandObject
     const playerId = player.id
     if (npcs.length === 0) {return addLog("There is nobody in the room to speak with")}
     if (npcs.length > 1 && !command2) {return addLog("You must specify who you want to speak with")}
@@ -60,7 +71,8 @@ export const playerSpeakToNpc = async (commandObject) => {
 
 
 export const playerSpeakToNpcQuest = async (commandObject) => {
-    const { npcs, command2, addLog, player, playerStatus } = commandObject
+    const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
+    const { command2, addLog, playerStatus } = commandObject
     toggleStatusTrue(playerStatus, "isTalking")
     const playerId = player.id
     if (!command2) {
@@ -83,8 +95,17 @@ export const playerSpeakToNpcQuest = async (commandObject) => {
     }
     if (command2) {
         const npc = npcs.find(npc => npc.name.toLowerCase() === command2)
+        if (!npc) {
+            addLog(`There is nobody here named ${command2} offering a quest.`)
+            return
+        }
         const npcId = npc.id
         const npcDialogue = await fetchNpcQuestDialogue(playerId, npcId)
+        if (!npcDialogue.success) {
+            addLog(`${npc.name} is not currently offering any quests.`)
+            return
+        }
+        console.log(npcDialogue)
         for (const paragraph of npcDialogue) {
             const dialogueJSX = npcSpeaks(npc, paragraph)
             await wait(200)
@@ -97,7 +118,7 @@ export const playerSpeakToNpcQuest = async (commandObject) => {
 
 export const playerLook = async (commandObject) => {
     console.log(commandObject)
-    const { player, setCurrentArea, setNpcs, setEnemies, setItems, setPlayers } = commandObject.gameData
+    const { player } = commandObject.gameData
     const { setGameData, addLog } = commandObject
 
     let areaId = !player.area_id ? 1 : player.area_id
@@ -128,7 +149,8 @@ export const playerLook = async (commandObject) => {
 }
 
 export const playerExamine = async (commandObject) => {
-    const { command2, currentArea, addLog } = commandObject
+    const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
+    const { command2, addLog, playerStatus } = commandObject
     if (!command2) {
         addLog("You must specify what you want to examine")
         return
@@ -145,7 +167,8 @@ export const playerExamine = async (commandObject) => {
 }
 
 export const playerPull = async (commandObject) => {
-    const { command2, currentArea, setCurrentArea, addLog } = commandObject
+    const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
+    const { command2, addLog, playerStatus, setGameData } = commandObject
     if (!command2) {
         addLog("You must specify what you want to pull")
         return
@@ -154,7 +177,11 @@ export const playerPull = async (commandObject) => {
     if (foundKeyword) {
         addLog(`You pull the ${foundKeyword.refName}`)
         const response = await foundKeyword[foundKeyword.methodCode](currentArea, foundKeyword)
-        await setCurrentArea(prev => ({...prev, exitsBool: response.updatedArea.exitsBool}))
+        const updatedAreaExits = response.updatedArea.exitsBool
+        setGameData(prev => ({
+            ...prev,
+            currentArea: ({...prev.currentArea, exitsBool: updatedAreaExits})
+        }))
     }
     if (!foundKeyword) {
         addLog(`You do not see a ${command2} to pull`)
@@ -175,13 +202,11 @@ export const playerGet = async (commandObject) => {
     if (command2 === "all") {
         const currentAreaItems = await fetchCurrentAreaItems(currentArea.id)
         await fetchCurrentAreaItemsToPlayer(currentAreaItems, player.id)
-        // setItems(prev => prev.filter(item => item.ownerId != player.id && item.ownerType != "player"))
         setGameData(prev => ({
             ...prev,
-            items: prev.filter(item => item.ownerId != player.id && item.ownerType != "player")
+            items: [...prev.items.filter(item => item.ownerId != player.id && item.ownerType != "player")]
         }))
         const updatedPlayerInventory = await fetchAllItemsThatBelongToPlayer(player.id)
-        // setPlayerItems(updatedPlayerInventory)
         setGameData(prev => ({
             ...prev,
             playerItems: updatedPlayerInventory

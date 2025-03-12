@@ -60,7 +60,7 @@ export const DevWindow = () => {
             return
         }
         addLog(`You swing at the enemy and hit it for ${damage} damage!`)
-        enemyTakesDamage(damage, enemyToAttack.id, setEnemies, addLog)
+        enemyTakesDamage(damage, enemyToAttack.id, setGameData, addLog)
     }
     
     function setPlayer1() {
@@ -94,11 +94,7 @@ export const DevWindow = () => {
 
     function spawnTwohandedSword() {
         fetchCreateTwohandedSword(player.area_id).then(item => {
-            setGameData(prev => ({
-                ...prev,
-                items: [...prev.items, item]
-            }))
-            // setItems(prev => [...prev, item])
+            setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
                 <p>A <span className="green">{item.name}</span> has spawned</p>
@@ -108,7 +104,7 @@ export const DevWindow = () => {
     }
     function spawnOnehandedSword() {
         fetchCreateOnehandedSword(player.area_id).then(item => {
-            setItems(prev => [...prev, item])
+            setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
                 <p>A <span className="green">{item.name}</span> has spawned</p>
@@ -118,7 +114,7 @@ export const DevWindow = () => {
     }
     function spawnDagger() {
         fetchCreateDagger(player.area_id).then(item => {
-            setItems(prev => [...prev, item])
+            setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
                 <p>A <span className="green">{item.name}</span> has spawned</p>
@@ -128,7 +124,7 @@ export const DevWindow = () => {
     }
     function spawnCrossbow() {
         fetchCreateCrossbow(player.area_id).then(item => {
-            setItems(prev => [...prev, item])
+            setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
                 <p>A <span className="green">{item.name}</span> has spawned</p>
@@ -145,7 +141,8 @@ export const DevWindow = () => {
         const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
         if (updatedPlayer) {
             addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
-            setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
+            setGameData(prev => ({...prev,player: {...prev.player, level: updatedPlayer.level, experience: updatedPlayer.experience}}))
+            // setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
             console.log(updatedPlayer.level, " updatedPlayer.level")
             if (updatedPlayer.level > playerPreviousLevel) {
                 addLog("YOU LEVELED UP!")
@@ -162,7 +159,8 @@ export const DevWindow = () => {
         const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
         if (updatedPlayer) {
             addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
-            setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
+            setGameData(prev => ({...prev,player: {...prev.player, level: updatedPlayer.level, experience: updatedPlayer.experience}}))
+            // setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
             console.log(updatedPlayer.level, " updatedPlayer.level")
             if (updatedPlayer.level < playerPreviousLevel) {
                 addLog("YOU DELEVELED!")

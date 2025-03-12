@@ -41,36 +41,52 @@ export const getNpcQuestDialogue = async(req, res) => {
     playerId: playerId,
     npcId: npcId
   }})
-  if (!playerNpc) {
+
+  //If the player_npc relationship does not exist, create one and reassign its value to playerNpc
+  if (!playerNpc && (npcId > 0 && playerId > 0)) {
+    playerNpc = await PlayerNpc.create({playerId: playerId, npcId: npcId})
+  }
+  if (!playerNpc && (isNaN(npcId) || isNaN(playerId))) {
     return res.status(404).json({message: "PlayerNpc not found"})
   }
+
+  console.log(npcId, " npcId")
+  console.log(playerNpc.questStage, " questStage")
   const npcDialogue = await NpcQuest.findOne({where: {
-    npcId: npcId,
+    npcId: parseInt(npcId),
     questStage: playerNpc.questStage
   }})
   if (!npcDialogue) {
-    return res.status(404).json({message: "dialogue not found"})
+    return res.status(404).json({message: "Npc dialogue not found", success: false})
   }
   const dialogueArray = npcDialogue.dialogue
   await playerNpc.save();
   res.status(200).json(dialogueArray)
 }
+
+
 export const getNpcDialogue = async(req, res) => {
   const { npcId } = req.params
   const { playerId } = req.query
-  const playerNpc = await PlayerNpc.findOne({where: {
+  let playerNpc = await PlayerNpc.findOne({where: {
     playerId: playerId,
     npcId: npcId
   }})
-  if (!playerNpc) {
+
+  //If the player_npc relationship does not exist, create one and reassign its value to playerNpc
+  if (!playerNpc && (npcId > 0 && playerId > 0)) {
+    playerNpc = await PlayerNpc.create({playerId: playerId, npcId: npcId})
+  }
+  if (!playerNpc && (isNaN(npcId) || isNaN(playerId))) {
     return res.status(404).json({message: "PlayerNpc not found"})
   }
+
   const npcDialogue = await NpcDialogue.findOne({where: {
     npcId: npcId,
     dialogueStage: playerNpc.dialogueStage
   }})
   if (!npcDialogue) {
-    return res.status(404).json({message: "dialogue not found"})
+    return res.status(404).json({message: "dialogue not found", success: false})
   }
   const dialogueArray = npcDialogue.dialogue
   const dialogueIndex = playerNpc.dialogueIndex % dialogueArray.length;
@@ -91,7 +107,7 @@ export const getNpcDialogueAll = async(req, res) => {
 //--------GETS ENTIRE QUEST - TESTING ONLY
 export const getNpcQuest = async (req, res) => {
   const { npcId, playerId } = req.params
-  const playerNpc = await PlayerNpc.findOne({where: { playerId, npcId }})
+  const playerNpc = await PlayerNpc.findOne({where: { playerId: playerId, npcId: npcId }})
   if (!playerNpc) {return res.status(404).json({message: "Player not found"})}
   const quest = await NpcQuest.findOne({where: { npcId, questStage: playerNpc.questStage }})
   if (!quest) {return res.status(404).json({message: "Quest not found"})}
@@ -100,34 +116,38 @@ export const getNpcQuest = async (req, res) => {
 
 export const postNpcRequirements = async (req, res) => {
   const { npcId, playerId, playerLevel, playerInventory, playerKillList } = req.body
-  const playerNpc = await PlayerNpc.findOne({where: { playerId, npcId }})
-  let playersRequiredItems
-  console.log(playerInventory, " playerInventory")
-  if (!playerNpc) {return res.status(404).json({message: "PlayerNpc not found"})}
-  const quest = await NpcQuest.findOne({where: { npcId, questStage: playerNpc.questStage }})
+  const playerNpc = await PlayerNpc.findOne({where: { playerId: playerId, npcId: npcId }})
 
+  // if (!playerNpc && (npcId > 0 && playerId > 0)) {
+  //   playerNpc = await PlayerNpc.create({playerId: playerId, npcId: npcId})
+  // }
+  // if (!playerNpc && (isNaN(npcId) || isNaN(playerId))) {
+  //   return res.status(404).json({message: "PlayerNpc not found"})
+  // }
+
+  let playersRequiredItems
+  if (!playerNpc) {return res.status(404).json({message: "Player_Npc relationship not found"})}
+  const quest = await NpcQuest.findOne({where: { npcId, questStage: playerNpc.questStage }})
   if (!quest) {return res.status(404).json({message: "404"})}
 
-  if (quest.requirements.requiredLevel > playerLevel) {return res.status(400).json({message: "level"})}
+  if (playerLevel < quest.requirements.requiredLevel) {return res.status(400).json({message: "level"})}
 
   if (quest.requirements.requiredItems) {
     const hasRequiredItem = quest.requirements.requiredItems.every(item => playerInventory.some(invItem => invItem.name.includes(item)))
     playersRequiredItems = quest.requirements.requiredItems.map(itemName => playerInventory.find(item => item.name == itemName)).filter(Boolean)
     if (!hasRequiredItem) {return res.status(400).json({message: "item"})}
     if (!playersRequiredItems) {return res.status(400).json({message: "required items not met"})}
+    await Promise.all(playersRequiredItems.map(async (item) => {
+      const itemToDestroy = await Item.findOne({ where: {id: item.id}})
+      if (itemToDestroy) {
+        await itemToDestroy.destroy()
+      }
+    }))
   }
-
   const player = await Player.findByPk(playerId)
   if (!player) {
     return res.status(404).json({message: "Player not found"})
   }
-
-  await Promise.all(playersRequiredItems.map(async (item) => {
-    const itemToDestroy = await Item.findOne({ where: {id: item.id}})
-    if (itemToDestroy) {
-      await itemToDestroy.destroy()
-    }
-  }))
 
   player.gold += quest.rewards.gold || 0
   player.experience += quest.rewards.experience || 0
