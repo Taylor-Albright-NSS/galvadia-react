@@ -181,8 +181,6 @@ export const getAllPlayerItems = async (req, res) => {
 export const patchPlayerPacksItem = async (req, res) => {
   try {
     const { playerId, itemId } = req.params
-    // const { designatedHand } = req.query
-    // let handSlot = designatedHand === "right" ? "right_hand" : "left_hand"
 
     const packedItem = await Item.findOne({
       where: {
@@ -195,7 +193,7 @@ export const patchPlayerPacksItem = async (req, res) => {
 
     await packedItem.update({ location: "inventory" })
     // if (playerId <= 0 || itemId <= 0) {return res.status(404).json({message: "playerId and/or itemId invalid"})}
-    return res.status(200).json(packedItem)
+    return res.status(200).json({packedItem, message: "You unpack your item"})
   } catch(error) {
     console.error(`Error packing item: `, error)
     return res.status(500).json({message: "Error packing item on the backend"})
@@ -206,7 +204,8 @@ export const patchPlayerUnpacksItem = async (req, res) => {
   try {
     const { playerId, itemId } = req.params
     if (playerId <= 0 || itemId <= 0) {return res.status(404).json({message: "playerId and/or itemId invalid"})}
-    const availableHands = playerItemInHandsCheck(playerId)
+    const availableHands = await playerItemInHandsCheck(playerId)
+    console.log(availableHands, " Available hands")
     const { leftHandOpen, rightHandOpen } = availableHands
     //If both hands are occupied -- fail
     if (!leftHandOpen && !rightHandOpen) {
@@ -223,23 +222,20 @@ export const patchPlayerUnpacksItem = async (req, res) => {
     }
     //If one of player's hands is occupied and unpacked item is two-handed -- fail
     if ((!leftHandOpen || !rightHandOpen) && unpackedItem.isTwoHanded) {
-      return res.status(422).json({message: "Player's hands are full"})
+      return res.status(422).json({message: "Both hands must be free in order to unpack a two-handed item"})
     }
 
-
-    if (rightHandOpen) {
-      await unpackedItem.update({ location: "right_hand" })
-      return res.status(200).json({message: "Item unpacked to right hand"})
-    }
-    if (leftHandOpen) {
-      await unpackedItem.update({ location: "left_hand" })
-      return res.status(200).json({message: "Item unpacked to left hand"})
-    }
     if ((rightHandOpen && leftHandOpen) && unpackedItem.isTwoHanded) {
       await unpackedItem.update({ location: "both_hands" })
-      return res.status(200).json({message: "Item unpack to both hands"})
+      return res.status(200).json({unpackedItem, message: "Item unpack to both hands"})
+    } else if (rightHandOpen) {
+      await unpackedItem.update({ location: "right_hand" })
+      return res.status(200).json({unpackedItem, message: "Item unpacked to right hand"})
+    } else if (leftHandOpen) {
+      await unpackedItem.update({ location: "left_hand" })
+      return res.status(200).json({unpackedItem, message: "Item unpacked to left hand"})
     }
-    return res.status(200).json(unpackedItem)
+    // return res.status(200).json(unpackedItem)
 
   } catch(error) {
     console.error(`Error unpacking item: `, error)
@@ -247,9 +243,23 @@ export const patchPlayerUnpacksItem = async (req, res) => {
   }
 }
 
+export const patchPlayerDropsItem = async (req, res) => {
+  try {
+    const { areaId, itemId } = req.params
+    const item = await Item.findByPk(itemId)
+    if (!item) {
+      return res.status(404).json({message: "Item not found"})
+    }
+    await item.update({ ownerId: areaId, ownerType: "area", location: null })
+    return res.status(200).json(item)
+  } catch(error) {
+    console.error(`Error dropping item`, error)
+  }
+}
+
 const playerItemInHandsCheck = async (playerId) => {
   try {
-    const playerFullInventory = Item.findAll({
+    const playerFullInventory = await Item.findAll({
       where: {ownerType: "player", ownerId: playerId}
     })
     const hands = {

@@ -25,6 +25,9 @@ module.exports = {
       isTwoHanded: {
         type: Sequelize.BOOLEAN
       },
+      keywords: {
+        type: Sequelize.ARRAY(Sequelize.DataTypes.STRING)
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false

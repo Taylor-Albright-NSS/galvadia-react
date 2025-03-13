@@ -3,7 +3,7 @@ import { createEnemy, enemyDies, enemyTakesDamage, fetchAllEnemies, fetchEnemies
 import { useContext, useState } from "react"
 import { fetchCurrentArea } from "../../fetches/areas/areas"
 import { zGameContext } from "./zGameContext"
-import { fetchCreateCrossbow, fetchCreateDagger, fetchCreateItem, fetchCreateOnehandedSword, fetchCreateTwohandedSword, fetchCurrentAreaItems, fetchEveryItem } from "../../fetches/items/items"
+import { fetchCreateCrossbow, fetchCreateDagger, fetchCreateItem, fetchCreateOnehandedSword, fetchCreateTwohandedSword, fetchCurrentAreaItems, fetchDeleteAllItems, fetchEveryItem, fetchPlayerUnpacksItem } from "../../fetches/items/items"
 // import { pickupItem, joshTest } from "../../websocket"
 // import { socket } from "../../websocket"
 import { getPlayer1, getPlayer2 } from "../../fetches/players/players"
@@ -169,6 +169,14 @@ export const DevWindow = () => {
             addLog(`Player didn't gain any experience for some reason`)
         }
     }
+    async function deleteAllItems() {
+        const data = await fetchDeleteAllItems()
+        addLog(data.message)
+    }
+    async function playerUnpackItem() {
+        const playerId = player.id
+        const data = await fetchPlayerUnpacksItem(playerId)
+    }
 
         return (
             <Container className="d-flex">
@@ -192,6 +200,7 @@ export const DevWindow = () => {
                     <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={spawnOnehandedSword}>Spawn OH Sword</button>
                     <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={spawnDagger}>Spawn Dagger</button>
                     <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={spawnCrossbow}>Spawn Bow</button>
+                    <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={deleteAllItems}>Delete all items</button>
                 </Row>
             </Container>
     )

@@ -2,7 +2,7 @@ import 'dotenv/config'; // No need for .config()
 import express from 'express';
 // import playerRoutes from './routes/playerRoutes'
 import Area from './models/area.js';
-import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem } from './controllers/playerController.js';
+import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem, patchPlayerDropsItem } from './controllers/playerController.js';
 import db from './models/associations.js';
 import cors from 'cors';
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js';
@@ -44,6 +44,7 @@ app.post('/item/dagger/:areaId', postDagger)
 app.post('/item/crossbow/:areaId', postCrossbow)
 app.patch('/item/pack/:playerId/:itemId', patchPlayerPacksItem)
 app.patch('/item/unpack/:playerId/:itemId', patchPlayerUnpacksItem)
+app.patch('/item/drop/:areaId/:itemId', patchPlayerDropsItem)
 //--------NPCS
 app.get('/npcs', getEveryNpc)
 app.get('/npcs/:areaId', getCurrentAreaNpcs)

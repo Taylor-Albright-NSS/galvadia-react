@@ -25,6 +25,9 @@ export const Item = sequelize.define('Item', {
     type: DataTypes.BOOLEAN,
     defaultValue: false,
   },
+  keywords: {
+    type: DataTypes.ARRAY(DataTypes.STRING)
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

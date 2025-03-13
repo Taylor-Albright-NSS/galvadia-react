@@ -2,7 +2,7 @@ import { fetchCurrentAreaNpcs, fetchNpcDialogue, fetchNpcQuestDialogue, questReq
 import { fetchCurrentArea } from "../fetches/areas/areas"
 import { areaDisplay } from "../DOMrenders/areaDisplay"
 import { npcSpeaks } from "../DOMrenders/npcActions"
-import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems, fetchCurrentAreaItemsToPlayer } from "../fetches/items/items"
+import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems, fetchCurrentAreaItemsToPlayer, fetchPlayerPacksItem, fetchPlayerUnpacksItem } from "../fetches/items/items"
 import { fetchEnemiesInRoom } from "../fetches/enemies/enemies"
 import { fetchPlayersInRoom } from "../fetches/players/players"
 import { toggleStatusFalse, toggleStatusTrue } from "../utils/playerStatus"
@@ -215,3 +215,66 @@ export const playerGet = async (commandObject) => {
     }
 }
 
+export async function playerUnpackItem(commandObject) {
+    const { addLog, command2, setGameData } = commandObject
+    const { id } = commandObject.gameData.player
+    const { playerItems } = commandObject.gameData
+    if (!command2) {
+        addLog(`You must specify what you want to unpack`)
+        return
+    }
+    const unpackedItem = playerItems.find(({ keywords }) => keywords.includes(command2))
+    if (!unpackedItem) {
+        addLog(`You do not have a ${command2} to unpack`)
+        return
+    }
+    const data = await fetchPlayerUnpacksItem(id, unpackedItem.id)
+    const updatedUnpackedItem = data.unpackedItem
+    if (!updatedUnpackedItem) {
+        addLog(`Internal server error`)
+        return
+    }
+    setGameData(prev => ({
+        ...prev,
+        playerItems: prev.playerItems.map(item => {
+            return item.id === updatedUnpackedItem.id ? updatedUnpackedItem : item
+        })
+    }))
+    addLog(`You unpack your ${updatedUnpackedItem.name}`)
+}
+export async function playerPackItem(commandObject) {
+    const { addLog, command2, setGameData } = commandObject
+    const { id } = commandObject.gameData.player
+    const { playerItems } = commandObject.gameData
+    if (!command2) {
+        addLog(`You must specify what you want to pack`)
+        return
+    }
+    const packedItem = playerItems.find(item => {
+        console.log(commandObject, " item")
+        if (command2 == "right") {
+            return item.location == "right_hand"
+        }
+        if (command2 == "left") {
+            return item.location == "left_hand"
+        }
+    })
+    if (!packedItem) {
+        addLog(`You do not have a ${command2} to pack`)
+        return
+    }
+    console.log(packedItem)
+    const data = await fetchPlayerPacksItem(id, packedItem.id)
+    const updatedPackedItem = data.packedItem
+    if (!packedItem) {
+        addLog(`Internal server error`)
+        return
+    }
+    setGameData(prev => ({
+        ...prev,
+        playerItems: prev.playerItems.map(item => {
+            return item.id === updatedPackedItem.id ? updatedPackedItem : item
+        })
+    }))
+    addLog(`You pack your ${updatedPackedItem.name}`)
+}

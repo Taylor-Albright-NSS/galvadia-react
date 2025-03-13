@@ -42,9 +42,10 @@ export const GameProvider = ({ children }) => {
       try {
         console.log(gameData.player)
         let player
+        if (!gameData.player) {player = await getPlayer1()}
         if (gameData.player.id == 1) {player = await getPlayer1()}
         if (gameData.player.id == 2) {player = await getPlayer2()}
-  
+        
         const [area, enemies, npcs, items, playerItems, players] = await Promise.all([
           fetchCurrentArea(player.area_id),
           fetchEnemiesInRoom(player.area_id),
