@@ -1,5 +1,5 @@
 import { moveDirection } from "../playerActions/playerMovement"
-import { playerExamine, playerGet, playerLook, playerOffersQuest, playerPackItem, playerPull, playerSpeakToNpc, playerSpeakToNpcQuest, playerUnpackItem } from "../playerActions/playerActions"
+import { playerDropsItem, playerExamine, playerGet, playerLook, playerOffersQuest, playerPacksItem, playerPull, playerSpeakToNpc, playerSpeakToNpcQuest, playerUnpacksItem } from "../playerActions/playerActions"
 import { playerInventoryDisplay } from "../DOMrenders/playerInventoryDisplay";
 
 export const commandActions = {
@@ -14,8 +14,9 @@ export const commandActions = {
     get: async (commandObject) => {playerGet(commandObject)},
     inventory: async (commandObject) => {playerInventoryDisplay(commandObject)},
     offer: async (commandObject) => {playerOffersQuest(commandObject)},
-    unpack: async (commandObject) => {playerUnpackItem(commandObject)},
-    pack: async (commandObject) => {playerPackItem(commandObject)}
+    unpack: async (commandObject) => {playerUnpacksItem(commandObject)},
+    pack: async (commandObject) => {playerPacksItem(commandObject)},
+    drop: async (commandObject) => {playerDropsItem(commandObject)}
 };
 
 export const actionList = async (commandObject) => {

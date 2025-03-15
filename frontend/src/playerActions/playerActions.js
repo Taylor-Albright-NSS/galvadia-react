@@ -2,12 +2,14 @@ import { fetchCurrentAreaNpcs, fetchNpcDialogue, fetchNpcQuestDialogue, questReq
 import { fetchCurrentArea } from "../fetches/areas/areas"
 import { areaDisplay } from "../DOMrenders/areaDisplay"
 import { npcSpeaks } from "../DOMrenders/npcActions"
-import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems, fetchCurrentAreaItemsToPlayer, fetchPlayerPacksItem, fetchPlayerUnpacksItem } from "../fetches/items/items"
+import { fetchAllItemsThatBelongToPlayer, fetchCurrentAreaItems, fetchCurrentAreaItemsToPlayer, fetchPlayerDropsItem, fetchPlayerPacksItem, fetchPlayerUnpacksItem } from "../fetches/items/items"
 import { fetchEnemiesInRoom } from "../fetches/enemies/enemies"
 import { fetchPlayersInRoom } from "../fetches/players/players"
 import { toggleStatusFalse, toggleStatusTrue } from "../utils/playerStatus"
 import { wait } from "../utils/wait"
 import { findNpcByName } from "../PlayerActionChecks/npcChecks"
+import { playerDropsJSX, playerPacksJSX, playerUnpacksJSX } from "./jsxFunctions"
+import { findItemByKeyword, findItemByLeft, findItemByRight, findItemsByKeyword } from "../helpers/itemHelpers"
 
 export const playerOffersQuest = async (commandObject) => {
     const { setGameData } = commandObject
@@ -215,21 +217,27 @@ export const playerGet = async (commandObject) => {
     }
 }
 
-export async function playerUnpackItem(commandObject) {
+export async function playerUnpacksItem(commandObject) {
     const { addLog, command2, setGameData } = commandObject
-    const { id } = commandObject.gameData.player
+    const playerId = commandObject.gameData.player.id
     const { playerItems } = commandObject.gameData
-    if (!command2) {
-        addLog(`You must specify what you want to unpack`)
-        return
-    }
-    const unpackedItem = playerItems.find(({ keywords }) => keywords.includes(command2))
-    if (!unpackedItem) {
-        addLog(`You do not have a ${command2} to unpack`)
-        return
-    }
-    const data = await fetchPlayerUnpacksItem(id, unpackedItem.id)
+    if (!command2) {return addLog(`You must specify what you want to unpack`)}
+
+    const isLeftHandFull = playerItems.some(item => item.location == "left_hand")
+    const isRightHandFull = playerItems.some(item => item.location == "right_hand")
+    const isWieldingTwoHanded = playerItems.some(item => item.location == "both_hands")
+
+    if ((isLeftHandFull && isRightHandFull) || isWieldingTwoHanded) {return addLog(`You cannot unpack anything when both hands are full`)}
+    
+    const unpackedItem = findItemByKeyword(playerItems, command2)
+    if (unpackedItem.location == "left_hand" || unpackedItem.location == "right_hand") {return addLog(`You are wielding the only ${unpackedItem.name} that you own`)}
+
+    if ((isLeftHandFull || isRightHandFull) && unpackedItem?.isTwoHanded) {return addLog(`Both hands must be free in order to hold a ${unpackedItem.name}`)}
+    if (!unpackedItem) {return addLog(`You do not have a ${command2} to unpack`)}
+    
+    const data = await fetchPlayerUnpacksItem(playerId, unpackedItem.id)
     const updatedUnpackedItem = data.unpackedItem
+
     if (!updatedUnpackedItem) {
         addLog(`Internal server error`)
         return
@@ -240,9 +248,41 @@ export async function playerUnpackItem(commandObject) {
             return item.id === updatedUnpackedItem.id ? updatedUnpackedItem : item
         })
     }))
-    addLog(`You unpack your ${updatedUnpackedItem.name}`)
+    const message = playerUnpacksJSX(updatedUnpackedItem)
+    addLog(message)
 }
-export async function playerPackItem(commandObject) {
+
+export async function playerDropsItem(commandObject) {
+    const { addLog, command2, command3, setGameData } = commandObject
+    const areaId = commandObject.gameData.currentArea.id
+    const { playerItems } = commandObject.gameData
+    if (!command2) {return addLog(`You must specify what you want to drop`)}
+    let droppedItem
+    if (command2 == "right") {droppedItem = findItemByRight(playerItems)}
+    else if (command2 == "left") {droppedItem = findItemByLeft(playerItems)}
+    else {droppedItem = findItemByKeyword(playerItems, command2)}
+
+    //negative logic
+    if (!droppedItem) {return addLog(`You do not have a ${command2} to drop`)}
+    if ((droppedItem.location == "left_hand" && command2 != "left")) {return addLog(`You must specify either left or right to drop something from your hands`)}
+    if ((droppedItem.location == "right_hand" && command2 != "right")) {return addLog(`You must specify either left or right to drop something from your hands`)}
+    //positive case
+    const updatedDroppedItem = await fetchPlayerDropsItem(areaId, droppedItem.id)
+    if (!updatedDroppedItem) {return addLog(`Internal server error`)}
+    setGameData(prev => ({
+        ...prev,
+        items: prev.items.map(item => {
+            return item.id === updatedDroppedItem.id ? updatedDroppedItem : item
+        }),
+        playerItems: prev.playerItems.filter(item => {
+            return item.id != updatedDroppedItem.id
+        })
+    }))
+    const message = playerDropsJSX(updatedDroppedItem)
+    addLog(message)
+}
+
+export async function playerPacksItem(commandObject) {
     const { addLog, command2, setGameData } = commandObject
     const { id } = commandObject.gameData.player
     const { playerItems } = commandObject.gameData
@@ -250,19 +290,24 @@ export async function playerPackItem(commandObject) {
         addLog(`You must specify what you want to pack`)
         return
     }
+
     const packedItem = playerItems.find(item => {
-        console.log(commandObject, " item")
+        if (command2 != "right" && command2 != "left") {
+            return item.keywords.some(keyword => keyword == command2)
+        }
         if (command2 == "right") {
-            return item.location == "right_hand"
+            return item.location == "right_hand" || item.location == "both_hands"
         }
         if (command2 == "left") {
-            return item.location == "left_hand"
+            return item.location == "left_hand" || item.location == "both_hands"
         }
     })
-    if (!packedItem) {
-        addLog(`You do not have a ${command2} to pack`)
-        return
-    }
+
+    if (!packedItem && command2 == "right") {return addLog(`You are not holding anything in your right hand`)}
+    if (!packedItem && command2 == "left") {return addLog(`You are not holding anything in your left hand`)}
+    if (!packedItem) {return addLog(`You do not have a ${command2} to pack`)}
+
+
     console.log(packedItem)
     const data = await fetchPlayerPacksItem(id, packedItem.id)
     const updatedPackedItem = data.packedItem
@@ -276,5 +321,6 @@ export async function playerPackItem(commandObject) {
             return item.id === updatedPackedItem.id ? updatedPackedItem : item
         })
     }))
-    addLog(`You pack your ${updatedPackedItem.name}`)
+    const message = playerPacksJSX(updatedPackedItem)
+    addLog(message)
 }

@@ -13,6 +13,7 @@ export const DevWindow = () => {
     const { gameData, setGameData, addLog } = useContext(zGameContext)
     const { currentArea, enemies, player, npcs, items, playerItems, players } = gameData
     const [enemyId, setEnemyId] = useState(0)
+    const [logState, setLogState] = useState("")
     console.log(setGameData)
 
     function retrieveAllEnemies() {
@@ -173,10 +174,12 @@ export const DevWindow = () => {
         const data = await fetchDeleteAllItems()
         addLog(data.message)
     }
-    async function playerUnpackItem() {
+    async function playerUnpacksItem() {
         const playerId = player.id
         const data = await fetchPlayerUnpacksItem(playerId)
     }
+
+
 
         return (
             <Container className="d-flex">
@@ -201,6 +204,14 @@ export const DevWindow = () => {
                     <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={spawnDagger}>Spawn Dagger</button>
                     <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={spawnCrossbow}>Spawn Bow</button>
                     <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={deleteAllItems}>Delete all items</button>
+
+                    <input type="text" style={{height: "50%", maxHeight: "40px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" 
+                    onChange={(e) => {
+                        console.log(e.target.value)
+                        setLogState(e.target.value)
+                        console.log(logState)
+                    }}/>
+                    <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1">Submit Log</button>
                 </Row>
             </Container>
     )

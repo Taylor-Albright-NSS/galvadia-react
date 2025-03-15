@@ -18,6 +18,7 @@ export const MainWindow = () => {
                 height: "700px",
                 alignItems: "flex-start"
             }}>
+                {console.log(windowLogs)}
             {windowLogs.map((element, index) => {
                 return <div key={index}>{element}</div>
             })}

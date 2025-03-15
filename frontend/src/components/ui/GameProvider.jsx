@@ -30,10 +30,26 @@ export const GameProvider = ({ children }) => {
     isResting: false,
   })
 
+
   const addLog = (message) => {
-    console.log(message)
     setWindowLogs(prev => [...prev, message])
   }
+  // [message, color]
+  // const customizeEachWord = function(messageCollection) {
+  //   const [message, color] = messageCollection
+  //   // const classOrClassArray = addClass
+  //   let span = document.createElement('span') //string 1
+  //   span.textContent = message
+  //   if (Array.isArray(classOrClassArray)) {
+  //     classOrClassArray.forEach(classToAdd => span.classList.add(classToAdd))
+  //   } else {
+  //     span.classList.add(classOrClassArray)
+  //   }
+  //   line.appendChild(span)
+  //   masterArea.appendChild(line)
+  //   updateScroll()
+  // }
+
 
   const contextValue = { gameData, setGameData, playerStatus, windowLogs, addLog }
 
