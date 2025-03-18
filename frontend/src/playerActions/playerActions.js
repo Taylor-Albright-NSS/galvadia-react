@@ -9,7 +9,7 @@ import { toggleStatusFalse, toggleStatusTrue } from "../utils/playerStatus"
 import { wait } from "../utils/wait"
 import { findNpcByName } from "../PlayerActionChecks/npcChecks"
 import { playerDropsJSX, playerPacksJSX, playerUnpacksJSX } from "./jsxFunctions"
-import { findItemByKeyword, findItemByLeft, findItemByRight, findItemsByKeyword } from "../helpers/itemHelpers"
+import { dropItemByKeyword, findItemByLeft, findItemByNumber, findItemByRight, unpackItemByKeyword } from "../helpers/itemHelpers"
 
 export const playerOffersQuest = async (commandObject) => {
     const { setGameData } = commandObject
@@ -38,7 +38,8 @@ export const playerOffersQuest = async (commandObject) => {
         if (questOffering.message === "level") {return addLog(`You do not meet the level requirement for this quest.`)}
         if (questOffering.message === "item") {return addLog(`You have not offered the correct item(s) required for this quest.`)}
         if (questOffering.player) {
-            addLog(questOffering.completionDialogue)
+            const dialogueJSX = npcSpeaks(foundNpc, questOffering.completionDialogue)
+            addLog(dialogueJSX)
             const { player } = questOffering
             setGameData(prev => ({
                 ...prev,
@@ -108,9 +109,9 @@ export const playerSpeakToNpcQuest = async (commandObject) => {
             return
         }
         console.log(npcDialogue)
-        for (const paragraph of npcDialogue) {
+        for (const paragraph of npcDialogue.message) {
             const dialogueJSX = npcSpeaks(npc, paragraph)
-            await wait(200)
+            await wait(100)
             if (!playerStatus.current.isTalking) {return}
             addLog(dialogueJSX)
         }
@@ -152,17 +153,31 @@ export const playerLook = async (commandObject) => {
 
 export const playerExamine = async (commandObject) => {
     const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
-    const { command2, addLog, playerStatus } = commandObject
+    const { command2, addLog, playerStatus, setGameData } = commandObject
     if (!command2) {
         addLog("You must specify what you want to examine")
         return
     }
-    const foundItem = currentArea.Keywords.find(keyword => keyword.refName == command2)
-    if (foundItem) {
-        addLog(foundItem.description)
-        return
+    const foundKeyword = currentArea.Keywords.find(keyword => keyword.refName == command2)
+    if (foundKeyword) {
+        const response = await foundKeyword[foundKeyword.methodCode](player, currentArea, foundKeyword)
+        if (response.message) {
+            addLog(foundKeyword.displayAlreadyActivated)
+            addLog(" ")
+            addLog(`**This keyword has already been activated**`) 
+            return
+        } else {
+            console.log(response)
+            addLog(foundKeyword.displayActivate)
+            addLog(`**activating keyword now**`)
+            setGameData(prev => ({
+                ...prev,
+                playerItems: [...prev.playerItems, response]
+            }))
+            return
+        }
     }
-    if (!foundItem) {
+    if (!foundKeyword) {
         addLog(`You do not see a ${command2} to examine`)
         return
     }
@@ -176,6 +191,10 @@ export const playerPull = async (commandObject) => {
         return
     }
     const foundKeyword = currentArea.Keywords.find(keyword => keyword.refName == command2)
+    if (!foundKeyword) {
+        addLog(`You do not see a ${command2} to pull`)
+        return
+    }
     if (foundKeyword) {
         addLog(`You pull the ${foundKeyword.refName}`)
         const response = await foundKeyword[foundKeyword.methodCode](currentArea, foundKeyword)
@@ -184,10 +203,6 @@ export const playerPull = async (commandObject) => {
             ...prev,
             currentArea: ({...prev.currentArea, exitsBool: updatedAreaExits})
         }))
-    }
-    if (!foundKeyword) {
-        addLog(`You do not see a ${command2} to pull`)
-        return
     }
 }
 
@@ -222,15 +237,18 @@ export async function playerUnpacksItem(commandObject) {
     const playerId = commandObject.gameData.player.id
     const { playerItems } = commandObject.gameData
     if (!command2) {return addLog(`You must specify what you want to unpack`)}
-
     const isLeftHandFull = playerItems.some(item => item.location == "left_hand")
     const isRightHandFull = playerItems.some(item => item.location == "right_hand")
     const isWieldingTwoHanded = playerItems.some(item => item.location == "both_hands")
-
+    
     if ((isLeftHandFull && isRightHandFull) || isWieldingTwoHanded) {return addLog(`You cannot unpack anything when both hands are full`)}
     
-    const unpackedItem = findItemByKeyword(playerItems, command2)
-    if (unpackedItem.location == "left_hand" || unpackedItem.location == "right_hand") {return addLog(`You are wielding the only ${unpackedItem.name} that you own`)}
+    let unpackedItem
+    if (!isNaN(command2)) {unpackedItem = findItemByNumber(playerItems, command2)}
+    if (isNaN(command2)) {unpackedItem = unpackItemByKeyword(playerItems, command2)}
+    if (unpackedItem === false) {return addLog(`You're currently holding that item`)}
+    if (!unpackedItem && !isNaN(command2)) {return addLog(`You don't have an item in that slot to unpack`)}
+    // if (unpackedItem.location == "left_hand" || unpackedItem.location == "right_hand") {return addLog(`You are wielding the only ${unpackedItem.name} that you own`)}
 
     if ((isLeftHandFull || isRightHandFull) && unpackedItem?.isTwoHanded) {return addLog(`Both hands must be free in order to hold a ${unpackedItem.name}`)}
     if (!unpackedItem) {return addLog(`You do not have a ${command2} to unpack`)}
@@ -260,12 +278,13 @@ export async function playerDropsItem(commandObject) {
     let droppedItem
     if (command2 == "right") {droppedItem = findItemByRight(playerItems)}
     else if (command2 == "left") {droppedItem = findItemByLeft(playerItems)}
-    else {droppedItem = findItemByKeyword(playerItems, command2)}
+    else {droppedItem = dropItemByKeyword(playerItems, command2)}
 
     //negative logic
     if (!droppedItem) {return addLog(`You do not have a ${command2} to drop`)}
     if ((droppedItem.location == "left_hand" && command2 != "left")) {return addLog(`You must specify either left or right to drop something from your hands`)}
     if ((droppedItem.location == "right_hand" && command2 != "right")) {return addLog(`You must specify either left or right to drop something from your hands`)}
+    if ((droppedItem.location == "both_hands" && (command2 != "right" && command2 != "left"))) {return addLog(`You must specify either left or right to drop something from your hands`)}
     //positive case
     const updatedDroppedItem = await fetchPlayerDropsItem(areaId, droppedItem.id)
     if (!updatedDroppedItem) {return addLog(`Internal server error`)}

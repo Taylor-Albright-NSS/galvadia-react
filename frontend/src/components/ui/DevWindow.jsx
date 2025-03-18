@@ -14,7 +14,7 @@ export const DevWindow = () => {
     const { currentArea, enemies, player, npcs, items, playerItems, players } = gameData
     const [enemyId, setEnemyId] = useState(0)
     const [logState, setLogState] = useState("")
-    console.log(setGameData)
+    console.log(currentArea)
 
     function retrieveAllEnemies() {
         fetchAllEnemies().then(enemies => {
@@ -28,7 +28,7 @@ export const DevWindow = () => {
     }
 
     function fetchCreateEnemy() {
-        createEnemy(player.area_id).then(enemy => {
+        createEnemy(currentArea.id).then(enemy => {
             setGameData(prev => ({
                 ...prev,
                 enemies: [...prev.enemies, enemy]
@@ -94,7 +94,8 @@ export const DevWindow = () => {
     }
 
     function spawnTwohandedSword() {
-        fetchCreateTwohandedSword(player.area_id).then(item => {
+        console.log(currentArea)
+        fetchCreateTwohandedSword(currentArea.id).then(item => {
             setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
@@ -104,7 +105,7 @@ export const DevWindow = () => {
         })
     }
     function spawnOnehandedSword() {
-        fetchCreateOnehandedSword(player.area_id).then(item => {
+        fetchCreateOnehandedSword(currentArea.id).then(item => {
             setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
@@ -114,7 +115,7 @@ export const DevWindow = () => {
         })
     }
     function spawnDagger() {
-        fetchCreateDagger(player.area_id).then(item => {
+        fetchCreateDagger(currentArea.id).then(item => {
             setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
@@ -124,7 +125,7 @@ export const DevWindow = () => {
         })
     }
     function spawnCrossbow() {
-        fetchCreateCrossbow(player.area_id).then(item => {
+        fetchCreateCrossbow(currentArea.id).then(item => {
             setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
