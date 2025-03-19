@@ -20,7 +20,6 @@ export const commandActions = {
 };
 
 export const actionList = async (commandObject) => {
-    console.log("actionList hit")
     const { command1, addLog} = commandObject
     if (!commandActions[command1]) {
         addLog("That is not a valid command")

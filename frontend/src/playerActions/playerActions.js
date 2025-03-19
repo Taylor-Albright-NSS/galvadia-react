@@ -22,7 +22,6 @@ export const playerOffersQuest = async (commandObject) => {
         playerInventory: playerItems,
         //add player kill list here
     }
-    console.log(body)
     if (npcs.length === 0) {return addLog("There is nobody in the room offering quests.")}
     if (npcs.length > 1 && !command2) {return addLog("You must specify whose quest you wish to see.")}
     if (npcs.length === 1) {
@@ -108,7 +107,6 @@ export const playerSpeakToNpcQuest = async (commandObject) => {
             addLog(`${npc.name} is not currently offering any quests.`)
             return
         }
-        console.log(npcDialogue)
         for (const paragraph of npcDialogue.message) {
             const dialogueJSX = npcSpeaks(npc, paragraph)
             await wait(100)
@@ -120,7 +118,6 @@ export const playerSpeakToNpcQuest = async (commandObject) => {
 }
 
 export const playerLook = async (commandObject) => {
-    console.log(commandObject)
     const { player } = commandObject.gameData
     const { setGameData, addLog } = commandObject
 
@@ -159,15 +156,18 @@ export const playerExamine = async (commandObject) => {
         return
     }
     const foundKeyword = currentArea.Keywords.find(keyword => keyword.refName == command2)
+    if (foundKeyword?.methodCode != "examineKeyword") {
+        addLog(foundKeyword.description)
+        return
+    }
     if (foundKeyword) {
-        const response = await foundKeyword[foundKeyword.methodCode](player, currentArea, foundKeyword)
+        const response = await foundKeyword[foundKeyword.methodCode](player, foundKeyword)
         if (response.message) {
-            addLog(foundKeyword.displayAlreadyActivated)
+            addLog(foundKeyword.description)
             addLog(" ")
             addLog(`**This keyword has already been activated**`) 
             return
         } else {
-            console.log(response)
             addLog(foundKeyword.displayActivate)
             addLog(`**activating keyword now**`)
             setGameData(prev => ({
@@ -191,6 +191,10 @@ export const playerPull = async (commandObject) => {
         return
     }
     const foundKeyword = currentArea.Keywords.find(keyword => keyword.refName == command2)
+    if (foundKeyword?.methodCode != "pullLever") {
+        addLog(`You cannot pull the ${command2}`)
+        return
+    }
     if (!foundKeyword) {
         addLog(`You do not see a ${command2} to pull`)
         return
@@ -207,11 +211,8 @@ export const playerPull = async (commandObject) => {
 }
 
 export const playerGet = async (commandObject) => {
-    console.log(commandObject)
     const { gameData, setGameData, addLog, command2 } = commandObject
     const { player, currentArea } = gameData
-    console.log(commandObject)
-    console.log(command2)
     if (command2 != "all") {
         addLog("Please specify all")
         return
@@ -326,8 +327,6 @@ export async function playerPacksItem(commandObject) {
     if (!packedItem && command2 == "left") {return addLog(`You are not holding anything in your left hand`)}
     if (!packedItem) {return addLog(`You do not have a ${command2} to pack`)}
 
-
-    console.log(packedItem)
     const data = await fetchPlayerPacksItem(id, packedItem.id)
     const updatedPackedItem = data.packedItem
     if (!packedItem) {

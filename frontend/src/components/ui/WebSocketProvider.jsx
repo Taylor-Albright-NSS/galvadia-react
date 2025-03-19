@@ -7,7 +7,6 @@ export const WebSocketProvider = ({ children }) => {
     const [messages, setMessages] = useState([]); // Store received messages
     const { addLog, gameData } = useContext(zGameContext)
     const { player } = gameData
-    console.log(player)
     useEffect(() => {
         if (player.id) {
             if (socket.readyState === WebSocket.OPEN) {
@@ -29,7 +28,6 @@ export const WebSocketProvider = ({ children }) => {
 
         ws.onmessage = (event) => {
             const data = JSON.parse(event.data)
-            console.log(data)
             if (data.type === "playerDialogue") {addLog(data.dialogue)}
             if (data.type === "playerMoves") {addLog(data.message)}
             setMessages((prev) => [...prev, event.data])

@@ -30,10 +30,10 @@ export const GameProvider = ({ children }) => {
     isResting: false,
   })
 
-
   const addLog = (message) => {
     setWindowLogs(prev => [...prev, message])
   }
+
   // [message, color]
   // const customizeEachWord = function(messageCollection) {
   //   const [message, color] = messageCollection
@@ -56,7 +56,7 @@ export const GameProvider = ({ children }) => {
   useEffect(() => {
     const updateAll = async () => {
       try {
-        console.log(gameData.player)
+        console.log(gameData)
         let player
         if (!gameData.player) {player = await getPlayer1()}
         if (gameData.player.id == 1) {player = await getPlayer1()}
@@ -80,7 +80,6 @@ export const GameProvider = ({ children }) => {
           playerItems,
           players
         })
-        console.log(players, " players")
         addLog(areaDisplay(area, enemies, npcs, items, players))
       } catch (error) {
         console.error("Error updating data:", error)

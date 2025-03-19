@@ -9,7 +9,6 @@ export const keywordMethods = {
     },
     examineKeyword: async function(player, currentArea, foundKeyword) {
         const keywordResponse = await fetchKeywordActivation(player, currentArea, foundKeyword)
-        console.log(keywordResponse, " keywordResponse")
         return keywordResponse
         
         // const spawnItemResponse = await fetchItemToSpawn(currentArea.id, keyword.special)

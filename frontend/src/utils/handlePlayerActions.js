@@ -10,7 +10,7 @@ export const handleEnterPress = (e, commandObject) => {
     const rawInput = e.target.value
     const { gameData, socket } = commandObject
     const { player } = gameData
-    console.log(commandObject)
+    console.log(commandObject, " COMMAND OBJECT")
     if (rawInput[0] === "'") {
         let normalizedInput = rawInput.slice(1)
         socket.send(JSON.stringify({type: "playerDialogue", playerId: player.id, areaId: player.area_id, playerName: player.name, playerDialogue: normalizedInput}))

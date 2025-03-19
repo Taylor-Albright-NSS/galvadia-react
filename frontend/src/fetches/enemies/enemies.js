@@ -20,7 +20,6 @@ export const enemyTakesDamage = async (damage, enemyId, setGameData, addLog) => 
         body: JSON.stringify({ damage })
     })
     const updatedEnemy = await response.json()
-    console.log(updatedEnemy)
     if (updatedEnemy.health <= 0) {
         setGameData(prev => ({
             ...prev,

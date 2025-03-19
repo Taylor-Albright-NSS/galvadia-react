@@ -14,7 +14,7 @@ export const fetchDirectionToUnlock = async (areaId, direction) => {
     return data
 }
 
-export const fetchKeywordActivation = async (player, currentArea, keyword) => {
+export const fetchKeywordActivation = async (player, keyword) => {
     // try {
         const keywordResponse = await fetch(`${api}/keywordActivation/`, {
             method: "PATCH",
@@ -25,10 +25,6 @@ export const fetchKeywordActivation = async (player, currentArea, keyword) => {
         })
         const keywordData = await keywordResponse.json()
         if (!keywordData.message) {
-            console.log(keywordData, " keywordData")
-            console.log(keywordData, " keywordData")
-            console.log(keywordData, " keywordData")
-            console.log(keywordData, " keywordData")
             return keywordData
         }
         if (keywordData.message) {
@@ -51,7 +47,6 @@ export const fetchSpawnItemToPlayer = async (player, keyword) => {
             throw new Error(`Spawning item failed`)
         }
         const data = await response.json()
-        console.log(data)
         return data
     } catch(error) {
         console.error(`Error: `, error.message)
@@ -70,7 +65,6 @@ export const fetchItemToSpawn = async (areaId, keywordSpecial) => {
             throw new Error(`Spawning item failed`)
         }
         const data = await response.json()
-        console.log(data)
         return data
     } catch(error) {
         console.error(`Error: `, error.message)
@@ -96,7 +90,14 @@ export const fetchCurrentArea = async (areaId) => {
 }
 
 export const getAreaByCoords = async (coords) => {
-    const response = await fetch(`${api}/area?x=${coords.x}&y=${coords.y}`)
-    const data = await response.json()
-    return data
+    try {
+        const response = await fetch(`${api}/area?x=${coords.x}&y=${coords.y}`)
+        if (!response.ok) {
+            return 
+        }
+        const data = await response.json()
+        return data
+    } catch(error) {
+        console.error(`Error:`, error)
+    }
 }

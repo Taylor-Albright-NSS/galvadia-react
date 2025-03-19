@@ -12,7 +12,6 @@ export const PlayerBar = () => {
    async function attackEnemy() {
         const enemyToAttack = enemies[0]
         const damage = 9
-        console.log(enemyToAttack, " player bar enemy")
         enemyTakesDamage(damage, enemyToAttack.id, setEnemies, addLog)
     }
 
@@ -21,7 +20,8 @@ export const PlayerBar = () => {
         <div style={{border: "4px solid yellow", height: "100px"}}>
             <div>Player Bar</div>
             <div>Name: {player?.name}</div>
-            
+            <div>Coords: x: {player?.x}  y: {player?.y}</div>
+            <div>Room Id: {player?.area_id}</div>
             {/* <Button onClick={attackEnemy}>Attack Enemy</Button>
             <Button onClick={() => {console.log(enemies)}}>Check all enemies</Button> */}
         </div>
