@@ -6,6 +6,7 @@ export const Item = sequelize.define('Item', {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
+    allowNull: false
   },
   name: {
     type: DataTypes.STRING,
@@ -28,6 +29,9 @@ export const Item = sequelize.define('Item', {
   keywords: {
     type: DataTypes.ARRAY(DataTypes.STRING)
   },
+  // description: {
+  //   type: DataTypes.TEXT,
+  // },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

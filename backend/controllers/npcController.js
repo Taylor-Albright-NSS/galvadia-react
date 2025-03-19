@@ -49,19 +49,16 @@ export const getNpcQuestDialogue = async(req, res) => {
   if (!playerNpc && (isNaN(npcId) || isNaN(playerId))) {
     return res.status(404).json({message: "PlayerNpc not found"})
   }
-
-  console.log(npcId, " npcId")
-  console.log(playerNpc.questStage, " questStage")
   const npcDialogue = await NpcQuest.findOne({where: {
     npcId: parseInt(npcId),
     questStage: playerNpc.questStage
   }})
   if (!npcDialogue) {
-    return res.status(404).json({message: "Npc dialogue not found", success: false})
+    return res.status(404).json({success: false})
   }
   const dialogueArray = npcDialogue.dialogue
   await playerNpc.save();
-  res.status(200).json(dialogueArray)
+  return res.status(200).json({success: true, message: dialogueArray})
 }
 
 
@@ -116,7 +113,7 @@ export const getNpcQuest = async (req, res) => {
 
 export const postNpcRequirements = async (req, res) => {
   const { npcId, playerId, playerLevel, playerInventory, playerKillList } = req.body
-  const playerNpc = await PlayerNpc.findOne({where: { playerId: playerId, npcId: npcId }})
+  let playerNpc = await PlayerNpc.findOne({where: { playerId: playerId, npcId: npcId }})
 
   // if (!playerNpc && (npcId > 0 && playerId > 0)) {
   //   playerNpc = await PlayerNpc.create({playerId: playerId, npcId: npcId})
@@ -126,7 +123,10 @@ export const postNpcRequirements = async (req, res) => {
   // }
 
   let playersRequiredItems
-  if (!playerNpc) {return res.status(404).json({message: "Player_Npc relationship not found"})}
+  if (!playerNpc) {
+    playerNpc = await PlayerNpc.create({playerId: playerId, npcId: npcId})
+    // return res.status(404).json({message: "Player_Npc relationship not found"})
+  }
   const quest = await NpcQuest.findOne({where: { npcId, questStage: playerNpc.questStage }})
   if (!quest) {return res.status(404).json({message: "404"})}
 

@@ -12,7 +12,7 @@ Npc.belongsTo(Area, { foreignKey: 'area_id' });
 
 Player.belongsToMany(Npc, {
     through: 'PlayerNpc',
-    foreightKey: 'playerId'
+    foreignKey: 'playerId'
 })
 
 Npc.belongsToMany(Player, {
@@ -20,8 +20,13 @@ Npc.belongsToMany(Player, {
     foreignKey: 'npcId'
 })
 
+Keyword.belongsToMany(Player, { through: 'PlayerKeywordActivations', foreignKey: 'keywordId' });
+Player.belongsToMany(Keyword, { through: 'PlayerKeywordActivations', foreignKey: 'playerId' });
+
 Area.hasMany(Player, { foreignKey: 'area_id' });
 Player.belongsTo(Area, { foreignKey: 'area_id' });
+
+
 
 Area.hasMany(Enemy, { foreignKey: 'area_id' });
 Enemy.belongsTo(Area, { foreignKey: 'area_id' });

@@ -57,10 +57,36 @@ export const putCurrentAreaItemsToPlayer = async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 }
+export const postSpawnItemToPlayer = async (req, res) => {
+  try {
+    const { player, keyword } = req.body
+    const playerId = player.id
+    const { name, keywords } = keyword.special
+    const item = await Item.create({name: name, ownerId: playerId, ownerType: "player", keywords: keywords, location: "inventory"})
+    console.log(item, " item")
+    if (!item) {
+      return res.status(500).json({message: "Item failed to be created"})
+    }
+    return res.status(201).json(item)
+  } catch(error) {
+    console.log("Duplicate ID?")
+    return res.status(500).json({message: "Internal server error. I think it's because of the unique ID contraint"})
+  }
+}
+export const postAreaKeywordSpawn = async (req, res) => {
+  const { areaId } = req.params
+  const { keywordSpecial } = req.body
+  const { name, ownerId, ownerType, keywords } = keywordSpecial
+  const item = await Item.create({name: name, ownerId: ownerId, ownerType: ownerType, keywords: keywords})
+  if (!item) {
+    return res.status(500).json({message: "Item failed to be created"})
+  }
+  return res.status(201).json(item)
+}
 
-export const postNewItem = async (req, res) => {
+export const postNewItem = async (req, res) => { //Dev Window test endpoint
   try {    
-    const item = await Item.create({name: "Twohanded Sword", ownerId: 1, ownerType: "area"})
+    const item = await Item.create({name: "Twohanded Sword", ownerId: 1, ownerType: "area", isTwoHanded: true, keywords: ["twohanded", "sword", "twohanded sword"]})
     return res.status(201).json(item)
   } catch (error) {
     return res.status(500).json({message: "Internal error"})
@@ -70,8 +96,12 @@ export const postNewItem = async (req, res) => {
 //--------These functions will spawn a weapon in the room that the player is currently in
 export const postTwohandedSword = async (req, res) => {
   const { areaId } = req.params
+  console.log(areaId, " areaId")
   try {    
-    const item = await Item.create({name: "Twohanded Sword", ownerId: areaId, ownerType: "area", isTwoHanded: true})
+    const item = await Item.create({name: "Twohanded Sword", ownerId: areaId, ownerType: "area", isTwoHanded: true, keywords: ["twohanded", "sword", "twohanded sword"]})
+    if (!item) {
+      return res.status(400).json({message: "Item could not be created"})
+    }
     return res.status(201).json(item)
   } catch (error) {
     return res.status(500).json({message: "Internal error"})
@@ -81,7 +111,7 @@ export const postTwohandedSword = async (req, res) => {
 export const postOnehandedSword = async (req, res) => {
   const { areaId } = req.params
   try {    
-    const item = await Item.create({name: "Onehanded Sword", ownerId: areaId, ownerType: "area"})
+    const item = await Item.create({name: "Onehanded Sword", ownerId: areaId, ownerType: "area", keywords: ["onehanded", "sword", "onehanded sword"]})
     return res.status(201).json(item)
   } catch (error) {
     return res.status(500).json({message: "Internal error"})
@@ -90,7 +120,7 @@ export const postOnehandedSword = async (req, res) => {
 export const postDagger = async (req, res) => {
   const { areaId } = req.params
   try {    
-    const item = await Item.create({name: "Dagger", ownerId: areaId, ownerType: "area"})
+    const item = await Item.create({name: "Dagger", ownerId: areaId, ownerType: "area", keywords: ["dagger"]})
     return res.status(201).json(item)
   } catch (error) {
     return res.status(500).json({message: "Internal error"})
@@ -99,8 +129,9 @@ export const postDagger = async (req, res) => {
 
 export const postCrossbow = async (req, res) => {
   const { areaId } = req.params
+  console.log(areaId, " areaId for crossbow")
   try {    
-    const item = await Item.create({name: "Crossbow", ownerId: areaId, ownerType: "area", isTwoHanded: true})
+    const item = await Item.create({name: "Crossbow", ownerId: areaId, ownerType: "area", isTwoHanded: true, keywords: ["crossbow"]})
     return res.status(201).json(item)
   } catch (error) {
     return res.status(500).json({message: "Internal error"})

@@ -28,7 +28,13 @@ export const Npc = sequelize.define('Npc', {
     defaultValue: DataTypes.NOW,
   },
 }, {
-
-  timestamps: true, 
+    timestamps: true, 
+    getterMethods: {
+      areaId() {
+        if (this.questS)
+      }
+    }
 });
+
+
 

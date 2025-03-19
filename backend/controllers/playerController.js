@@ -245,6 +245,7 @@ export const patchPlayerUnpacksItem = async (req, res) => {
 
 export const patchPlayerDropsItem = async (req, res) => {
   try {
+    console.log("Endpoint hit")
     const { areaId, itemId } = req.params
     const item = await Item.findByPk(itemId)
     if (!item) {

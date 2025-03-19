@@ -1,13 +1,12 @@
 import { DataTypes, Sequelize } from 'sequelize'
 import { sequelize } from '../config/db.js' // Import the sequelize instance from your db.js
-import Area from './area.js';
 
 export const Keyword = sequelize.define('Keyword', {
   // Define the fields (similar to C# properties)
   id: {
-    type: DataTypes.INTEGER,  // Define the type as integer
-    primaryKey: true,         // Mark this field as the primary key
-    autoIncrement: true,      // Auto increment the ID
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true,
   },
   area_id: {
     type: DataTypes.INTEGER,
@@ -18,47 +17,45 @@ export const Keyword = sequelize.define('Keyword', {
     }
   },
   actionAreaId: {
-    type: DataTypes.INTEGER,   // Define the type as string
-    allowNull: true,         // Set validation to make this field required
+    type: DataTypes.INTEGER,
   },
-  actionDirections: {
-    type: DataTypes.STRING,
+  npcId: {
+    type: DataTypes.INTEGER
+  },
+  special: {
+    type: DataTypes.JSON,
   },
   name: {
-    type: DataTypes.STRING,   // Define the type as string
-    allowNull: true,         // Set validation to make this field required
+    type: DataTypes.STRING,
   },
   refName: {
-    type: DataTypes.STRING,   // Define the type as string
-    allowNull: true,         // Set validation to make this field required
+    type: DataTypes.STRING,
   },
   color: {
-    type: DataTypes.STRING,   // Define the type as string
-    allowNull: true,         // Set validation to make this field required
+    type: DataTypes.STRING, 
   },
   description: {
-    type: DataTypes.STRING,   // Define the type as string
-    allowNull: true,
+    type: DataTypes.TEXT,
   },
-  action: {
-    type: DataTypes.STRING,   // Define the type as string
-    allowNull: true,         // Set validation to make this field required
+  displayActivate: {
+    type: DataTypes.TEXT
   },
-  methodCode: {  // This field will store the specific action code for each keyword
-    type: DataTypes.STRING,  // Store the method's name or a code reference
-    allowNull: true,
+  displayAlreadyActivated: {
+    type: DataTypes.TEXT
+  },
+  methodCode: { 
+    type: DataTypes.STRING,
   },
   createdAt: {
-    type: DataTypes.DATE,     // Define the type as date
-    defaultValue: DataTypes.NOW,  // Set default value to current timestamp
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
   },
   updatedAt: {
-    type: DataTypes.DATE,     // Define the type as date
-    defaultValue: DataTypes.NOW,  // Set default value to current timestamp
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW,
   },
 }, {
-  // Additional configuration options can go here
-  timestamps: true,  // Enable timestamps (createdAt, updatedAt)
+  timestamps: true,
 });
 
   

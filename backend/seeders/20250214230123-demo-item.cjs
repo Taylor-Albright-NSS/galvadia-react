@@ -1,18 +1,16 @@
 module.exports = {
   up: async (queryInterface) => {
     await queryInterface.bulkInsert('Items', [{
-      id: 1,
-      name: 'Sword',
+      name: 'Training Onehanded Sword',
       ownerId: 1, 
       ownerType: "player",
       location: "inventory",
       isTwoHanded: false,
-      keywords: ["sword"],
+      keywords: ['training', 'onehanded', 'sword', 'training onehanded', 'onehanded sword', 'training onehanded sword'],
       createdAt: new Date(),
       updatedAt: new Date(),
     }, 
     {
-      id: 2,
       name: 'Dagger',
       ownerId: 1, 
       ownerType: "area",
@@ -23,7 +21,6 @@ module.exports = {
       updatedAt: new Date(),
     }, 
     {
-      id: 3,
       name: 'Crossbow',
       ownerId: 2, 
       ownerType: "area",
@@ -34,7 +31,6 @@ module.exports = {
       updatedAt: new Date(),
     },
     {
-      id: 4,
       name: 'Twohanded Blue Sabre',
       ownerId: 2, 
       ownerType: "area",
@@ -44,6 +40,27 @@ module.exports = {
       createdAt: new Date(),
       updatedAt: new Date(),
     },
+    {
+      name: 'Twohanded Bastard Sword',
+      ownerId: 2, 
+      ownerType: "area",
+      location: null,
+      keywords: ["twohanded", "bastard", "sword", "twohanded bastard sword", 'twohanded bastard', 'bastard sword', 'twohanded bastard sword'],
+      isTwoHanded: true,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      name: 'Shortsword',
+      ownerId: 2,
+      ownerType: "area",
+      location: null,
+      keywords: ["shortsword", "sword", 'short', 'short sword'],
+      isTwoHanded: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    
   ], {});
   },
 

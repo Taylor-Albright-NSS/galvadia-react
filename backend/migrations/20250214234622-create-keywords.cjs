@@ -16,8 +16,11 @@ module.exports = {
       actionAreaId: {
         type: Sequelize.INTEGER,
       },
-      actionDirections: {
-        type: Sequelize.STRING,
+      npcId: {
+        type: Sequelize.INTEGER
+      },
+      special: {
+        type: Sequelize.JSON,
       },
       name: {
         type: Sequelize.STRING,
@@ -35,9 +38,11 @@ module.exports = {
         type: Sequelize.TEXT,
         allowNull: true,
       },
-      action: {
-        type: Sequelize.TEXT,
-        allowNull: true,
+      displayActivate: {
+        type: Sequelize.TEXT
+      },
+      displayAlreadyActivated: {
+        type: Sequelize.TEXT
       },
       methodCode: {  // This field will store the specific action code for each keyword
         type: Sequelize.STRING,  // Store the method's name or a code reference
