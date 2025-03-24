@@ -7,7 +7,7 @@ import Player from "../models/player.js";
 import { PlayerNpc } from "../models/playerNpc.js";
 
 //--------MULTIPLE NPCS
-export const getEveryNpc = async (req, res) => {
+export const getEveryNpc = async (req, res) => { //Mainly for testing. Gets all Npc instances
   try {
     const npcs = await Npc.findAll()
     // const npcsDTO = npcs.map(npcDTO)
@@ -18,13 +18,36 @@ export const getEveryNpc = async (req, res) => {
 }
 export const getCurrentAreaNpcs = async (req, res) => {
   try {
-    const { areaId } = req.params
+    const { areaId, playerId } = req.params
     // console.log(areaId, " get current area npcs -> area id")
-    const npcs = await Npc.findAll({where: {area_id: areaId}})
-    const npcsDTO = npcs.map(npcDTO)
-    res.status(200).json(npcsDTO)
+    const playerNpcs = await PlayerNpc.findAll({ where: {area_id: areaId, playerId: playerId}})
+    const allNpcs = await Npc.findAll({where: {area_id: areaId}})
+    //filters npcs that the player has not yet interacted with
+    const missingNpcs = allNpcs.filter(npc => 
+      !playerNpcs.some(playerNpc => playerNpc.npcId === npc.id)
+    );
+    const newPlayerNpcs = await Promise.all(
+      missingNpcs.map(npc => {
+        PlayerNpc.create({
+          playerId: playerId,
+          npcId: npc.id,
+          area_id: areaId,
+          // dialogueStage: npc.dialogueStage,
+          // dialogueIndex: npc.dialogueIndex,
+          // questStage: npc.questStage,
+        })
+      })
+    )
+
+    const updatedPlayerNpcs = await PlayerNpc.findAll({
+      where: { area_id: areaId, playerId },
+      include: [{ model: Npc }] // Include master NPC reference for name, etc.
+    });
+    return res.status(200).json(updatedPlayerNpcs)
+    // const npcsDTO = allNpcs.map(npcDTO)
+    // res.status(200).json(npcsDTO)
   } catch(error) {
-    res.status(500).json({ error: error.message })
+    return res.status(500).json({ error: error.message })
   }
 }
 //--------SINGLE NPCS

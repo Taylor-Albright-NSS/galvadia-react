@@ -4,6 +4,7 @@ module.exports = {
     {
       playerId: 1,
       npcId: 1,
+      area_id: 1,
       dialogueStage: 1,
       dialogueIndex: 0,
       questStage: 1,
@@ -13,6 +14,7 @@ module.exports = {
     {
       playerId: 1,
       npcId: 2,
+      area_id: 1,
       dialogueStage: 2,
       dialogueIndex: 0,
       questStage: 1,
@@ -22,6 +24,7 @@ module.exports = {
     {
       playerId: 1,
       npcId: 3,
+      area_id: 1,
       dialogueStage: 1,
       dialogueIndex: 0,
       questStage: 1,

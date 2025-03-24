@@ -124,9 +124,9 @@ export const playerLook = async (commandObject) => {
     let areaId = !player.area_id ? 1 : player.area_id
     let playerId = player.id
     const [ area, enemies, npcs, items, players ] = await Promise.all([
-        fetchCurrentArea(areaId),
+        fetchCurrentArea(areaId,),
         fetchEnemiesInRoom(areaId),
-        fetchCurrentAreaNpcs(areaId),
+        fetchCurrentAreaNpcs(areaId, playerId),
         fetchCurrentAreaItems(areaId),
         fetchPlayersInRoom(areaId, playerId)
     ])

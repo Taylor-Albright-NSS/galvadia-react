@@ -13,6 +13,9 @@ export const PlayerNpc = sequelize.define("PlayerNpc", {
     npcId: {
         type: DataTypes.INTEGER,
     },
+    area_id: {
+        type: DataTypes.INTEGER
+    },
     dialogueStage: {
         type: DataTypes.INTEGER,
         defaultValue: 1

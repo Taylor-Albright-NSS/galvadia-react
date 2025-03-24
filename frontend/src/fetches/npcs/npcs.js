@@ -12,8 +12,8 @@ export const questRequirementCheck = async (body) => {
     return data
 }
 
-export const fetchCurrentAreaNpcs = async (areaId) => {
-    const response = await fetch(`${api}/npcs/${areaId}`)
+export const fetchCurrentAreaNpcs = async (areaId, playerId) => {
+    const response = await fetch(`${api}/npcs/${areaId}/${playerId}`)
     const data = await response.json()
     return data
 }

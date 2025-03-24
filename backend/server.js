@@ -50,7 +50,7 @@ app.post(`/area/:areaId/spawnItem`, postAreaKeywordSpawn)
 app.post(`/spawnToPlayer/:playerId`, postSpawnItemToPlayer)
 //--------NPCS
 app.get('/npcs', getEveryNpc)
-app.get('/npcs/:areaId', getCurrentAreaNpcs)
+app.get('/npcs/:areaId/:playerId', getCurrentAreaNpcs)
 app.get('/npc/:id', getNpcById)
 app.get('/npc/:id/dialogue', getNpcDialogue)
 //--------PLAYERS 
