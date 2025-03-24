@@ -16,16 +16,36 @@ Player.init({
     primaryKey: true,
     autoIncrement: true,
   },
-  name: {type: DataTypes.STRING},
-  level: {type: DataTypes.INTEGER},
-  experience: {type: DataTypes.INTEGER},
-  gold: {type: DataTypes.INTEGER},
-  skillPoints: {type: DataTypes.INTEGER},
-  attributePoints: {type: DataTypes.INTEGER},
-  x: {type: DataTypes.STRING},
-  y: {type: DataTypes.STRING},
-  z: {type: DataTypes.STRING},
-  area_id: {type: DataTypes.INTEGER},
+  name: {
+    type: DataTypes.STRING
+  },
+  level: {
+    type: DataTypes.INTEGER
+  },
+  experience: {
+    type: DataTypes.INTEGER
+  },
+  gold: {
+    type: DataTypes.INTEGER
+  },
+  skillPoints: {
+    type: DataTypes.INTEGER
+  },
+  attributePoints: {
+    type: DataTypes.INTEGER
+  },
+  x: {
+    type: DataTypes.STRING
+  },
+  y: {
+    type: DataTypes.STRING
+  },
+  z: {
+    type: DataTypes.STRING
+  },
+  area_id: {
+    type: DataTypes.INTEGER
+  },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

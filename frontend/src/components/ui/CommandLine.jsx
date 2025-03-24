@@ -6,8 +6,11 @@ import { zGameContext } from "./zGameContext"
 import { WebSocketContext } from "./WebSocketContext"
 
 export const CommandLine = () => {
+    console.log("Component rendered")
     const { socket, sendMessage } = useContext(WebSocketContext)
     const commandObject = useContext(zGameContext)
+    const { gameData } = commandObject
+    console.log(gameData)
     commandObject.socket = socket
     commandObject.sendMessage = sendMessage
     return (

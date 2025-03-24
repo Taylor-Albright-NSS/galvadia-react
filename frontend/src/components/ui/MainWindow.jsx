@@ -7,7 +7,6 @@ export const MainWindow = () => {
         let mainWindow = document.getElementById("main-window")
         mainWindow.scrollTop = mainWindow.scrollHeight;
     }, [windowLogs]);
-
     return (
         <div 
             id="main-window"

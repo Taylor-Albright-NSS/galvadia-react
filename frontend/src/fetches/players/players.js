@@ -8,7 +8,6 @@ export const fetchPlayersInRoom = async (areaId, playerId) => {
 
 export const fetchIncreasePlayerExperience = async (playerId, experienceGain) => {
     try {
-        console.log(`${api}/player/${playerId}/experience`)
         const response = await fetch(`${api}/player/${playerId}/experience`, {
             method: "PATCH",
             headers: {
@@ -18,7 +17,6 @@ export const fetchIncreasePlayerExperience = async (playerId, experienceGain) =>
         })
         const player = await response.json()
         if (!response.ok) {
-            console.log("Response was not ok")
             throw new Error({message: "Response was not ok"})
         }
         return player

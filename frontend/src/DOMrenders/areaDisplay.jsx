@@ -31,7 +31,6 @@ export const areaDisplay = (area, enemies, npcs, items, players) => {
                 <p>People: </p>
                 {npcs.map((npc, index) => {return <p className="mx-1 green" key={index}>{npc.name}</p>})}
             </span>}
-            {console.log(players, " PLAYERS IN AREA DISPLAY")}
             {players?.length > 0 && 
             <span className="d-flex flex-wrap">
                 <p>Players: </p>

@@ -1,15 +1,16 @@
 module.exports = {
   up: async (queryInterface) => {
-    await queryInterface.bulkInsert('Areas', [{
+    await queryInterface.bulkInsert('Areas', [
+      {
       id: 1,
-      name: 'Town Square',
-      heading: "Town Square",
-      headingColor: "galvadia-town",
-      description: "This is the Town Square of Galvadia. It's the central area in Galvadia. There is a lever here.",
+      name: 'trainingHallsBasementCentralRoom',
+      heading: "Training Halls Basement Central Room",
+      headingColor: "trainingHallsBasement",
+      description: "A somewhat large, circular room with several exits. The area is clean, tidy, and well lit.",
       exitsBool: JSON.stringify({
         north: true,
         east: true,
-        south: 'locked',
+        south: true,
         west: true
       }),
       x: 0,
@@ -17,12 +18,15 @@ module.exports = {
       z: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }, {
+    }, 
+    {
       id: 2,
-      name: 'North',
-      heading: "North Of The Town Square",
-      description: "North of the town square",
+      name: 'trainingHallsBasementCorridor1',
+      heading: "Training Halls Basement Corridor 1",
+      headingColor: "trainingHallsBasement",
+      description: "Various wooden boxes and locked chests full of training equipment line the walls of the hallway. You see something written on the wall here.",
       exitsBool: JSON.stringify({
+        north: true,
         south: true,
       }),
       x: 0,
@@ -30,10 +34,12 @@ module.exports = {
       z: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }, {
+    }, 
+    {
       id: 3,
       name: 'East',
       heading: "East Of The Town Square",
+      headingColor: "trainingHallsBasement",
       description: "East of the town square",
       exitsBool: JSON.stringify({
         west: true,
@@ -43,10 +49,12 @@ module.exports = {
       z: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }, {
+    }, 
+    {
       id: 4,
       name: 'South',
       heading: "South Of The Town Square",
+      headingColor: "trainingHallsBasement",
       description: "South of the town square",
       exitsBool: JSON.stringify({
         north: true,
@@ -56,10 +64,12 @@ module.exports = {
       z: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }, {
+    }, 
+    {
       id: 5,
       name: 'West',
       heading: "Eest Of The Town Square",
+      headingColor: "trainingHallsBasement",
       description: "West of the town square",
       exitsBool: JSON.stringify({
         east: true,
@@ -69,7 +79,76 @@ module.exports = {
       z: 0,
       createdAt: new Date(),
       updatedAt: new Date(),
-    }], {});
+    },
+    {
+      id: 6,
+      name: `trainingHallsBasementCorridor2`,
+      heading: `Training Halls Basement Corridor 2`,
+      headingColor: "trainingHallsBasement",
+      description: "There are several lit sconces that line the walls. Their oscillating glow is quite comforting. You see a lever mounted on the wall to the right of the door.",
+      exitsBool: JSON.stringify({
+        north: "locked",
+        south: true,
+        west: true,
+      }),
+      x: 0,
+      y: 2,
+      z: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, 
+    {
+      id: 7,
+      name: `outsideEgbertsOffice`,
+      heading: `Outside Egbert's Office`,
+      headingColor: "trainingHallsBasement",
+      description: `Just outside Egbert's Office`,
+      exitsBool: JSON.stringify({
+        east: "blocked",
+        south: true,
+        west: true,
+      }),
+      x: 0,
+      y: 3,
+      z: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, 
+    {
+      id: 8,
+      name: `Egbert's Office`,
+      heading: `Egbert's Office`,
+      headingColor: "trainingHallsBasement",
+      description: `Egbert's office is a spacious and well-decorated room. Bookshelves and cabinets line the walls, each packed full of books and scrolls. On the far wall is a desk illuminated by candle light. You notice something sticking out from underneath the stacks of parchment sitting on the desk.
+      Tip: (Use the EXAMINE or EX command you learned about earlier!)`,
+      exitsBool: JSON.stringify({
+        east: true,
+      }),
+      x: -1,
+      y: 3,
+      z: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, 
+    {
+      id: 9,
+      name: `Room 2`,
+      heading: `Hallway 3`,
+      headingColor: "trainingHallsBasement",
+      description: `This is a hallway 3`,
+      exitsBool: JSON.stringify({
+        north: true,
+        east: "locked",
+        south: "locked",
+        west: true
+      }),
+      x: 1,
+      y: 3,
+      z: 0,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }, 
+  ], {});
   },
 
   down: async (queryInterface, Sequelize) => {

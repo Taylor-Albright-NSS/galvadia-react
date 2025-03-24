@@ -2,15 +2,16 @@ import 'dotenv/config'; // No need for .config()
 import express from 'express';
 // import playerRoutes from './routes/playerRoutes'
 import Area from './models/area.js';
-import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords, getAllPlayerItems, getPlayersInRoom, playerGainsExperience } from './controllers/playerController.js';
+import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem, patchPlayerDropsItem } from './controllers/playerController.js';
 import db from './models/associations.js';
 import cors from 'cors';
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js';
 import { getCurrentAreaNpcs, getNpcById, getNpcDialogue, getEveryNpc, getNpcDialogueAll, getNpcQuestDialogue, getNpcQuest, postNpcRequirements, patchDecrementQuestStage, patchIncrementQuestStage } from './controllers/npcController.js';
 import { createEnemy, deleteEnemy, enemyTakesDamage, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './controllers/enemyController.js';
-import { deleteAllItems, getCurrentAreaItems, getItems, postCrossbow, postDagger, postNewItem, postOnehandedSword, postTwohandedSword, putCurrentAreaItemsToPlayer } from './controllers/itemController.js';
+import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, postCrossbow, postDagger, postNewItem, postOnehandedSword, postSpawnItemToPlayer, postTwohandedSword, putCurrentAreaItemsToPlayer } from './controllers/itemController.js';
 import { app }  from './websocket.js';
 import { getUser } from './controllers/userController.js';
+import { patchKeywordActivation, patchToggleKeywordFalse } from './controllers/keywordController.js';
 // const app = express();
 // const server = http.createServer(app)
 // export const wss = new WebSocketServer({ server });
@@ -42,18 +43,23 @@ app.post('/item/twohandedsword/:areaId', postTwohandedSword)
 app.post('/item/onehandedsword/:areaId', postOnehandedSword)
 app.post('/item/dagger/:areaId', postDagger)
 app.post('/item/crossbow/:areaId', postCrossbow)
+app.patch('/item/pack/:playerId/:itemId', patchPlayerPacksItem)
+app.patch('/item/unpack/:playerId/:itemId', patchPlayerUnpacksItem)
+app.patch('/item/drop/:areaId/:itemId', patchPlayerDropsItem)
+app.post(`/area/:areaId/spawnItem`, postAreaKeywordSpawn)
+app.post(`/spawnToPlayer/:playerId`, postSpawnItemToPlayer)
 //--------NPCS
 app.get('/npcs', getEveryNpc)
-app.get('/npcs/:areaId', getCurrentAreaNpcs)
+app.get('/npcs/:areaId/:playerId', getCurrentAreaNpcs)
 app.get('/npc/:id', getNpcById)
 app.get('/npc/:id/dialogue', getNpcDialogue)
 //--------PLAYERS 
-// (SINGLE)
+  //(SINGLE)
 app.patch('/player/:id/coordinates', playerPatchCoords)
 app.patch('/player/:playerId/experience', playerGainsExperience)
 app.get('/player/:id', getPlayer1API);
 
-// (MULTIPLE)
+  //(MULTIPLE)
 app.get('/players', getPlayers);
 app.get('/players/:areaId', getPlayersInRoom)
 app.post('/players', createPlayer);
@@ -81,7 +87,9 @@ app.post('/areas', async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 })
-
+//--------KEYWORDS
+app.patch('/keywordActivation/', patchKeywordActivation)
+app.patch('/keywordActivation/:keywordId', patchToggleKeywordFalse)
 //--------ENEMIES
 app.delete('/enemy/:id', deleteEnemy)
 app.post('/enemy/:areaId', createEnemy)

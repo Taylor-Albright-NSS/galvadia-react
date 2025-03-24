@@ -2,31 +2,24 @@
 
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Items', {
+    await queryInterface.createTable('PlayerKeywordActivations', {
       id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
         allowNull: false
       },
-      name: {
+      playerId: {
+        type: Sequelize.INTEGER,
+      },
+      keywordId: {
+        type: Sequelize.INTEGER,
+      },
+      activated: {
+        type: Sequelize.BOOLEAN,
+      },
+      requiredItemName: {
         type: Sequelize.STRING,
-        allowNull: false
-      },
-      ownerId: {
-        type: Sequelize.INTEGER
-      },
-      ownerType: {
-        type: Sequelize.STRING,
-      },
-      location: {
-        type: Sequelize.STRING
-      },
-      isTwoHanded: {
-        type: Sequelize.BOOLEAN
-      },
-      keywords: {
-        type: Sequelize.ARRAY(Sequelize.DataTypes.STRING)
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -40,6 +33,6 @@ module.exports = {
   },
 
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Items');
+    await queryInterface.dropTable('PlayerKeywordActivations');
   }
 };

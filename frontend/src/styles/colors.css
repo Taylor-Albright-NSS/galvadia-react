@@ -8,6 +8,17 @@
     color: red;
 }
 
+.blue {
+    color: blue;
+}
+.parchment {
+    color: rgb(252, 252, 181)
+}
+
+.trainingHallsBasement {
+    color: brown;
+}
+
 .galvadia-town {
     color: brown;
 }

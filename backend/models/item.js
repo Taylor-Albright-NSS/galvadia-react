@@ -6,17 +6,32 @@ export const Item = sequelize.define('Item', {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
+    allowNull: false
   },
   name: {
     type: DataTypes.STRING,
-    allowNull: true,
   },
   ownerId: {
     type: DataTypes.INTEGER
   },
   ownerType: {
-    type: DataTypes.ENUM("player, enemy, area")
+    type: DataTypes.STRING
   },
+  location: {
+    //If ownerType is player, location is among these: right_hand, left_hand, all other slots
+    //If ownerType is anything but player, value is null
+    type: DataTypes.STRING,
+  },
+  isTwoHanded: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
+  keywords: {
+    type: DataTypes.ARRAY(DataTypes.STRING)
+  },
+  // description: {
+  //   type: DataTypes.TEXT,
+  // },
   createdAt: {
     type: DataTypes.DATE,
     defaultValue: DataTypes.NOW,

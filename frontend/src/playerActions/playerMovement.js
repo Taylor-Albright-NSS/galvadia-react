@@ -3,7 +3,8 @@ import { getAreaByCoords } from "../fetches/areas/areas"
 import { playerUpdateCoordinates } from "../fetches/players/playerUpdateCoordinates"
 import { toggleStatusFalse } from "../utils/playerStatus"
 
-export const moveDirection = async (player, setPlayer, inputDirection, currentArea, addLog, socket, playerStatus) => {
+export const moveDirection = async (gameData, setGameData, inputDirection, addLog, socket, playerStatus) => {
+    const { currentArea, player } = gameData
     toggleStatusFalse(playerStatus, "isTalking")
     if (currentArea.exitsBool[inputDirection] == "locked") {
         addLog("You cannot move in this direction. The door is locked.")
@@ -21,12 +22,16 @@ export const moveDirection = async (player, setPlayer, inputDirection, currentAr
     }
     const directionCoords = directionCoordsList[inputDirection]
     const combinedCoords = {
-         x: player.x + directionCoords.x,
-         y: player.y + directionCoords.y,
+        x: player.x + directionCoords.x,
+        y: player.y + directionCoords.y,
     }
     const newAreaIfExists = await getAreaByCoords(combinedCoords)
+    if (newAreaIfExists && !currentArea?.exitsBool?.[inputDirection]) {
+        addLog(`(This should not happen. Room exists, but direction is not part of exits bool)`)
+        return
+    }
     if (!newAreaIfExists) {
-        console.log("Does not exist")
+        addLog("Cannot move in that direction (AREA DOES NOT EXIST)")
         return
     }
     combinedCoords.area_id = newAreaIfExists.id
@@ -39,5 +44,15 @@ export const moveDirection = async (player, setPlayer, inputDirection, currentAr
         addLog("Cannot move in that direction (AREA DOES NOT EXIST)")
         return
     }
-    setPlayer(prevState => ({...prevState, area_id: combinedCoords.area_id, x: newPlayerCoords.x, y:newPlayerCoords.y}))
+    setGameData(prev => {
+        return {
+        ...prev,
+        player: {
+            ...prev.player,
+            area_id: combinedCoords.area_id,
+            x: newPlayerCoords.x,
+            y: newPlayerCoords.y
+        }
+    }
+    })
 }

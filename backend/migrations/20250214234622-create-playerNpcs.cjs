@@ -17,6 +17,9 @@ module.exports = {
         type: Sequelize.INTEGER,
         allowNull: true
       },
+      area_id: {
+        type: Sequelize.INTEGER
+      },
       dialogueStage: {
         type: Sequelize.INTEGER,
         allowNull: true

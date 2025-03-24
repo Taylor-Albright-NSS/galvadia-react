@@ -9,7 +9,8 @@ import { useContext } from "react";
 import { zGameContext } from "./zGameContext";
 
 export const UI = () => {
-    const { player } = useContext(zGameContext)
+    const { gameData } = useContext(zGameContext)
+    const { player } = gameData
     return (
         <Container 
             style={{

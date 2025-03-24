@@ -1,11 +1,12 @@
 module.exports = {
   up: async (queryInterface) => {
-    await queryInterface.bulkInsert('NpcQuests', [{
+    await queryInterface.bulkInsert('NpcQuests', [
+      {
       id: 1,
-      npcId: 1,
+      npcId: 1, //Joch
       questStage: 1,
-      dialogue: [`This is the first stage of my quest. To complete it, simply type 'offer'.`, `This is the second element in the array that should show up below my previous sentence.`],
-      completionDialogue: [`Congrats! You completed it!`, `This should appear below the first sentence!`],
+      dialogue: [`Your first task is to reach level 2.`],
+      completionDialogue: [`Great job!`],
       requirements: JSON.stringify({
         requiredLevel: 2,
         requiredItems: null,
@@ -22,9 +23,9 @@ module.exports = {
     }, 
     {
       id: 2,
-      npcId: 1,
+      npcId: 1, //Joch
       questStage: 2,
-      dialogue: [`"This is the second stage of my quest. You will need to offer me any weapon in order to complete it!"`, `This should show up under my first sentence!`],
+      dialogue: [`For your next task, return to me a Dagger and Crossbow`],
       completionDialogue: [`You completed my second quest, well done!`, `As a reward.. Well, I can't offer you anything yet!`],
       requirements: JSON.stringify({
         requiredLevel: 2,
@@ -36,6 +37,26 @@ module.exports = {
         skillPoints: 2,
         attributePoints: 2,
         items: ["Sword"]
+      }),
+      repeatable: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    },
+    {
+      id: 3,
+      npcId: 3, //Egbert
+      questStage: 1,
+      dialogue: [`I lost my glasses. Can you please find them for me?`],
+      completionDialogue: [`Ahh, I can see again!`, `Thank you, young lad. Here's for your troubles.`],
+      requirements: JSON.stringify({
+        requiredLevel: 1,
+        requiredItems: ["Pair Of Glasses"],
+      }),
+      rewards: JSON.stringify({
+        gold: 50,
+        experience: 1000,
+        skillPoints: 3,
+        attributePoints: 3,
       }),
       repeatable: false,
       createdAt: new Date(),

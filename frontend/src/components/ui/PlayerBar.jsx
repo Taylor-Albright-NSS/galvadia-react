@@ -4,14 +4,14 @@ import { enemyTakesDamage } from "../../fetches/enemies/enemies"
 
 export const PlayerBar = () => {
     const ref = useRef()
-    const { currentArea, setEnemies, enemies, addLog, player } = useContext(zGameContext)
+    const { currentArea, setEnemies, enemies, addLog, gameData } = useContext(zGameContext)
+    const { player } = gameData
     const [reset, setReset] = useState(0)
 
 
    async function attackEnemy() {
         const enemyToAttack = enemies[0]
         const damage = 9
-        console.log(enemyToAttack, " player bar enemy")
         enemyTakesDamage(damage, enemyToAttack.id, setEnemies, addLog)
     }
 
@@ -19,8 +19,9 @@ export const PlayerBar = () => {
     return (
         <div style={{border: "4px solid yellow", height: "100px"}}>
             <div>Player Bar</div>
-            <div>{player?.name}</div>
-            
+            <div>Name: {player?.name}</div>
+            <div>Coords: x: {player?.x}  y: {player?.y}</div>
+            <div>Room Id: {player?.area_id}</div>
             {/* <Button onClick={attackEnemy}>Attack Enemy</Button>
             <Button onClick={() => {console.log(enemies)}}>Check all enemies</Button> */}
         </div>

@@ -8,7 +8,9 @@ export const handleEnterPress = (e, commandObject) => {
     //  get practice with typing it out
     if (e.keyCode != 13) {return}
     const rawInput = e.target.value
-    const { player, socket } = commandObject
+    const { gameData, socket } = commandObject
+    const { player } = gameData
+    console.log(commandObject, " COMMAND OBJECT")
     if (rawInput[0] === "'") {
         let normalizedInput = rawInput.slice(1)
         socket.send(JSON.stringify({type: "playerDialogue", playerId: player.id, areaId: player.area_id, playerName: player.name, playerDialogue: normalizedInput}))
@@ -23,6 +25,4 @@ export const handleEnterPress = (e, commandObject) => {
     commandObject.command4 = userInput[3]
     actionList(commandObject)
 }
-
-
 

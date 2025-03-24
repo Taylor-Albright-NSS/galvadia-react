@@ -6,13 +6,14 @@ import { Keyword } from './keyword.js';
 import { Npc } from './npc.js';
 import { NpcDialogue } from './npcDialogue.js';
 import Player from './player.js';
+import { PlayerNpc } from './playerNpc.js';
 // Define associations AFTER importing models
 Area.hasMany(Npc, { foreignKey: 'area_id' });
 Npc.belongsTo(Area, { foreignKey: 'area_id' });
 
 Player.belongsToMany(Npc, {
     through: 'PlayerNpc',
-    foreightKey: 'playerId'
+    foreignKey: 'playerId'
 })
 
 Npc.belongsToMany(Player, {
@@ -20,8 +21,19 @@ Npc.belongsToMany(Player, {
     foreignKey: 'npcId'
 })
 
+PlayerNpc.belongsTo(Npc, { foreignKey: 'npcId' }); 
+Npc.hasMany(PlayerNpc, { foreignKey: 'npcId' });
+
+PlayerNpc.belongsTo(Player, { foreignKey: 'playerId' });
+Player.hasMany(PlayerNpc, { foreignKey: 'playerId' });
+
+Keyword.belongsToMany(Player, { through: 'PlayerKeywordActivations', foreignKey: 'keywordId' });
+Player.belongsToMany(Keyword, { through: 'PlayerKeywordActivations', foreignKey: 'playerId' });
+
 Area.hasMany(Player, { foreignKey: 'area_id' });
 Player.belongsTo(Area, { foreignKey: 'area_id' });
+
+
 
 Area.hasMany(Enemy, { foreignKey: 'area_id' });
 Enemy.belongsTo(Area, { foreignKey: 'area_id' });

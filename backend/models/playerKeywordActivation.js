@@ -1,7 +1,7 @@
 import { DataTypes } from "sequelize";
 import { sequelize } from "../config/db.js";
 
-export const PlayerNpc = sequelize.define("PlayerNpc", {
+export const PlayerKeywordActivation = sequelize.define("PlayerKeywordActivation", {
     id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
@@ -10,23 +10,14 @@ export const PlayerNpc = sequelize.define("PlayerNpc", {
     playerId: {
         type: DataTypes.INTEGER,
     },
-    npcId: {
+    keywordId: {
         type: DataTypes.INTEGER,
     },
-    area_id: {
-        type: DataTypes.INTEGER
+    activated: {
+        type: DataTypes.BOOLEAN
     },
-    dialogueStage: {
-        type: DataTypes.INTEGER,
-        defaultValue: 1
-    },
-    dialogueIndex: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0
-    },
-    questStage: {
-        type: DataTypes.INTEGER,
-        defaultValue: 1
+    requiredItemName: {
+        type: DataTypes.STRING
     },
     createdAt: {
         type: DataTypes.DATE,

@@ -3,16 +3,18 @@ import { createEnemy, enemyDies, enemyTakesDamage, fetchAllEnemies, fetchEnemies
 import { useContext, useState } from "react"
 import { fetchCurrentArea } from "../../fetches/areas/areas"
 import { zGameContext } from "./zGameContext"
-import { fetchCreateCrossbow, fetchCreateDagger, fetchCreateItem, fetchCreateOnehandedSword, fetchCreateTwohandedSword, fetchCurrentAreaItems, fetchEveryItem } from "../../fetches/items/items"
+import { fetchCreateCrossbow, fetchCreateDagger, fetchCreateItem, fetchCreateOnehandedSword, fetchCreateTwohandedSword, fetchCurrentAreaItems, fetchDeleteAllItems, fetchEveryItem, fetchPlayerUnpacksItem } from "../../fetches/items/items"
 // import { pickupItem, joshTest } from "../../websocket"
 // import { socket } from "../../websocket"
 import { getPlayer1, getPlayer2 } from "../../fetches/players/players"
 import { fetchIncreasePlayerExperience } from "../../fetches/players/players"
 
 export const DevWindow = () => {
-    const { currentArea, enemies, player, setEnemies, setItems, addLog, setPlayer, setPlayerItems } = useContext(zGameContext)
+    const { gameData, setGameData, addLog } = useContext(zGameContext)
+    const { currentArea, enemies, player, npcs, items, playerItems, players } = gameData
     const [enemyId, setEnemyId] = useState(0)
-    console.log(player)
+    const [logState, setLogState] = useState("")
+    console.log(currentArea)
 
     function retrieveAllEnemies() {
         fetchAllEnemies().then(enemies => {
@@ -26,8 +28,12 @@ export const DevWindow = () => {
     }
 
     function fetchCreateEnemy() {
-        createEnemy(player.area_id).then(enemy => {
-            setEnemies(prev => ([...prev, enemy]))
+        createEnemy(currentArea.id).then(enemy => {
+            setGameData(prev => ({
+                ...prev,
+                enemies: [...prev.enemies, enemy]
+            }))
+            // setEnemies(prev => ([...prev, enemy]))
         })
     }
     function retrieveCurrentArea() {
@@ -55,19 +61,32 @@ export const DevWindow = () => {
             return
         }
         addLog(`You swing at the enemy and hit it for ${damage} damage!`)
-        enemyTakesDamage(damage, enemyToAttack.id, setEnemies, addLog)
+        enemyTakesDamage(damage, enemyToAttack.id, setGameData, addLog)
     }
     
     function setPlayer1() {
         getPlayer1().then(player => {
-            setPlayer(player)
-            setPlayerItems(player.items.sort())
+            setGameData(prev => {
+                console.log(prev)
+                return ({
+                    ...prev,
+                    player: player
+                })
+            })
+            setGameData(prev => ({...prev, playerItems: player.items.sort()}))
         })
     }
     function setPlayer2() {
         getPlayer2().then(player => {
-            setPlayer(player)
-            setPlayerItems(player.items.sort())
+            console.log(player)
+            setGameData(prev => {
+                console.log(prev)
+                return ({
+                    ...prev,
+                    player: player
+                })
+            })
+            setGameData(prev => ({...prev, playerItems: player.items.sort()}))
         })
     }
     function retrieveCurrentPlayer() {
@@ -75,8 +94,9 @@ export const DevWindow = () => {
     }
 
     function spawnTwohandedSword() {
-        fetchCreateTwohandedSword(player.area_id).then(item => {
-            setItems(prev => [...prev, item])
+        console.log(currentArea)
+        fetchCreateTwohandedSword(currentArea.id).then(item => {
+            setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
                 <p>A <span className="green">{item.name}</span> has spawned</p>
@@ -85,8 +105,8 @@ export const DevWindow = () => {
         })
     }
     function spawnOnehandedSword() {
-        fetchCreateOnehandedSword(player.area_id).then(item => {
-            setItems(prev => [...prev, item])
+        fetchCreateOnehandedSword(currentArea.id).then(item => {
+            setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
                 <p>A <span className="green">{item.name}</span> has spawned</p>
@@ -95,8 +115,8 @@ export const DevWindow = () => {
         })
     }
     function spawnDagger() {
-        fetchCreateDagger(player.area_id).then(item => {
-            setItems(prev => [...prev, item])
+        fetchCreateDagger(currentArea.id).then(item => {
+            setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
                 <p>A <span className="green">{item.name}</span> has spawned</p>
@@ -105,8 +125,8 @@ export const DevWindow = () => {
         })
     }
     function spawnCrossbow() {
-        fetchCreateCrossbow(player.area_id).then(item => {
-            setItems(prev => [...prev, item])
+        fetchCreateCrossbow(currentArea.id).then(item => {
+            setGameData(prev => ({...prev,items: [...prev.items, item]}))
             const test = 
             <div style={{color: "green"}}>
                 <p>A <span className="green">{item.name}</span> has spawned</p>
@@ -123,7 +143,8 @@ export const DevWindow = () => {
         const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
         if (updatedPlayer) {
             addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
-            setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
+            setGameData(prev => ({...prev,player: {...prev.player, level: updatedPlayer.level, experience: updatedPlayer.experience}}))
+            // setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
             console.log(updatedPlayer.level, " updatedPlayer.level")
             if (updatedPlayer.level > playerPreviousLevel) {
                 addLog("YOU LEVELED UP!")
@@ -140,7 +161,8 @@ export const DevWindow = () => {
         const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
         if (updatedPlayer) {
             addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
-            setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
+            setGameData(prev => ({...prev,player: {...prev.player, level: updatedPlayer.level, experience: updatedPlayer.experience}}))
+            // setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
             console.log(updatedPlayer.level, " updatedPlayer.level")
             if (updatedPlayer.level < playerPreviousLevel) {
                 addLog("YOU DELEVELED!")
@@ -149,6 +171,16 @@ export const DevWindow = () => {
             addLog(`Player didn't gain any experience for some reason`)
         }
     }
+    async function deleteAllItems() {
+        const data = await fetchDeleteAllItems()
+        addLog(data.message)
+    }
+    async function playerUnpacksItem() {
+        const playerId = player.id
+        const data = await fetchPlayerUnpacksItem(playerId)
+    }
+
+
 
         return (
             <Container className="d-flex">
@@ -172,6 +204,15 @@ export const DevWindow = () => {
                     <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={spawnOnehandedSword}>Spawn OH Sword</button>
                     <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={spawnDagger}>Spawn Dagger</button>
                     <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={spawnCrossbow}>Spawn Bow</button>
+                    <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" onClick={deleteAllItems}>Delete all items</button>
+
+                    <input type="text" style={{height: "50%", maxHeight: "40px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1" 
+                    onChange={(e) => {
+                        console.log(e.target.value)
+                        setLogState(e.target.value)
+                        console.log(logState)
+                    }}/>
+                    <button style={{height: "100%", maxHeight: "80px", width: "100%", maxWidth: "90px", backgroundColor: "blue", fontWeight: "bold"}} className="m-1">Submit Log</button>
                 </Row>
             </Container>
     )
