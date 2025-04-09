@@ -1,6 +1,8 @@
 import "../styles/colors.css"
 
 export const areaDisplay = (area, enemies, npcs, items, players) => {
+    console.clear()
+    console.log(npcs, " area npcs")
     const splitDescription = area.description ? area.description.split(" ") : ""
     return (
         <div className="my-2">
@@ -29,7 +31,7 @@ export const areaDisplay = (area, enemies, npcs, items, players) => {
             {npcs?.length > 0 && 
             <span className="d-flex flex-wrap">
                 <p>People: </p>
-                {npcs.map((npc, index) => {return <p className="mx-1 green" key={index}>{npc.name}</p>})}
+                {npcs.map((npc, index) => {return <p className="mx-1 green" key={index}>{npc.Npc.name}</p>})}
             </span>}
             {players?.length > 0 && 
             <span className="d-flex flex-wrap">

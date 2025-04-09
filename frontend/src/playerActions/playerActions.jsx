@@ -31,9 +31,10 @@ export const playerOffersQuest = async (commandObject) => {
     }
     if (npcs.length > 1) {
         const foundNpc = findNpcByName(npcs, command2)
+        const npcName = foundNpc.Npc.name
         body.npcId = foundNpc.id
         const questOffering = await questRequirementCheck(body)
-        if (questOffering.message === "404") {return addLog(`${foundNpc.name} does not have a quest for you to make an offer to.`)}
+        if (questOffering.message === "404") {return addLog(`${npcName} does not have a quest for you to make an offer to.`)}
         if (questOffering.message === "level") {return addLog(`You do not meet the level requirement for this quest.`)}
         if (questOffering.message === "item") {return addLog(`You have not offered the correct item(s) required for this quest.`)}
         if (questOffering.player) {
@@ -96,7 +97,9 @@ export const playerSpeakToNpcQuest = async (commandObject) => {
         }
     }
     if (command2) {
-        const npc = npcs.find(npc => npc.name.toLowerCase() === command2)
+        const npc = findNpcByName(npcs, command2)
+        const npcName = npc.Npc.name
+        // const npc = npcs.find(npc => npc.Npc.name.toLowerCase() === command2)
         if (!npc) {
             addLog(`There is nobody here named ${command2} offering a quest.`)
             return
@@ -104,7 +107,7 @@ export const playerSpeakToNpcQuest = async (commandObject) => {
         const npcId = npc.id
         const npcDialogue = await fetchNpcQuestDialogue(playerId, npcId)
         if (!npcDialogue.success) {
-            addLog(`${npc.name} is not currently offering any quests.`)
+            addLog(`${npcName} is not currently offering any quests.`)
             return
         }
         for (const paragraph of npcDialogue.message) {
@@ -242,7 +245,9 @@ export async function playerUnpacksItem(commandObject) {
     const isRightHandFull = playerItems.some(item => item.location == "right_hand")
     const isWieldingTwoHanded = playerItems.some(item => item.location == "both_hands")
     
-    if ((isLeftHandFull && isRightHandFull) || isWieldingTwoHanded) {return addLog(`You cannot unpack anything when both hands are full`)}
+    if ((isLeftHandFull && isRightHandFull) || isWieldingTwoHanded) {
+        return addLog(`You cannot unpack anything when both hands are full`)
+    }
     
     let unpackedItem
     if (!isNaN(command2)) {unpackedItem = findItemByNumber(playerItems, command2)}
@@ -250,8 +255,13 @@ export async function playerUnpacksItem(commandObject) {
     if (unpackedItem === false) {return addLog(`You're currently holding that item`)}
     if (!unpackedItem && !isNaN(command2)) {return addLog(`You don't have an item in that slot to unpack`)}
     // if (unpackedItem.location == "left_hand" || unpackedItem.location == "right_hand") {return addLog(`You are wielding the only ${unpackedItem.name} that you own`)}
-
-    if ((isLeftHandFull || isRightHandFull) && unpackedItem?.isTwoHanded) {return addLog(`Both hands must be free in order to hold a ${unpackedItem.name}`)}
+    
+    if ((isLeftHandFull || isRightHandFull) && unpackedItem?.isTwoHanded) {
+        const message = <div>Both hands MUST be FREE in order to hold a <span style={{color: "green"}}>${unpackedItem.name}</span></div>
+        addLog(message)
+        addLog('test')
+        return addLog(`Both hands must be free in order to hold a ${unpackedItem.name}`)
+    }
     if (!unpackedItem) {return addLog(`You do not have a ${command2} to unpack`)}
     
     const data = await fetchPlayerUnpacksItem(playerId, unpackedItem.id)
