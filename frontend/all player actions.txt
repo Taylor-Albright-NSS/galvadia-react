@@ -21,7 +21,7 @@ clean
 show
 don/wear/equip
 unequip/remove
-buy
+buyd
 spells
 train
 learn
