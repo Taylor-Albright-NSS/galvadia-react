@@ -26,7 +26,7 @@ export const putCurrentAreaItemsToPlayer = async (req, res) => {
     const itemsArray = req.body
     const { playerId } = req.query
     if (itemsArray.length === 0) {
-      console.log(`Current WebSocket Clients: ${wss.clients.size}`);
+      console.log(`Current WebSocket Clients: ${wss.clients.size}`)
       return res.status(404).json({message: "No items to pick up"})
     }
     console.log(`Current WebSocket Clients: ${wss.clients.size}`);
@@ -57,6 +57,7 @@ export const putCurrentAreaItemsToPlayer = async (req, res) => {
     res.status(500).json({ error: error.message })
   }
 }
+
 export const postSpawnItemToPlayer = async (req, res) => {
   try {
     const { player, keyword } = req.body
