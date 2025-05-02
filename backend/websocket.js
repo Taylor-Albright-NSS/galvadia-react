@@ -1,11 +1,8 @@
 import express from 'express'
 import http from 'http'
 import { WebSocket, WebSocketServer } from 'ws'
-import { playerGainsExperience, playerRoomTransition } from './controllers/playerController.js'
 import { players } from './controllers/playerController.js'
-import { User } from './models/user.js'
-import { getGameData } from './controllers/gameStateController.js'
-import { handlePlayerAction } from './controllerHandlers/playerActionsHandler.js'
+import { handlePlayerAction, handlePlayerModify } from './controllerHandlers/playerActionsHandler.js'
 
 export const app = express()
 export const server = http.createServer(app)
@@ -21,41 +18,9 @@ wss.on('connection', ws => {
 		} catch (error) {
 			return ws.send(JSON.stringify({ error: 'Failed to parse data' }))
 		}
-		let updatedPlayer
 		if (data.type === 'playerAction') handlePlayerAction(data, ws, wss)
+		if (data.type === 'playerModify') handlePlayerModify(data, ws, wss)
 
-		// if (data.type === 'playerAction') {
-		// 	async function response(data) {
-		// 		try {
-		// 			switch (data.action) {
-		// 				case 'playerRoomTransition':
-		// 					updatedPlayer = await playerRoomTransition(data, wss)
-		// 					const gameData = { playerId: updatedPlayer.id, areaId: updatedPlayer.area_id }
-		// 					const updatedGameData = await getGameData(gameData)
-		// 					ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRoomTransition', updatedPlayer, updatedGameData }))
-		// 					break
-		// 				case 'get':
-		// 					const user = await User.findOne({ where: { id: 1 } })
-		// 					ws.send(JSON.stringify({ type: 'user', user: user }))
-		// 					break
-		// 			}
-		// 		} catch (error) {
-		// 			ws.send(JSON.stringify({ testError: error }))
-		// 		}
-		// 	}
-		// 	response(data)
-		// }
-		if (data.type === 'playerModify') {
-			async function response(data) {
-				switch (data.action) {
-					case 'playerGainsExperience':
-						updatedPlayer = await playerGainsExperience(data)
-						ws.send(JSON.stringify({ type: 'playerModify', action: 'playerGainsExperience', updatedPlayer }))
-						break
-				}
-			}
-			response(data)
-		}
 		if (data.type === 'playerMoves') {
 			console.log('PLAYER MOVES')
 			//playerId and areaId of player who is moving

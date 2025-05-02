@@ -1,6 +1,5 @@
 import Player from '../models/player.js'
-import { Op, Sequelize } from 'sequelize'
-// import { wss } from "../websocket.js";
+import { Op } from 'sequelize'
 import { sequelize } from '../config/db.js'
 import { Item } from '../models/item.js'
 
@@ -10,6 +9,7 @@ export let players = {}
 export const playerRoomTransition = async (data, wss) => {
 	try {
 		const { id } = data.player
+    console.log(id, " player room transition player ID")
 		const { x, y, area_id, oldAreaId } = data.combinedCoords
 		const playerOldAreaId = oldAreaId
 		let counter = 1
@@ -27,6 +27,10 @@ export const playerRoomTransition = async (data, wss) => {
 		player.x = x
 		player.y = y
 		player.area_id = area_id
+    console.log(players, " PLAYERS OBJECT")
+    console.log(players[0], " FIRST PLAYER")
+    console.log(players[1], " SECOND PLAYER")
+    console.log(id, " ID")
 		players[id].areaId = area_id
 		counter = 1
 		wss.clients.forEach(client => {
@@ -77,53 +81,6 @@ export const playerGainsExperience = async data => {
 //   player.level = player.levelCalc
 //   player.save()
 //   return res.status(200).json(player)
-// }
-
-// export const playerPatchCoords = async (req, res) => {
-//   try {
-//     const { id } = req.params
-//     const { x, y, area_id, oldAreaId } = req.body
-//     console.log(id, x, y)
-//     const playerOldAreaId = oldAreaId
-//     let counter = 1
-//     console.log("Does run???")
-//     wss.clients.forEach(client => {
-//       console.log(players[counter].name)
-//       let player = players[counter]
-//       if (player.id != parseInt(id)) {
-//         if (player.areaId === area_id) {
-//           client.send(JSON.stringify({type: "playerMoves", message: "Player enters the room"}))
-//         }
-//       }
-//       counter++
-//     })
-//     const player = await Player.findOne({where: { id: id }})
-//     if (!player) {
-//       return res.status(404).json({ message: "Player not found" })
-//     }
-//     if (!area_id) {
-//       return res.status(404).json({message: "Area does not exist"})
-//     }
-//     player.x = x
-//     player.y = y
-//     player.area_id = area_id
-//     players[id].areaId = area_id
-//     console.log(playerOldAreaId, " old area id")
-//     counter = 1
-//     wss.clients.forEach(client => {
-//       if (players[counter].id != parseInt(id)) {
-//         if (playerOldAreaId === players[counter].areaId) {
-//           client.send(JSON.stringify({type: "playerMoves", message: "Player leaves the room"}))
-//           console.log("Player leaves the room should be triggered")
-//         }
-//       }
-//       counter++
-//     })
-//     await player.save()
-//     return res.json(player)
-//   } catch(error) {
-//     return res.status(500).json({message: "Failed to update player coordinates"})
-//   }
 // }
 
 export const getPlayer1API = async (req, res) => {
