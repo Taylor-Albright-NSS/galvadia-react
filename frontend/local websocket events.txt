@@ -1,7 +1,0 @@
-//All actions broadcast to any player in the same room
-- equip/unequip
-- attacking/abilities
-- entering/leaving a room
-- talking
-- emotes
-- gambling

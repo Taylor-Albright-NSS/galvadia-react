@@ -15,6 +15,7 @@ export const questRequirementCheck = async (body) => {
 export const fetchCurrentAreaNpcs = async (areaId, playerId) => {
     const response = await fetch(`${api}/npcs/${areaId}/${playerId}`)
     const data = await response.json()
+    console.log(data, " Updated NPCs")
     return data
 }
 

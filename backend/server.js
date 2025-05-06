@@ -2,7 +2,7 @@ import 'dotenv/config'; // No need for .config()
 import express from 'express';
 // import playerRoutes from './routes/playerRoutes'
 import Area from './models/area.js';
-import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerPatchCoords, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem, patchPlayerDropsItem } from './controllers/playerController.js';
+import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerRoomTransition, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem, patchPlayerDropsItem } from './controllers/playerController.js';
 import db from './models/associations.js';
 import cors from 'cors';
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js';
@@ -12,6 +12,7 @@ import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, po
 import { app }  from './websocket.js';
 import { getUser } from './controllers/userController.js';
 import { patchKeywordActivation, patchToggleKeywordFalse } from './controllers/keywordController.js';
+import { getGameData } from './controllers/gameStateController.js';
 // const app = express();
 // const server = http.createServer(app)
 // export const wss = new WebSocketServer({ server });
@@ -19,7 +20,8 @@ app.use(express.json())
 app.use(cors());
 //--------ROUTE TESTING
 app.get('/npcquest/:npcId/:playerId', getNpcQuest)
-
+//--------GAME DATA
+app.get('/gamedata/:playerId/:areaId', getGameData)
 //--------NPC QUEST
 app.post('/questcomplete', postNpcRequirements)
 app.patch('/queststage/decrement/:npcId/:playerId', patchDecrementQuestStage)
@@ -55,7 +57,7 @@ app.get('/npc/:id', getNpcById)
 app.get('/npc/:id/dialogue', getNpcDialogue)
 //--------PLAYERS 
   //(SINGLE)
-app.patch('/player/:id/coordinates', playerPatchCoords)
+// app.patch('/player/:id/coordinates', playerRoomTransition)
 app.patch('/player/:playerId/experience', playerGainsExperience)
 app.get('/player/:id', getPlayer1API);
 

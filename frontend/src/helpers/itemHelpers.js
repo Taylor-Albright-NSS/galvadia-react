@@ -7,7 +7,6 @@ export const dropItemByKeyword = function(playerItems, command2) {
     return playerItems.find(({ keywords }) => keywords.includes(command2))
 }
 
-
 export const findItemsByKeyword = function(playerItems, command2) {
     return playerItems.filter(({ keywords }) => keywords.includes(command2))
 }
