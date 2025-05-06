@@ -7,7 +7,6 @@ class Player extends Model {
 		const level = Math.max(Math.floor(Math.sqrt(experience / 100)), 1)
 		return level
 	}
-	get;
 }
 
 Player.init(

@@ -10,29 +10,13 @@ import { PlayerNpc } from '../models/playerNpc.js'
 export const getGameData = async data => {
 	const { playerId, areaId } = data
 	console.log(playerId, areaId, ' playerId and areaId')
-	//fetch current area
-	//enemies in room
-	//current area npcs
-	//current area items
-	//items that belong to player
-	//players in room
+
 	const area = await Area.findOne({ where: { id: areaId }, include: { model: Keyword } })
 	const enemies = await Enemy.findAll({ where: { area_id: areaId } })
-	// const npcs = await Npc.findAll({ where: {area_id: areaId} })
 	const itemsInArea = await Item.findAll({ where: { ownerId: areaId, ownerType: 'area' } })
 	const players = await Player.findAll({ where: { area_id: areaId, id: { [Op.ne]: playerId } } })
-	// const updatedItems = await Promise.all(
-	//     itemsArray.map(async (item) => {
-	//     const updatedItem = await Item.update(
-	//         { ownerId: playerId, ownerType: "player", location: "inventory" },
-	//         { where: { id: item.id }, returning: true }
-	//     );
-	//     return updatedItem;
-	//     })
-	// );
 	const playerNpcs = await PlayerNpc.findAll({ where: { area_id: areaId, playerId: playerId } })
 	const allNpcs = await Npc.findAll({ where: { area_id: areaId } })
-	//filters npcs that the player has not yet interacted with
 	const missingNpcs = allNpcs.filter(npc => !playerNpcs.some(playerNpc => playerNpc.npcId === npc.id))
 	const newPlayerNpcs = await Promise.all(
 		missingNpcs.map(npc => {

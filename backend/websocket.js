@@ -18,7 +18,10 @@ wss.on('connection', ws => {
 		} catch (error) {
 			return ws.send(JSON.stringify({ error: 'Failed to parse data' }))
 		}
-		if (data.type === 'playerAction') handlePlayerAction(data, ws, wss)
+		if (data.type === 'playerAction') {
+			console.log(data, ' FIRST DATA')
+			handlePlayerAction(data, ws, wss)
+		}
 		if (data.type === 'playerModify') handlePlayerModify(data, ws, wss)
 
 		if (data.type === 'playerMoves') {

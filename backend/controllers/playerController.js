@@ -2,14 +2,89 @@ import Player from '../models/player.js'
 import { Op } from 'sequelize'
 import { sequelize } from '../config/db.js'
 import { Item } from '../models/item.js'
+import { Enemy } from '../models/enemy.js'
+import { GamePlayer } from '../services/GamePlayer.js'
+import { enemyDies } from './enemyController.js'
 
 export let players = {}
 // prettier-ignore
+export const playerRetreats = async (data, ws, wss) => {
+  try {
+    const { playerId, areaId } = data
+    const allEnemies = await Enemy.findAll({ where: { area_id: areaId } })
+    console.log(allEnemies, " ALL ENEMIES")
+    if (!allEnemies) {
+      throw new Error("Error retrieving all enemies")
+    }
+    const playerIsInCombat = allEnemies.some(({ playerCombatIds }) => playerCombatIds.includes(playerId))
+    if (!playerIsInCombat) { 
+      console.log("Player is not in combat. No retreat happens")
+      return 
+    }
+    const updatedEnemies = await Promise.all(
+      allEnemies.map(async (enemy) => {
+      const [_, [updatedEnemy]] = await Enemy.update(
+        { playerCombatIds: enemy.playerCombatIds.filter(id => id !== playerId) },
+        { where: { id: enemy.id }, returning: true }
+      )
+      return updatedEnemy
+    }))
+    ws.send(JSON.stringify({ type: "playerAction", action: "playerRetreats", enemies: updatedEnemies }))
+
+  } catch(error) {
+    ws.send(JSON.stringify({ type: "error", message: "Failed to retreat" }))
+    console.error(`Error: `, error)
+  }
+}
+
+export const playerAdvancesEnemy = async (data, ws, wss) => {
+	try {
+		const { playerId, enemyId } = data
+		const player = await Player.findByPk(playerId)
+		const enemy = await Enemy.findByPk(enemyId)
+
+		if (!player) {
+			throw new Error(`Cannot find player`)
+		}
+		if (!enemy) {
+			throw new Error(`Cannot find enemy`)
+		}
+
+		if (!enemy.playerCombatIds.some(id => id === playerId)) {
+			enemy.playerCombatIds = [...enemy.playerCombatIds, playerId]
+			enemy.save()
+			ws.send(JSON.stringify({ type: 'playerAction', action: 'playerAdvancesEnemy', enemy }))
+		}
+	} catch (error) {
+		ws.send(JSON.stringify({ type: 'error', message: 'Error advancing the enemy' }))
+		console.error(`Backend error: `, error)
+	}
+}
+
+export const playerRegularAttack = async (data, ws, wss) => {
+	const { playerId, enemyId } = data
+	const player = await Player.findByPk(playerId)
+	const enemy = await Enemy.findByPk(enemyId)
+
+	const gamePlayer = new GamePlayer(player)
+	const playerDamage = gamePlayer.rawDamage
+	console.log(playerDamage, ' Player Damage')
+	enemy.health = Math.max(enemy.health - playerDamage, 0)
+	if (enemy.health <= 0) {
+		console.log('Enemy dies here')
+		await enemyDies(enemy, ws, wss)
+		ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyDies', enemy, damage: playerDamage }))
+	} else {
+		console.log('Enemy takes damage and is still alive')
+		enemy.save()
+		ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyTakesDamage', enemy, damage: playerDamage }))
+	}
+}
 
 export const playerRoomTransition = async (data, wss) => {
 	try {
 		const { id } = data.player
-    console.log(id, " player room transition player ID")
+		console.log(id, ' player room transition player ID')
 		const { x, y, area_id, oldAreaId } = data.combinedCoords
 		const playerOldAreaId = oldAreaId
 		let counter = 1
@@ -27,10 +102,10 @@ export const playerRoomTransition = async (data, wss) => {
 		player.x = x
 		player.y = y
 		player.area_id = area_id
-    console.log(players, " PLAYERS OBJECT")
-    console.log(players[0], " FIRST PLAYER")
-    console.log(players[1], " SECOND PLAYER")
-    console.log(id, " ID")
+		console.log(players, ' PLAYERS OBJECT')
+		console.log(players[0], ' FIRST PLAYER')
+		console.log(players[1], ' SECOND PLAYER')
+		console.log(id, ' ID')
 		players[id].areaId = area_id
 		counter = 1
 		wss.clients.forEach(client => {

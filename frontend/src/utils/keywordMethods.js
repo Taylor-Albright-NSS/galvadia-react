@@ -1,6 +1,4 @@
-import { fetchDirectionToUnlock, fetchItemToSpawn, fetchKeywordActivation } from "../fetches/areas/areas"
-
-const api = "http://localhost:3000"
+import { fetchDirectionToUnlock, fetchKeywordActivation } from "../fetches/areas/areas"
 
 export const keywordMethods = {
     pullLever: async function(currentArea, keyword) {
