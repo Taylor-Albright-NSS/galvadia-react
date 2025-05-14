@@ -1,8 +1,8 @@
 import { moveDirection } from "../playerActions/playerMovement"
-import { playerAdvances, playerAttacks, playerDropsItem, playerExamine, playerGet, playerLook, playerOffersQuest, 
+import { playerAdvances, playerAttacks, playerDropsItem, playerExamineService, playerGet, playerInspectService, playerLookService, playerOffersQuest, 
             playerPacksItem, playerPull, playerRetreats, playerSpeakToNpc, playerSpeakToNpcQuest, 
             playerUnpacksItem 
-        } from "../playerActions/playerActions"
+        } from "../services/servicesPlayer"
 
 import { playerInventoryDisplay } from "../DOMrenders/playerInventoryDisplay";
 
@@ -10,10 +10,11 @@ export const commandActions = {
 // command1, command2, command3, command4, player, setPlayer, addLog, currentArea, npcs, enemies
 // items, setItems, playerItems, setPlayerItems, players, setPlayers, setNpcs, setEnemies, ws,
 // playerStatus
-    look: async (commandObject) => {playerLook(commandObject)},
+    look: async (commandObject) => {playerLookService(commandObject)},
     speak: async (commandObject) => {playerSpeakToNpc(commandObject)},
     quest: async (commandObject) => {playerSpeakToNpcQuest(commandObject)},
-    examine: async (commandObject) => {playerExamine(commandObject)},
+    examine: async (commandObject) => {playerExamineService(commandObject)},
+    inspect: async (commandObject) => {playerInspectService(commandObject)},
     pull: async (commandObject) => {playerPull(commandObject)},
     get: async (commandObject) => {playerGet(commandObject)},
     inventory: async (commandObject) => {playerInventoryDisplay(commandObject)},

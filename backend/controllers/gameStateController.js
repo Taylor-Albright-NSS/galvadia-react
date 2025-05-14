@@ -1,42 +1,59 @@
 import Area from '../models/area.js'
+import Player from '../models/player.js'
 import { Enemy } from '../models/enemy.js'
 import { Item } from '../models/item.js'
 import { Keyword } from '../models/keyword.js'
 import { Npc } from '../models/npc.js'
-import Player from '../models/player.js'
 import { Op } from 'sequelize'
 import { PlayerNpc } from '../models/playerNpc.js'
+import { PlayerArea } from '../models/playerArea.js'
+import { applyPlayerArea } from '../utils/areaUtils.js'
 
 export const getGameData = async data => {
-	const { playerId, areaId } = data
-	console.log(playerId, areaId, ' playerId and areaId')
+	try {
+		const { playerId, areaId } = data
+		console.log(playerId, areaId, ' playerId and areaId')
 
-	const area = await Area.findOne({ where: { id: areaId }, include: { model: Keyword } })
-	const enemies = await Enemy.findAll({ where: { area_id: areaId } })
-	const itemsInArea = await Item.findAll({ where: { ownerId: areaId, ownerType: 'area' } })
-	const players = await Player.findAll({ where: { area_id: areaId, id: { [Op.ne]: playerId } } })
-	const playerNpcs = await PlayerNpc.findAll({ where: { area_id: areaId, playerId: playerId } })
-	const allNpcs = await Npc.findAll({ where: { area_id: areaId } })
-	const missingNpcs = allNpcs.filter(npc => !playerNpcs.some(playerNpc => playerNpc.npcId === npc.id))
-	const newPlayerNpcs = await Promise.all(
-		missingNpcs.map(npc => {
-			PlayerNpc.create({
-				playerId: playerId,
-				npcId: npc.id,
-				area_id: areaId,
-				// dialogueStage: npc.dialogueStage,
-				// dialogueIndex: npc.dialogueIndex,
-				// questStage: npc.questStage,
+		const area = await Area.findOne({ where: { id: areaId }, include: { model: Keyword } })
+		const playerArea = await PlayerArea.findOne({ where: { playerId, area_id: areaId } })
+		let modifiedArea
+		if (playerArea) {
+			modifiedArea = applyPlayerArea(playerArea, area)
+			console.log(modifiedArea, ' modifiedArea')
+		} else {
+			modifiedArea = area.toJSON()
+		}
+		console.log('Inside game data', 1)
+		const enemies = await Enemy.findAll({ where: { area_id: areaId } })
+		const itemsInArea = await Item.findAll({ where: { ownerId: areaId, ownerType: 'area' } })
+		const players = await Player.findAll({ where: { area_id: areaId, id: { [Op.ne]: playerId } } })
+		const playerNpcs = await PlayerNpc.findAll({ where: { area_id: areaId, playerId: playerId } })
+		const allNpcs = await Npc.findAll({ where: { area_id: areaId } })
+		const missingNpcs = allNpcs.filter(npc => !playerNpcs.some(playerNpc => playerNpc.npcId === npc.id))
+		await Promise.all(
+			missingNpcs.map(npc => {
+				PlayerNpc.create({
+					playerId: playerId,
+					npcId: npc.id,
+					area_id: areaId,
+					// dialogueStage: npc.dialogueStage,
+					// dialogueIndex: npc.dialogueIndex,
+					// questStage: npc.questStage,
+				})
 			})
-		})
-	)
+		)
 
-	const npcs = await PlayerNpc.findAll({
-		where: { area_id: areaId, playerId },
-		include: [{ model: Npc }], // Include master NPC reference for name, etc.
-	})
-	const gameData = { area, enemies, npcs, itemsInArea, players }
-	return gameData
+		console.log('Inside game data', 2)
+		const npcs = await PlayerNpc.findAll({
+			where: { area_id: areaId, playerId },
+			include: [{ model: Npc }], // Include master NPC reference for name, etc.
+		})
+		console.log('Inside game data', 3)
+		const gameData = { area: modifiedArea, enemies, npcs, itemsInArea, players }
+		return gameData
+	} catch (error) {
+		console.log(`Error: `, error)
+	}
 }
 // export const getGameData = async (req, res) => {
 //     const { playerId, areaId } = req.params

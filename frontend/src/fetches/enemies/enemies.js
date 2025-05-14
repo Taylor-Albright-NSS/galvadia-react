@@ -49,6 +49,7 @@ export const enemyDies = async (enemyId) => {
 }
 
 export const createEnemy = async (areaId) => {
+    console.log(areaId, " areaId")
     const response = await fetch(`${api}/enemy/${areaId}`, {
         method: "POST",
         headers: {

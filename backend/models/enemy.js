@@ -1,20 +1,21 @@
-import { DataTypes } from 'sequelize'
+import { DataTypes, Model } from 'sequelize'
 import { sequelize } from '../config/db.js' // Import the sequelize instance from your db.js
-import { playerGainsExperience } from '../controllers/playerController.js'
+
+export class Enemy extends Model {}
 
 Enemy.init(
 	{
+		id: {
+			type: DataTypes.INTEGER,
+			primaryKey: true,
+			autoIncrement: true,
+		},
 		enemyTypeId: {
 			type: DataTypes.INTEGER,
 			references: {
 				model: 'EnemyTypes',
 				key: 'id',
 			},
-		},
-		id: {
-			type: DataTypes.INTEGER,
-			primaryKey: true,
-			autoIncrement: true,
 		},
 		area_id: {
 			type: DataTypes.INTEGER,
@@ -31,6 +32,7 @@ Enemy.init(
 		damage: { type: DataTypes.INTEGER },
 		experience: { type: DataTypes.INTEGER },
 		playerCombatIds: { type: DataTypes.ARRAY(DataTypes.INTEGER) },
+		loot: { type: DataTypes.ARRAY(DataTypes.JSONB) },
 
 		createdAt: {
 			type: DataTypes.DATE,
@@ -52,3 +54,5 @@ Enemy.init(
 		// },
 	}
 )
+
+export default Enemy

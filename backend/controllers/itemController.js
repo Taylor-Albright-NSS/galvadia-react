@@ -10,6 +10,13 @@ export const getItems = async (req, res) => {
 		res.status(500).json({ error: error.message })
 	}
 }
+
+export const getAllItems = async (data, ws, wss) => {
+	try {
+		const items = Item.findAll({})
+	} catch (error) {}
+}
+
 export const getCurrentAreaItems = async (req, res) => {
 	const { areaId } = req.params
 	try {

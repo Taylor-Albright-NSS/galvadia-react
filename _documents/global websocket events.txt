@@ -1,0 +1,3 @@
+//Events that are broadcast to every player regardless of proximity
+- Deaths
+- Level ups

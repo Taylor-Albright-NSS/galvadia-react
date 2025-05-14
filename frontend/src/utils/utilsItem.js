@@ -23,3 +23,20 @@ export const findItemByNumber = function(playerItems, command2) {
     })
     return foundItem
 }
+
+export const itemFindFirstUtil = () => {}
+export const itemFindByKeywordUtil = (items, command2) => {
+    console.log(command2, " COMMAND2")
+    console.log(items, " PLAYERITEMS")
+    const foundItem = items.find(({ keywords }) => keywords.some(keyword => keyword === command2))
+    return foundItem
+}
+
+export const playerItemFindByKeywordUtil = (command2, playerItems) => {
+    const foundItem = playerItems.find(({ keywords }) => keywords.some(keyword => keyword === command2))
+    return foundItem
+}
+export const playerItemFindByNumberUtil = (command2, playerItems) => {
+    const foundItem = playerItems[command2 - 1]
+    return foundItem
+}

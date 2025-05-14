@@ -42,6 +42,7 @@ const commandAliases = (command1) => {
         i: "inventory",
         talk: "speak",
         ex: "examine",
+        in: "inspect",
         g: "get",
         p: "pack",
         a: "attack",

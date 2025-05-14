@@ -9,10 +9,11 @@ module.exports = {
 				primaryKey: true,
 				allowNull: false,
 			},
+			lootTableId: { type: Sequelize.INTEGER },
 			name: { type: Sequelize.STRING },
-			baseHealth: { type: Sequelize.INTEGER },
 			minLevel: { type: Sequelize.INTEGER },
 			maxLevel: { type: Sequelize.INTEGER },
+			baseHealth: { type: Sequelize.INTEGER },
 			baseDamage: { type: Sequelize.INTEGER },
 			baseExperience: { type: Sequelize.INTEGER },
 

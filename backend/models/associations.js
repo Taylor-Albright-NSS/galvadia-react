@@ -4,6 +4,7 @@ import { Enemy } from './enemy.js'
 import { EnemyType } from './enemyType.js'
 import { Item } from './item.js'
 import { Keyword } from './keyword.js'
+import LootTable from './lootTable.js'
 import { Npc } from './npc.js'
 import { NpcDialogue } from './npcDialogue.js'
 import Player from './player.js'
@@ -39,6 +40,9 @@ Enemy.belongsTo(Area, { foreignKey: 'area_id' })
 
 Area.hasMany(Keyword, { foreignKey: 'area_id' })
 Keyword.belongsTo(Area, { foreignKey: 'area_id' })
+
+// itemTemplate.hasMany(LootTable, { foreignKey: 'itemTemplateId' })
+// LootTable.belongsTo(itemTemplate, { foreignKey: 'itemTemplateId' })
 
 const db = { sequelize, Area, Npc, Player, Keyword, Enemy, NpcDialogue }
 
