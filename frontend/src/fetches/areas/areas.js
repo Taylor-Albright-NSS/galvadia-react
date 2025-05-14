@@ -101,3 +101,7 @@ export const getAreaByCoords = async (coords) => {
         console.error(`Error:`, error)
     }
 }
+
+export const sendAreaByCoords = async (ws, coords) => {
+    ws.send(JSON.stringify({ type: "coordinatesModify", coords }))
+}

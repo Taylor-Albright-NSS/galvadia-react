@@ -7,7 +7,6 @@ export const dropItemByKeyword = function(playerItems, command2) {
     return playerItems.find(({ keywords }) => keywords.includes(command2))
 }
 
-
 export const findItemsByKeyword = function(playerItems, command2) {
     return playerItems.filter(({ keywords }) => keywords.includes(command2))
 }
@@ -22,5 +21,22 @@ export const findItemByNumber = function(playerItems, command2) {
     .find((_, index) => {
         return index + 1 == command2
     })
+    return foundItem
+}
+
+export const itemFindFirstUtil = () => {}
+export const itemFindByKeywordUtil = (items, command2) => {
+    console.log(command2, " COMMAND2")
+    console.log(items, " PLAYERITEMS")
+    const foundItem = items.find(({ keywords }) => keywords.some(keyword => keyword === command2))
+    return foundItem
+}
+
+export const playerItemFindByKeywordUtil = (command2, playerItems) => {
+    const foundItem = playerItems.find(({ keywords }) => keywords.some(keyword => keyword === command2))
+    return foundItem
+}
+export const playerItemFindByNumberUtil = (command2, playerItems) => {
+    const foundItem = playerItems[command2 - 1]
     return foundItem
 }

@@ -1,47 +1,25 @@
-import { DataTypes } from 'sequelize'
+import { DataTypes, Model } from 'sequelize'
 import { sequelize } from '../config/db.js'
 
-export const Item = sequelize.define('Item', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-    allowNull: false
-  },
-  name: {
-    type: DataTypes.STRING,
-  },
-  ownerId: {
-    type: DataTypes.INTEGER
-  },
-  ownerType: {
-    type: DataTypes.STRING
-  },
-  location: {
-    //If ownerType is player, location is among these: right_hand, left_hand, all other slots
-    //If ownerType is anything but player, value is null
-    type: DataTypes.STRING,
-  },
-  isTwoHanded: {
-    type: DataTypes.BOOLEAN,
-    defaultValue: false,
-  },
-  keywords: {
-    type: DataTypes.ARRAY(DataTypes.STRING)
-  },
-  // description: {
-  //   type: DataTypes.TEXT,
-  // },
-  createdAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-  updatedAt: {
-    type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-  },
-}, {
+export class Item extends Model {}
 
-  timestamps: true, 
-});
+Item.init(
+	{
+		id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
+		name: { type: DataTypes.STRING },
+		ownerId: { type: DataTypes.INTEGER },
+		ownerType: { type: DataTypes.STRING },
+		templateId: { type: DataTypes.INTEGER },
+		templateType: { type: DataTypes.STRING },
+		location: { type: DataTypes.STRING },
+		createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+		updatedAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
+	},
+	{
+		sequelize,
+		modelName: 'Item',
+		timestamps: true,
+	}
+)
 
+export default Item

@@ -23,7 +23,10 @@ export const fetchIncreasePlayerExperience = async (playerId, experienceGain) =>
     } catch(err) {
         console.error(`Error message: ${err.message}`)
     }
-} 
+}
+export const playerGainsExperienceRequest = async (ws, playerId, experienceGain) => {
+    ws.send(JSON.stringify({ type: "playerModify", action: "playerGainsExperience", playerId, experienceGain }))
+}
 
 export const getPlayers = async () =>{
     const response = await fetch(`${api}/players`)

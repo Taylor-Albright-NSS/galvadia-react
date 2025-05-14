@@ -1,22 +1,30 @@
 import { moveDirection } from "../playerActions/playerMovement"
-import { playerDropsItem, playerExamine, playerGet, playerLook, playerOffersQuest, playerPacksItem, playerPull, playerSpeakToNpc, playerSpeakToNpcQuest, playerUnpacksItem } from "../playerActions/playerActions"
+import { playerAdvances, playerAttacks, playerDropsItem, playerExamineService, playerGet, playerInspectService, playerLookService, playerOffersQuest, 
+            playerPacksItem, playerPull, playerRetreats, playerSpeakToNpc, playerSpeakToNpcQuest, 
+            playerUnpacksItem 
+        } from "../services/servicesPlayer"
+
 import { playerInventoryDisplay } from "../DOMrenders/playerInventoryDisplay";
 
 export const commandActions = {
 // command1, command2, command3, command4, player, setPlayer, addLog, currentArea, npcs, enemies
-// items, setItems, playerItems, setPlayerItems, players, setPlayers, setNpcs, setEnemies, socket,
+// items, setItems, playerItems, setPlayerItems, players, setPlayers, setNpcs, setEnemies, ws,
 // playerStatus
-    look: async (commandObject) => {playerLook(commandObject)},
+    look: async (commandObject) => {playerLookService(commandObject)},
     speak: async (commandObject) => {playerSpeakToNpc(commandObject)},
     quest: async (commandObject) => {playerSpeakToNpcQuest(commandObject)},
-    examine: async (commandObject) => {playerExamine(commandObject)},
+    examine: async (commandObject) => {playerExamineService(commandObject)},
+    inspect: async (commandObject) => {playerInspectService(commandObject)},
     pull: async (commandObject) => {playerPull(commandObject)},
     get: async (commandObject) => {playerGet(commandObject)},
     inventory: async (commandObject) => {playerInventoryDisplay(commandObject)},
     offer: async (commandObject) => {playerOffersQuest(commandObject)},
     unpack: async (commandObject) => {playerUnpacksItem(commandObject)},
     pack: async (commandObject) => {playerPacksItem(commandObject)},
-    drop: async (commandObject) => {playerDropsItem(commandObject)}
+    drop: async (commandObject) => {playerDropsItem(commandObject)},
+    attack: async (commandObject) => {playerAttacks(commandObject)},
+    advance: async (commandObject) => {playerAdvances(commandObject)},
+    retreat: async (commandObject) => {playerRetreats(commandObject)},
 };
 
 export const actionList = async (commandObject) => {
@@ -31,11 +39,7 @@ export const actionList = async (commandObject) => {
 }
 const movementDirections = new Set(["north", "northeast", "east", "southeast" , "south", "southwest", "west", "northwest"])
 
-
 movementDirections.forEach(direction => {
-    commandActions[direction] = ({ gameData, setGameData, command1, addLog, socket, playerStatus }) =>
-        moveDirection(gameData, setGameData, command1, addLog, socket, playerStatus);
-    // commandActions[direction] = ({ player, setPlayer, command1, currentArea, addLog, socket, playerStatus }) =>
-    //     moveDirection(player, setPlayer, command1, currentArea, addLog, socket, playerStatus);
+    commandActions[direction] = ({ gameData, setGameData, command1, addLog, ws, playerStatus }) =>
+        moveDirection(gameData, setGameData, command1, addLog, ws, playerStatus);
 });
-//

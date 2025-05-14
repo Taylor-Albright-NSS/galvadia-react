@@ -22,7 +22,8 @@ show
 don/wear/equip
 unequip/remove
 buy
-spellstrain
+spells
+train
 learn
 read
 touch

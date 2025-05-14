@@ -3,10 +3,9 @@ import './App.css'
 import { WebSocketProvider } from './components/ui/WebSocketProvider'
 
 export const App = () => {
-
-  return (
-    <WebSocketProvider>
-      <UI />
-    </WebSocketProvider>
-  )
+	return (
+		<WebSocketProvider>
+			<UI />
+		</WebSocketProvider>
+	)
 }

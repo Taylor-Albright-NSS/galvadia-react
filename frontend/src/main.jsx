@@ -4,10 +4,8 @@ import { App } from './App'
 import './index.css'
 import { GameProvider } from './components/ui/GameProvider'
 
-
-
 createRoot(document.getElementById('root')).render(
-    <GameProvider>
-      <App />
-    </GameProvider>
+	<GameProvider>
+		<App />
+	</GameProvider>
 )
