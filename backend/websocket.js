@@ -3,6 +3,9 @@ import http from 'http'
 import { WebSocket, WebSocketServer } from 'ws'
 import { players } from './controllers/playerController.js'
 import { handlePlayerAction, handlePlayerModify } from './controllerHandlers/playerActionsHandler.js'
+import { handleEnemyAction } from './controllerHandlers/enemyActionsHandler.js'
+import { handleItemAction } from './controllerHandlers/itemActionsHandler.js'
+import { handlePlayerDataRetrieval } from './controllerHandlers/playerRetrieveDataHandler.js'
 
 export const app = express()
 export const server = http.createServer(app)
@@ -19,10 +22,20 @@ wss.on('connection', ws => {
 			return ws.send(JSON.stringify({ error: 'Failed to parse data' }))
 		}
 		if (data.type === 'playerAction') {
-			console.log(data, ' FIRST DATA')
 			handlePlayerAction(data, ws, wss)
 		}
-		if (data.type === 'playerModify') handlePlayerModify(data, ws, wss)
+		if (data.type === 'playerModify') {
+			handlePlayerModify(data, ws, wss)
+		}
+		if (data.type === 'enemyAction') {
+			handleEnemyAction(data, ws, wss)
+		}
+		if (data.type === 'itemAction') {
+			handleItemAction(data, ws, wss)
+		}
+		if (data.type === 'retrievePlayerData') {
+			handlePlayerDataRetrieval(data, ws)
+		}
 
 		if (data.type === 'playerMoves') {
 			console.log('PLAYER MOVES')

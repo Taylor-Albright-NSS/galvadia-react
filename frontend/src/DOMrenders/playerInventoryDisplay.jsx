@@ -4,6 +4,7 @@ export const playerInventoryDisplay = (commandObject) => {
     const playerInventory = playerItems.sort((a, b) => {
         return a.name - b.name
     })
+    console.log(playerInventory)
     addLog(
         <div style={{maxWidth: "100%", width: "100%", border: "8px ridge grey"}}>
             <h4 style={{border: "6px outset grey", textAlign: "center"}}>Inventory</h4>

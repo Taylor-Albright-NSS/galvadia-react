@@ -36,9 +36,9 @@ export const GameProvider = ({ children }) => {
 	const contextValue = { messages, setMessages, gameData, setGameData, playerStatus, setPlayerStatus, windowLogs, addLog }
 
 	useEffect(() => {
-		const { currentArea, enemies, npcs, itemsInArea, players } = gameData
+		const { currentArea, enemies, npcs, items, players } = gameData
 		console.log('render check')
-		addLog(areaDisplay(currentArea, enemies, npcs, itemsInArea, players))
+		addLog(areaDisplay(currentArea, enemies, npcs, items, players))
 	}, [gameData.player.area_id])
 
 	return <zGameContext.Provider value={contextValue}>{children}</zGameContext.Provider>

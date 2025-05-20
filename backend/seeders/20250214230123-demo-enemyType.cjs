@@ -8,6 +8,7 @@ module.exports = {
 				{
 					id: 1,
 					name: 'Lesser Elemental',
+					lootTableId: 1,
 					minLevel: 1,
 					maxLevel: 5,
 					baseHealth: 10,
@@ -19,6 +20,7 @@ module.exports = {
 				{
 					id: 2,
 					name: 'Kobold',
+					lootTableId: 2,
 					minLevel: 10,
 					maxLevel: 15,
 					baseHealth: 30,

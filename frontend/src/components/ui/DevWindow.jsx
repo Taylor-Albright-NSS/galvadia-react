@@ -10,14 +10,22 @@ import { getPlayer1, getPlayer2, playerGainsExperienceRequest } from '../../fetc
 import { fetchIncreasePlayerExperience } from '../../fetches/players/players'
 import { fetchGameData } from '../../fetches/gameData/gameData'
 import { WebSocketContext } from './WebSocketContext'
+import { enemySpawnsSender } from '../../senders/sendersEnemy'
+import { playerUpdateAllAttributesSender } from '../../services/servicesPlayer'
 
 export const DevWindow = () => {
 	const { gameData, setGameData, addLog, playerStatus } = useContext(zGameContext)
+	const allContext = useContext(zGameContext)
+	console.log(allContext, " allContext")
 	const { ws } = useContext(WebSocketContext)
 	const { currentArea, enemies, player, npcs, items, playerItems, players } = gameData
 	const [enemyId, setEnemyId] = useState(0)
 	const [logState, setLogState] = useState('')
 	console.log(currentArea)
+
+	function enemySpawnsDev() {
+		enemySpawnsSender(currentArea.id, ws)
+	}
 
 	function retrieveAllEnemies() {
 		fetchAllEnemies().then(enemies => {
@@ -191,6 +199,11 @@ export const DevWindow = () => {
 	}
 	async function deleteAllItems() {
 		const data = await fetchDeleteAllItems()
+		setGameData(prev => ({
+			...prev,
+			items: [],
+			playerItems: []
+		}))
 		addLog(data.message)
 	}
 	async function playerUnpacksItem() {
@@ -219,6 +232,12 @@ export const DevWindow = () => {
 	return (
 		<Container className="d-flex">
 			<Row className="d-flex align-content-start">
+				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={() => playerUpdateAllAttributesSender(player.id, ws)}>
+					Retrieve Player Stats
+				</button>
+				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={enemySpawnsDev}>
+					Spawn enemy
+				</button>
 				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={websocketGetTest}>
 					WEBSOCKET GET USER
 				</button>

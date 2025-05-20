@@ -1,15 +1,25 @@
 import { npcDTO } from '../models/dtos/npcDTO.js'
 import { Item } from '../models/item.js'
+import Weapon from '../models/weapon.js'
+import WeaponTemplate from '../models/weaponTemplate.js'
+import { generateWeapon } from '../utils/itemUtils.js'
 import { wss } from '../websocket.js'
 
 export const getItems = async (req, res) => {
 	try {
-		const items = await Item.findAll()
+		const [allItems, allWeapons] = await Promise.all([Item.findAll()])
 		res.status(200).json(items)
 	} catch (error) {
 		res.status(500).json({ error: error.message })
 	}
 }
+
+export const getAllItems = async (data, ws, wss) => {
+	try {
+		const items = Item.findAll({})
+	} catch (error) {}
+}
+
 export const getCurrentAreaItems = async (req, res) => {
 	const { areaId } = req.params
 	try {
@@ -111,12 +121,20 @@ export const postTwohandedSword = async (req, res) => {
 export const postOnehandedSword = async (req, res) => {
 	const { areaId } = req.params
 	try {
-		const item = await Item.create({ name: 'Onehanded Sword', ownerId: areaId, ownerType: 'area', keywords: ['onehanded', 'sword', 'onehanded sword'] })
-		return res.status(201).json(item)
+		const weaponTemplate = await WeaponTemplate.findByPk(1)
+		const item = await generateWeapon(weaponTemplate, 1)
+		if (!item) {
+			throw new Error('Weapon could not be created')
+		}
+		const weaponToSend = await Item.findOne({ where: { id: item.id }, include: [{ model: Weapon }] })
+		// const item = await Item.create({ name: 'Onehanded Sword', ownerId: areaId, ownerType: 'area', keywords: ['onehanded', 'sword', 'onehanded sword'] })
+		// const weapon = await Weapon.create({})
+		return res.status(201).json(weaponToSend)
 	} catch (error) {
-		return res.status(500).json({ message: 'Internal error' })
+		return res.status(500).json({ message: error.message })
 	}
 }
+
 export const postDagger = async (req, res) => {
 	const { areaId } = req.params
 	try {
@@ -140,13 +158,11 @@ export const postCrossbow = async (req, res) => {
 
 export const deleteAllItems = async (req, res) => {
 	try {
-		const allItems = await Item.findAll()
-		console.log(allItems)
-		if (allItems.length === 0) {
+		const [allItems, allWeapons] = await Promise.all([Item.findAll(), Weapon.findAll()])
+
+		await Promise.all([...allItems.map(item => item.destroy()), ...allWeapons.map(weapon => weapon.destroy())])
+		if (allItems.length === 0 && allWeapons.length === 0) {
 			return res.status(404).json({ message: 'All items not found' })
-		}
-		for (const item of allItems) {
-			await item.destroy()
 		}
 		return res.status(200).json({ message: 'All items have been destroyed' })
 	} catch (err) {

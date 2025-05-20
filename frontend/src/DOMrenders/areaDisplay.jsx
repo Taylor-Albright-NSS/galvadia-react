@@ -51,6 +51,7 @@ export const areaDisplay = (area, enemies, npcs, items, players) => {
 				<span className="d-flex flex-wrap">
 					<p>People: </p>
 					{npcs.map((npc, index) => {
+						console.log(npc)
 						return (
 							<p className="mx-1 green" key={index}>
 								{npc.Npc.name}

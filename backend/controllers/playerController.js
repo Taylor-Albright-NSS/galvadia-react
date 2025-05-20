@@ -5,6 +5,11 @@ import { Item } from '../models/item.js'
 import { Enemy } from '../models/enemy.js'
 import { GamePlayer } from '../services/GamePlayer.js'
 import { enemyDies } from './enemyController.js'
+import { generateEnemyDrops } from '../utils/itemUtils.js'
+import { Weapon } from '../models/weapon.js'
+import Area from '../models/area.js'
+import { PlayerRace } from '../models/playerRace.js'
+import { PlayerClass } from '../models/playerClass.js'
 
 export let players = {}
 // prettier-ignore
@@ -62,56 +67,78 @@ export const playerAdvancesEnemy = async (data, ws, wss) => {
 }
 
 export const playerRegularAttack = async (data, ws, wss) => {
-	const { playerId, enemyId } = data
-	const player = await Player.findByPk(playerId)
-	const enemy = await Enemy.findByPk(enemyId)
+	try {
+		const { playerId, enemyId } = data
 
-	const gamePlayer = new GamePlayer(player)
-	const playerDamage = gamePlayer.rawDamage
-	console.log(playerDamage, ' Player Damage')
-	enemy.health = Math.max(enemy.health - playerDamage, 0)
-	if (enemy.health <= 0) {
-		console.log('Enemy dies here')
-		await enemyDies(enemy, ws, wss)
-		ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyDies', enemy, damage: playerDamage }))
-	} else {
-		console.log('Enemy takes damage and is still alive')
-		enemy.save()
-		ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyTakesDamage', enemy, damage: playerDamage }))
+		const player = await Player.findByPk(playerId)
+		if (!player) {
+			throw new Error(`Error finding player by id`)
+		}
+		const enemy = await Enemy.findByPk(enemyId)
+		if (!enemy) {
+			throw new Error(`Error finding enemy by id`)
+		}
+
+		const gamePlayer = new GamePlayer(player)
+		if (!gamePlayer) {
+			throw new Error(`Error creating GamePlayer`)
+		}
+
+		const playerDamage = gamePlayer.rawDamage
+		enemy.health = Math.max(enemy.health - playerDamage, 0)
+
+		if (enemy.health <= 0) {
+			const loot = (await generateEnemyDrops(enemy)) || []
+			if (!loot) {
+				throw new Error(`Error generating loot`)
+			}
+			// console.log(loot, ' loot')
+			if (enemy.loot.length > 0) {
+				loot.push(...enemy.loot)
+			}
+
+			const gainedExperience = enemy.experience || 0
+			await enemy.destroy()
+			await player.update({
+				experience: player.experience + gainedExperience,
+			})
+			console.log(loot, ' LOOT')
+			ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyDies', enemy, experience: gainedExperience, damage: playerDamage, loot }))
+		} else {
+			await enemy.save()
+			ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyTakesDamage', enemy, damage: playerDamage }))
+		}
+	} catch (error) {
+		ws.send(JSON.stringify({ type: 'error', message: error.message }))
 	}
 }
 
 export const playerRoomTransition = async (data, wss) => {
 	try {
-		const { id } = data.player
-		console.log(id, ' player room transition player ID')
-		const { x, y, area_id, oldAreaId } = data.combinedCoords
-		const playerOldAreaId = oldAreaId
+		const { x, y, areaId, previousAreaId, playerId } = data
+
 		let counter = 1
 		wss.clients.forEach(client => {
 			if (!players?.[counter]?.name) return
 			let player = players[counter]
-			if (player.id != parseInt(id)) {
-				if (player.areaId === area_id) {
+			if (player.id != parseInt(playerId)) {
+				if (player.areaId === areaId) {
 					client.send(JSON.stringify({ type: 'playerMoves', message: 'Player enters the room' }))
 				}
 			}
 			counter++
 		})
-		const player = await Player.findOne({ where: { id: id } })
+		const player = await Player.findOne({ where: { id: playerId } })
 		player.x = x
 		player.y = y
-		player.area_id = area_id
-		console.log(players, ' PLAYERS OBJECT')
-		console.log(players[0], ' FIRST PLAYER')
-		console.log(players[1], ' SECOND PLAYER')
-		console.log(id, ' ID')
-		players[id].areaId = area_id
+		player.area_id = areaId
+
+		players[playerId].areaId = areaId
 		counter = 1
 		wss.clients.forEach(client => {
 			if (!players?.[counter]?.name) return
-			if (players[counter].id != parseInt(id)) {
-				if (playerOldAreaId === players[counter].areaId) {
+			if (players[counter].id != parseInt(playerId)) {
+				if (previousAreaId === players[counter].areaId) {
 					client.send(JSON.stringify({ type: 'playerMoves', message: 'Player leaves the room' }))
 				}
 			}
@@ -162,9 +189,16 @@ export const getPlayer1API = async (req, res) => {
 	try {
 		const playerId = req.params.id
 		const player = await Player.findByPk(playerId, {
-			include: [{ model: sequelize.models.Area, as: 'Area' }],
+			include: [{ model: Area }, { model: PlayerRace }, { model: PlayerClass }],
 		})
-		const playerItems = await Item.findAll({ where: { ownerId: playerId, ownerType: 'player' } })
+		console.log(player, ' player')
+		const playerItems = await Item.findAll({
+			where: { ownerId: playerId, ownerType: 'player' },
+			include: [{ model: Weapon }],
+		})
+		if (!playerItems) {
+			return res.status(404).json({ message: 'Player items not found' })
+		}
 		player.dataValues.items = playerItems
 		if (!player) {
 			return res.status(404).json({ message: 'Player not found' })

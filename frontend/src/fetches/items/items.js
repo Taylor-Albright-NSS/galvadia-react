@@ -32,6 +32,8 @@ export const fetchCurrentAreaItemsToPlayer = async (itemsArray, playerId) => {
         console.error(`No items to pick up`)
     }
 }
+
+
 //
 
 export const fetchAllItemsThatBelongToPlayer = async (playerId) => {
@@ -50,6 +52,7 @@ export const fetchCreateItem = async () => {
 export const fetchCreateTwohandedSword = async (areaId) => {
     const response = await fetch(`${api}/item/twohandedsword/${areaId}`, {method: "POST"})
     const data = await response.json()
+    console.log(data)
     return data
 }
 export const fetchCreateOnehandedSword = async (areaId) => {
