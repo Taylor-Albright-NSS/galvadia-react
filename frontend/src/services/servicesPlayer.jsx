@@ -10,10 +10,11 @@ import { playerDropsJSX, playerPacksJSX, playerUnpacksJSX } from '../playerActio
 import { dropItemByKeyword, findItemByLeft, findItemByNumber, findItemByRight, itemFindByKeywordUtil, playerItemFindByKeywordUtil, playerItemFindByNumberUtil, unpackItemByKeyword } from '../utils/utilsItem'
 import { enemyFindByName, enemyFindByNumber, findEnemy, findEnemyInCombatWithPlayer, findNpcByName } from '../utils/utilsEnemy'
 import { playerIsInCombatCheck, toggleStatusFalse, toggleStatusTrue } from '../utils/utilsPlayer'
-import { playerAdvancesEnemySender, playerLooksSender, playerRegularAttackSender, playerRetreatsSender } from '../senders/sendersPlayer'
+import { playerAdvancesEnemySender, playerLooksSender, playerRegularAttackSender, playerRetreatsSender, playerSpeaksToNpcSender } from '../senders/sendersPlayer'
 import { playerAdvancesEnemySetter } from '../setters/settersPlayer'
 import { itemExamineDisplay } from '../DOMrenders/itemDescriptionDisplay'
 import { enemyExamineDisplay } from '../DOMrenders/enemyDescriptionDisplay'
+import { currentAreaItemsSender } from '../senders/sendersItem'
 
 export const playerOffersQuest = async commandObject => {
 	const { setGameData } = commandObject
@@ -70,10 +71,9 @@ export const playerOffersQuest = async commandObject => {
 	}
 }
 
-export const playerSpeakToNpc = async commandObject => {
+export const playerSpeaksToNpcService = async commandObject => {
 	const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
-	const { command2, addLog } = commandObject
-	const playerId = player.id
+	const { command2, addLog, ws } = commandObject
 	if (npcs.length === 0) {
 		return addLog('There is nobody in the room to speak with')
 	}
@@ -82,12 +82,15 @@ export const playerSpeakToNpc = async commandObject => {
 	}
 	if (npcs.length > 1) {
 		const foundNpc = findNpcByName(npcs, command2)
-		const npcDialogue = await fetchNpcDialogue(playerId, foundNpc.id)
-		const dialogueJSX = npcSpeaks(foundNpc, npcDialogue)
-		addLog(dialogueJSX)
+		playerSpeaksToNpcSender(player.id, foundNpc.id, ws)
+
+		// const npcDialogue = await fetchNpcDialogue(player.id, foundNpc.id)
+		// const dialogueJSX = npcSpeaks(foundNpc, npcDialogue)
+		// addLog(dialogueJSX)
 		return
 	}
 }
+
 
 export const playerSpeakToNpcQuest = async commandObject => {
 	const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
@@ -177,7 +180,6 @@ export const playerInspectService = (commandObject) => {
 	let foundItem
 
 	if (!Number.isInteger(Number(command2))) {
-		console.log(Number.isInteger(command2))
 		addLog('Not number?')
 		foundItem = playerItemFindByKeywordUtil(command2, playerItems)
 		if (!foundItem) {
@@ -266,9 +268,9 @@ export const playerPull = async commandObject => {
 	}
 }
 
-export const playerGet = async commandObject => {
-	const { gameData, setGameData, addLog, command2 } = commandObject
-	const { player, currentArea } = gameData
+export const playerGetService = async commandObject => {
+	const { addLog, command2, ws } = commandObject
+	const { player, currentArea } = commandObject.gameData
 
 
 	if (command2 != 'all') {
@@ -276,23 +278,38 @@ export const playerGet = async commandObject => {
 		return
 	}
 	if (command2 === 'all') {
-		const currentAreaItems = await fetchCurrentAreaItems(currentArea.id)
-		await fetchCurrentAreaItemsToPlayer(currentAreaItems, player.id)
-		setGameData(prev => ({
-			...prev,
-			items: [...prev.items.filter(item => item.ownerId != player.id && item.ownerType != 'player')],
-		}))
-		const updatedPlayerInventory = await fetchAllItemsThatBelongToPlayer(player.id)
-		setGameData(prev => ({
-			...prev,
-			playerItems: updatedPlayerInventory,
-		}))
+		currentAreaItemsSender(player.id, currentArea.id, ws)
+		// await fetchCurrentAreaItemsToPlayer(currentAreaItems, player.id)
 		addLog(`You pick up all the items in the room`)
 	}
 }
+// export const playerGet = async commandObject => {
+// 	const { gameData, setGameData, addLog, command2 } = commandObject
+// 	const { player, currentArea } = gameData
+
+
+// 	if (command2 != 'all') {
+// 		addLog('Please specify all')
+// 		return
+// 	}
+// 	if (command2 === 'all') {
+// 		const currentAreaItems = await fetchCurrentAreaItems(currentArea.id)
+// 		await fetchCurrentAreaItemsToPlayer(currentAreaItems, player.id)
+// 		setGameData(prev => ({
+// 			...prev,
+// 			items: [...prev.items.filter(item => item.ownerId != player.id && item.ownerType != 'player')],
+// 		}))
+// 		const updatedPlayerInventory = await fetchAllItemsThatBelongToPlayer(player.id)
+// 		setGameData(prev => ({
+// 			...prev,
+// 			playerItems: updatedPlayerInventory,
+// 		}))
+// 		addLog(`You pick up all the items in the room`)
+// 	}
+// }
 
 export async function playerUnpacksItem(commandObject) {
-	const { addLog, command2, setGameData } = commandObject
+	const { addLog, command2, setGameData, ws } = commandObject
 	const playerId = commandObject.gameData.player.id
 	const { playerItems } = commandObject.gameData
 	if (!command2) {
@@ -348,6 +365,7 @@ export async function playerUnpacksItem(commandObject) {
 		}),
 	}))
 	const message = playerUnpacksJSX(updatedUnpackedItem)
+	playerUpdateAllAttributesSender(playerId, ws)
 	addLog(message)
 }
 
@@ -359,13 +377,10 @@ export async function playerDropsItem(commandObject) {
 		return addLog(`You must specify what you want to drop`)
 	}
 	let droppedItem
-	if (command2 == 'right') {
-		droppedItem = findItemByRight(playerItems)
-	} else if (command2 == 'left') {
-		droppedItem = findItemByLeft(playerItems)
-	} else {
-		droppedItem = dropItemByKeyword(playerItems, command2)
-	}
+	if (command2 == 'right') {droppedItem = findItemByRight(playerItems)} 
+	if (command2 == 'left') {droppedItem = findItemByLeft(playerItems)}
+	if (isNaN(command2)) {droppedItem = dropItemByKeyword(playerItems, command2)}
+	if (!isNaN(command2)) {droppedItem = findItemByNumber(playerItems, command2)}
 
 	//negative logic
 	if (!droppedItem) {
@@ -399,8 +414,8 @@ export async function playerDropsItem(commandObject) {
 }
 
 export async function playerPacksItem(commandObject) {
-	const { addLog, command2, setGameData } = commandObject
-	const { id } = commandObject.gameData.player
+	const { addLog, command2, setGameData, ws } = commandObject
+	const playerId = commandObject.gameData.player.id
 	const { playerItems } = commandObject.gameData
 	if (!command2) {
 		addLog(`You must specify what you want to pack`)
@@ -429,7 +444,7 @@ export async function playerPacksItem(commandObject) {
 		return addLog(`You do not have a ${command2} to pack`)
 	}
 
-	const data = await fetchPlayerPacksItem(id, packedItem.id)
+	const data = await fetchPlayerPacksItem(playerId, packedItem.id)
 	const updatedPackedItem = data.packedItem
 	if (!packedItem) {
 		addLog(`Internal server error`)
@@ -443,6 +458,7 @@ export async function playerPacksItem(commandObject) {
 	}))
 	const message = playerPacksJSX(updatedPackedItem)
 	addLog(message)
+	playerUpdateAllAttributesSender(playerId, ws)
 }
 
 export const playerAttacks = commandObject => {
@@ -508,4 +524,8 @@ export const playerExamineItemUtil = (commandObject) => {
 			addLog(`There is no ${command2} to examine`)
 		}
 	}
+}
+
+export const playerUpdateAllAttributesSender = (playerId, ws) => {
+	ws.send(JSON.stringify({ type: 'retrievePlayerData', action: 'allAttributes', playerId }))
 }

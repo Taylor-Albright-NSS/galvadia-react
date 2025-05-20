@@ -1,14 +1,16 @@
 module.exports = {
 	up: async queryInterface => {
 		await queryInterface.bulkInsert(
-			'Weapons',
+			'Items',
 			[
 				{
 					name: 'Training Onehanded Sword',
 					ownerId: 1,
 					ownerType: 'player',
+					templateId: 1,
+					templateType: 'weapon',
 					location: 'inventory',
-
+					keywords: ['training onehanded sword', 'training onehanded', 'onehanded sword', 'training', 'onehanded', 'sword'],
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
@@ -18,6 +20,6 @@ module.exports = {
 	},
 
 	down: async queryInterface => {
-		await queryInterface.bulkDelete('Weapons', null, {})
+		await queryInterface.bulkDelete('Items', null, {})
 	},
 }

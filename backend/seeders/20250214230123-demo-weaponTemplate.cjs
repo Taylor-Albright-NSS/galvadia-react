@@ -12,6 +12,16 @@ module.exports = {
 					maxDamageMin: 5,
 					minDamageMax: 7,
 					maxDamageMax: 9,
+					bonuses: JSON.stringify({
+						attributes: {
+							strength: 1,
+							dexterity: 1,
+							agility: 1,
+						},
+						skills: {
+							onehanded: 1,
+						},
+					}),
 					weight: 10,
 					sellValue: 15,
 					isTwoHanded: false,

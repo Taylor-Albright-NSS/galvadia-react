@@ -13,3 +13,7 @@ export const playerRetreatsSender = (playerId, areaId, ws) => {
 export const playerLooksSender = (playerId, areaId, ws) => {
 	ws.send(JSON.stringify({ type: "playerAction", action: "playerLooks", playerId, areaId }))
 }
+
+export const playerSpeaksToNpcSender = (playerId, npcId, ws) => {
+	ws.send(JSON.stringify({ type: "playerAction", action: "playerSpeaksToNpc", playerId, npcId }))
+}

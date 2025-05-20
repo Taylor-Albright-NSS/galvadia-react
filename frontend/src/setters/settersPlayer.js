@@ -1,5 +1,7 @@
 import { areaDisplay } from "../DOMrenders/areaDisplay"
+import { npcSpeaks } from "../DOMrenders/npcActions"
 import { keywordMethods } from "../utils/keywordMethods"
+import { findNpcById } from "../utils/utilsNpc"
 
 export const playerRoomTransitionSetter = (data, setGameData) => {
     const { area, enemies, itemsInArea, npcs, players } = data.updatedGameData
@@ -43,7 +45,8 @@ export const playerLooksSetter = (data, setGameData, addLog) => {
         players
     }))
     addLog(areaDisplay(currentArea, enemies, npcs, items, players))
-} 
+}
+
 
 export const playerAdvancesEnemySetter = (data, setGameData) => {
     const { enemy } = data
@@ -65,5 +68,23 @@ export const playerRetreatsSetter = (data, setGameData) => {
     setGameData(prev => ({
         ...prev,
         enemies: enemies
+    }))
+}
+
+export const playerSpeaksToNpcSetter = (data, addLog) => {
+    const { dialogue, npc } = data
+    console.log(data, " DATA")
+    const dialogueJSX = npcSpeaks(npc, dialogue)
+    addLog(dialogueJSX)
+}
+
+export const playerUpdateAllAttributesSetter = (data, setGameData) => {
+    console.log(data, ' Update all player attributes')
+    setGameData(prev => ({
+        ...prev,
+        player: {
+            ...prev.player,
+            attributes: { ...data.attributes } 
+        }
     }))
 }

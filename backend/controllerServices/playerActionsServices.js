@@ -11,6 +11,8 @@ import Player from '../models/player.js'
 import { PlayerNpc } from '../models/playerNpc.js'
 import { PlayerArea } from '../models/playerArea.js'
 import { applyPlayerArea } from '../utils/areaUtils.js'
+import Weapon from '../models/weapon.js'
+import { NpcDialogue } from '../models/npcDialogue.js'
 
 export const playerRoomTransitionService = async (data, ws, wss) => {
 	console.log('WEBSOCKET PLAYER ROOM TRANSITION')
@@ -55,7 +57,45 @@ export const playerRetreatsService = async (data, ws, wss) => {
 	await playerRetreats(data, ws, wss)
 }
 
-export const playerLooksService = async (data, ws, wss) => {
+export const playerSpeaksToNpcService = async (data, ws) => {
+	const { playerId, npcId } = data
+	console.log(playerId, npcId, ' playerId --- npcId')
+	let playerNpc = await PlayerNpc.findOne({ where: { playerId, npcId } })
+
+	if (!playerNpc && playerId > 0) {
+		playerNpc = await PlayerNpc.create({ playerId, npcId })
+	}
+
+	if (!playerNpc && (isNaN(playerId) || isNaN(npcId))) {
+		return ws.send(JSON.stringify({ type: 'error', message: 'Invalid playerNpc' }))
+	}
+
+	const npcDialogue = await NpcDialogue.findOne({
+		where: {
+			npcId,
+			dialogueStage: playerNpc.dialogueStage,
+		},
+	})
+
+	if (!npcDialogue) {
+		return ws.send(JSON.stringify({ type: 'error', message: 'Dialogue not found' }))
+	}
+
+	const npc = await Npc.findByPk(npcId)
+
+	if (!npc) {
+		return ws.send(JSON.stringify({ type: 'error', message: 'Npc not found' }))
+	}
+
+	const dialogueArray = npcDialogue.dialogue
+	const dialogueIndex = playerNpc.dialogueIndex % dialogueArray.length
+	const dialogue = dialogueArray[dialogueIndex]
+	playerNpc.dialogueIndex = (dialogueIndex + 1) % dialogueArray.length
+	await playerNpc.save()
+	ws.send(JSON.stringify({ type: 'playerAction', action: 'playerSpeaksToNpc', dialogue, npc }))
+}
+
+export const playerLooksService = async (data, ws) => {
 	try {
 		const { playerId, areaId } = data
 
@@ -72,7 +112,7 @@ export const playerLooksService = async (data, ws, wss) => {
 			// Area.findOne({ where: { id: areaId }, include: { model: Keyword } }),
 			Enemy.findAll({ where: { area_id: areaId } }),
 			Npc.findAll({ where: { area_id: areaId } }),
-			Item.findAll({ where: { ownerId: areaId, ownerType: 'area' } }),
+			Item.findAll({ where: { ownerId: areaId, ownerType: 'area' }, include: [{ model: Weapon }] }),
 			Player.findAll({ where: { area_id: areaId, id: { [Op.ne]: playerId } } }),
 			PlayerNpc.findAll({ where: { area_id: areaId, playerId } }),
 		])

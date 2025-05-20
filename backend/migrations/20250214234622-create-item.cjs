@@ -9,8 +9,8 @@ module.exports = {
 			ownerType: { type: Sequelize.STRING },
 			templateId: { type: Sequelize.INTEGER },
 			templateType: { type: Sequelize.STRING },
-
 			location: { type: Sequelize.STRING },
+			keywords: { type: Sequelize.ARRAY(Sequelize.STRING) },
 
 			createdAt: { type: Sequelize.DATE, allowNull: false },
 			updatedAt: { type: Sequelize.DATE, allowNull: false },

@@ -6,6 +6,10 @@ import { Enemy } from '../models/enemy.js'
 import { GamePlayer } from '../services/GamePlayer.js'
 import { enemyDies } from './enemyController.js'
 import { generateEnemyDrops } from '../utils/itemUtils.js'
+import { Weapon } from '../models/weapon.js'
+import Area from '../models/area.js'
+import { PlayerRace } from '../models/playerRace.js'
+import { PlayerClass } from '../models/playerClass.js'
 
 export let players = {}
 // prettier-ignore
@@ -185,9 +189,16 @@ export const getPlayer1API = async (req, res) => {
 	try {
 		const playerId = req.params.id
 		const player = await Player.findByPk(playerId, {
-			include: [{ model: sequelize.models.Area, as: 'Area' }],
+			include: [{ model: Area }, { model: PlayerRace }, { model: PlayerClass }],
 		})
-		const playerItems = await Item.findAll({ where: { ownerId: playerId, ownerType: 'player' } })
+		console.log(player, ' player')
+		const playerItems = await Item.findAll({
+			where: { ownerId: playerId, ownerType: 'player' },
+			include: [{ model: Weapon }],
+		})
+		if (!playerItems) {
+			return res.status(404).json({ message: 'Player items not found' })
+		}
 		player.dataValues.items = playerItems
 		if (!player) {
 			return res.status(404).json({ message: 'Player not found' })

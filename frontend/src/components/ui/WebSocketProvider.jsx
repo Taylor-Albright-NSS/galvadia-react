@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useRef } from 'react'
 import { zGameContext } from './zGameContext'
 import { WebSocketContext } from './WebSocketContext'
 import { messageHandlers } from '../../helpers/messageHandlers'
-import { playerAdvancesEnemySetter, playerLooksSetter, playerRetreatsSetter, playerRoomTransitionSetter } from '../../setters/settersPlayer'
+import { playerAdvancesEnemySetter, playerLooksSetter, playerRetreatsSetter, playerRoomTransitionSetter, playerSpeaksToNpcSetter, playerUpdateAllAttributesSetter } from '../../setters/settersPlayer'
 import { enemyDiesSetter, enemySpawnsSetter, enemyTakesDamageSetter } from '../../setters/settersEnemy'
+import { areaCurrentAreaItemsSetter } from '../../setters/settersArea'
 
 export const WebSocketProvider = ({ children }) => {
 	const wsRef = useRef(null)
@@ -42,6 +43,10 @@ export const WebSocketProvider = ({ children }) => {
 				if (data.action === 'playerAdvancesEnemy') {playerAdvancesEnemySetter(data, setGameData)}
 				if (data.action === 'playerRetreats') {playerRetreatsSetter(data, setGameData)}
 				if (data.action === 'playerLooks') {playerLooksSetter(data, setGameData, addLog)}
+				if (data.action === 'playerSpeaksToNpc') {playerSpeaksToNpcSetter(data, addLog)}
+			}
+			if (data.type === 'itemAction') {
+				if (data.action === 'currentAreaItems') {areaCurrentAreaItemsSetter(data, setGameData, addLog)}
 			}
 			if (data.type === 'playerModify') {
 				if (data.action === 'playerGainsExperience') {
@@ -53,6 +58,7 @@ export const WebSocketProvider = ({ children }) => {
 				if (data.action === 'enemyDies') {enemyDiesSetter(data, setGameData, addLog)}
 				if (data.action === 'enemySpawns') {enemySpawnsSetter(data, setGameData, addLog)}
 			}
+			if (data.type === 'retrievePlayerData') {playerUpdateAllAttributesSetter(data, setGameData, addLog)}
 			if (data.type === 'gamemessage') console.log(data, ' RECEIVED')
 			if (data.type === 'playerDialogue') {
 				addLog(data.dialogue)

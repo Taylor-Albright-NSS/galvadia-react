@@ -16,6 +16,7 @@ module.exports = {
 			maxDamageMin: { type: Sequelize.INTEGER },
 			minDamageMax: { type: Sequelize.INTEGER },
 			maxDamageMax: { type: Sequelize.INTEGER },
+			bonuses: { type: Sequelize.JSONB },
 			weight: { type: Sequelize.INTEGER },
 			sellValue: { type: Sequelize.INTEGER },
 			isTwoHanded: { type: Sequelize.BOOLEAN },

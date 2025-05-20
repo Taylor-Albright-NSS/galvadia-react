@@ -13,6 +13,7 @@ WeaponTemplate.init(
 		minDamageMax: { type: DataTypes.INTEGER },
 		maxDamageMin: { type: DataTypes.INTEGER },
 		maxDamageMax: { type: DataTypes.INTEGER },
+		bonuses: { type: DataTypes.JSONB },
 		weight: { type: DataTypes.INTEGER },
 		sellValue: { type: DataTypes.INTEGER },
 		isTwoHanded: { type: DataTypes.BOOLEAN },
