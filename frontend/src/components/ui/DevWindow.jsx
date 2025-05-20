@@ -11,6 +11,7 @@ import { fetchIncreasePlayerExperience } from '../../fetches/players/players'
 import { fetchGameData } from '../../fetches/gameData/gameData'
 import { WebSocketContext } from './WebSocketContext'
 import { enemySpawnsSender } from '../../senders/sendersEnemy'
+import { playerUpdateAllAttributesSender } from '../../services/servicesPlayer'
 
 export const DevWindow = () => {
 	const { gameData, setGameData, addLog, playerStatus } = useContext(zGameContext)
@@ -198,6 +199,11 @@ export const DevWindow = () => {
 	}
 	async function deleteAllItems() {
 		const data = await fetchDeleteAllItems()
+		setGameData(prev => ({
+			...prev,
+			items: [],
+			playerItems: []
+		}))
 		addLog(data.message)
 	}
 	async function playerUnpacksItem() {
@@ -226,6 +232,9 @@ export const DevWindow = () => {
 	return (
 		<Container className="d-flex">
 			<Row className="d-flex align-content-start">
+				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={() => playerUpdateAllAttributesSender(player.id, ws)}>
+					Retrieve Player Stats
+				</button>
 				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={enemySpawnsDev}>
 					Spawn enemy
 				</button>

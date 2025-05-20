@@ -12,7 +12,7 @@ export const randomNumberRange = (min, max) => {
 export const generateWeapon = async (weaponTemplate, enemyAreaId) => {
 	const transaction = await sequelize.transaction()
 	try {
-		const { name, id, templateType, damageType, weight, sellValue, isTwoHanded, description, keywords } = weaponTemplate
+		const { name, id, templateType, damageType, weight, sellValue, isTwoHanded, description, keywords, bonuses } = weaponTemplate
 		const templateId = id
 		const ownerType = 'area'
 		const ownerId = enemyAreaId
@@ -29,29 +29,34 @@ export const generateWeapon = async (weaponTemplate, enemyAreaId) => {
 				// description,
 				// sellValue,
 				// weight,
-				// keywords,
+				keywords,
 			},
 			{ transaction }
 		)
-
+		console.log(item, ' item')
 		const generatedWeapon = await Weapon.create(
 			{
 				// ownerId,
 				// ownerType,
 				// templateId,
 				// templateType,
+				itemId: item.id,
 				name,
+				ownerId,
+				ownerType,
 				damageType,
 				minDamage,
 				maxDamage,
+				bonuses,
 				weight,
 				sellValue,
 				isTwoHanded,
-				description,
 				keywords,
+				description,
 			},
 			{ transaction }
 		)
+		console.log(generatedWeapon, ' gen weapon')
 		item.dataValues.weapon = generatedWeapon
 		item.setDataValue('weapon', generatedWeapon)
 

@@ -18,5 +18,6 @@ PlayerArea.init(
 		sequelize,
 		timestamps: true,
 		modelName: 'PlayerArea',
+		tableName: 'PlayerAreas',
 	}
 )

@@ -4,7 +4,8 @@ import { WebSocket, WebSocketServer } from 'ws'
 import { players } from './controllers/playerController.js'
 import { handlePlayerAction, handlePlayerModify } from './controllerHandlers/playerActionsHandler.js'
 import { handleEnemyAction } from './controllerHandlers/enemyActionsHandler.js'
-import { handleAreaAction } from './controllerHandlers/areaActionsHandler.js'
+import { handleItemAction } from './controllerHandlers/itemActionsHandler.js'
+import { handlePlayerDataRetrieval } from './controllerHandlers/playerRetrieveDataHandler.js'
 
 export const app = express()
 export const server = http.createServer(app)
@@ -29,8 +30,11 @@ wss.on('connection', ws => {
 		if (data.type === 'enemyAction') {
 			handleEnemyAction(data, ws, wss)
 		}
-		if (data.type === 'areaAction') {
-			handleAreaAction(data, ws, wss)
+		if (data.type === 'itemAction') {
+			handleItemAction(data, ws, wss)
+		}
+		if (data.type === 'retrievePlayerData') {
+			handlePlayerDataRetrieval(data, ws)
 		}
 
 		if (data.type === 'playerMoves') {

@@ -13,9 +13,7 @@ import { app } from './websocket.js'
 import { getUser } from './controllers/userController.js'
 import { patchKeywordActivation, patchToggleKeywordFalse } from './controllers/keywordController.js'
 import { getGameData } from './controllers/gameStateController.js'
-// const app = express();
-// const server = http.createServer(app)
-// export const wss = new WebSocketServer({ server });
+
 app.use(express.json())
 app.use(cors())
 //--------ROUTE TESTING
@@ -40,11 +38,11 @@ app.get('/items/area/:areaId', getCurrentAreaItems)
 app.put('/items', putCurrentAreaItemsToPlayer)
 app.delete('/items', deleteAllItems)
 // (SINGLE)
-app.post('/item', postNewItem)
-app.post('/item/twohandedsword/:areaId', postTwohandedSword)
+// app.post('/item', postNewItem)
+// app.post('/item/twohandedsword/:areaId', postTwohandedSword)
 app.post('/item/onehandedsword/:areaId', postOnehandedSword)
-app.post('/item/dagger/:areaId', postDagger)
-app.post('/item/crossbow/:areaId', postCrossbow)
+// app.post('/item/dagger/:areaId', postDagger)
+// app.post('/item/crossbow/:areaId', postCrossbow)
 app.patch('/item/pack/:playerId/:itemId', patchPlayerPacksItem)
 app.patch('/item/unpack/:playerId/:itemId', patchPlayerUnpacksItem)
 app.patch('/item/drop/:areaId/:itemId', patchPlayerDropsItem)
