@@ -1,5 +1,9 @@
+import { unarmedSwing } from "../flavorText/weaponSwings/unarmed"
+
 export const enemyTakesDamageSetter = (data, setGameData, addLog) => {
-    const { enemy, damage } = data
+    const { enemy, damageObject } = data
+    // const { damageType, swingVerb, weaponName, enemyName, actualDamage, blockedDamage} = damageObject
+    console.log(data, " data coming from enemyTakesDamageSetter")
     setGameData(prev => ({
         ...prev,
         enemies: prev.enemies.map(prevEnemy => {
@@ -13,10 +17,11 @@ export const enemyTakesDamageSetter = (data, setGameData, addLog) => {
             }
         })
     }))
-    addLog(`You deal ${damage} damage to the ${enemy.name}!`)
+    const message = unarmedSwing(damageObject)
+    addLog(message)
 }
 export const enemyDiesSetter = (data, setGameData, addLog) => {
-    const { enemy, damage, experience, loot } = data
+    const { enemy, experience, loot } = data
     console.log(loot, " LOOT")
     console.log(experience, " EXPERIENCE")
     setGameData(prev => ({
@@ -28,7 +33,6 @@ export const enemyDiesSetter = (data, setGameData, addLog) => {
         items: [...prev.items, ...loot],
         enemies: prev.enemies.filter(prevEnemy => prevEnemy.id !== enemy.id)
     }))
-    addLog(`You deal ${damage} damage to the ${enemy.name}!`)
     addLog(`${enemy.name} dies!`)
     loot.forEach(item => {
         addLog(`Enemy drops ${item.name}!`)

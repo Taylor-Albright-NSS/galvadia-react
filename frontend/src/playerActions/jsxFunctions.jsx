@@ -1,8 +1,22 @@
-export const playerUnpacksJSX = function (unpackedItem) {
-    return (<span>You unpack your <span className={unpackedItem?.color || "green"}>{unpackedItem.name}</span></span>)
+export const playerUnpacksJSX = function (item) {
+    return (<span>You unpack your <span className={item?.color || "green"}>{item.name}</span></span>)
 }
-export const playerPacksJSX = function (packedItem) {
-    return (<span>You put away your <span className={packedItem?.color || "green"}>{packedItem.name}</span></span>)
+export const playerPacksJSX = function (item) {
+    return (<span>You put away your <span className={item?.color || "green"}>{item.name}</span></span>)
+}
+export const playerPicksUpItemJSX = function (item) {
+    return (<span>You pick up the <span className={item?.color || "green"}>{item.name}</span></span>)
+}
+export const playerPicksUpAllItemsJSX = function () {
+    return (<span>You pick up all items in the room and <span className='yellow'>X</span> gold</span>)
+}
+
+
+export const playerEquipsArmorJSX = function (equippedItem) {
+    return (<span>You unequip your <span className={equippedItem?.color || "green"}>{equippedItem.name}</span></span>)
+}
+export const playerRemovesArmorJSX = function (removedItem) {
+    return (<span>You remove your <span className={removedItem?.color || "green"}>{removedItem.name}</span></span>)
 }
 
 // ANOTHER

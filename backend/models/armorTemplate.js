@@ -1,22 +1,19 @@
 import { DataTypes, Model } from 'sequelize'
 import { sequelize } from '../config/db.js'
 
-export class WeaponTemplate extends Model {}
+export class ArmorTemplate extends Model {}
 
-WeaponTemplate.init(
+ArmorTemplate.init(
 	{
 		id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 		templateType: { type: DataTypes.STRING },
-		name: { type: DataTypes.STRING }, // Dagger, Training Onehanded Sword, etc
-		damageTypes: { type: DataTypes.JSONB },
-		minDamageMin: { type: DataTypes.INTEGER },
-		minDamageMax: { type: DataTypes.INTEGER },
-		maxDamageMin: { type: DataTypes.INTEGER },
-		maxDamageMax: { type: DataTypes.INTEGER },
+		name: { type: DataTypes.STRING }, // Steel Plate, Leather Chestpiece, etc
+		armorValues: { type: DataTypes.JSONB },
 		bonuses: { type: DataTypes.JSONB },
+		slot: { type: DataTypes.STRING },
+		material: { type: DataTypes.STRING },
 		weight: { type: DataTypes.INTEGER },
 		sellValue: { type: DataTypes.INTEGER },
-		isTwoHanded: { type: DataTypes.BOOLEAN },
 		keywords: { type: DataTypes.ARRAY(DataTypes.STRING) },
 		description: { type: DataTypes.STRING },
 
@@ -25,9 +22,9 @@ WeaponTemplate.init(
 	},
 	{
 		sequelize,
-		modelName: 'WeaponTemplate',
-		tableName: 'WeaponTemplates',
+		modelName: 'ArmorTemplate',
+		tableName: 'ArmorTemplates',
 	}
 )
 
-export default WeaponTemplate
+export default ArmorTemplate

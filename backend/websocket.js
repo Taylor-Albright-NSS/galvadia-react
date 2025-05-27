@@ -4,7 +4,6 @@ import { WebSocket, WebSocketServer } from 'ws'
 import { players } from './controllers/playerController.js'
 import { handlePlayerAction, handlePlayerModify } from './controllerHandlers/playerActionsHandler.js'
 import { handleEnemyAction } from './controllerHandlers/enemyActionsHandler.js'
-import { handleItemAction } from './controllerHandlers/itemActionsHandler.js'
 import { handlePlayerDataRetrieval } from './controllerHandlers/playerRetrieveDataHandler.js'
 
 export const app = express()

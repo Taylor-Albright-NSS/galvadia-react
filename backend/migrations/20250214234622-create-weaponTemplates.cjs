@@ -11,7 +11,7 @@ module.exports = {
 			},
 			templateType: { type: Sequelize.STRING },
 			name: { type: Sequelize.STRING },
-			damageType: { type: Sequelize.ARRAY(Sequelize.DataTypes.STRING) },
+			damageTypes: { type: Sequelize.JSONB },
 			minDamageMin: { type: Sequelize.INTEGER },
 			maxDamageMin: { type: Sequelize.INTEGER },
 			minDamageMax: { type: Sequelize.INTEGER },

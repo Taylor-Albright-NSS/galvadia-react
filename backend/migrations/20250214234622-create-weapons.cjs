@@ -23,7 +23,7 @@ module.exports = {
 			ownerType: { type: Sequelize.STRING },
 
 			name: { type: Sequelize.STRING },
-			damageType: { type: Sequelize.ARRAY(Sequelize.DataTypes.STRING) },
+			damageTypes: { type: Sequelize.JSONB },
 			minDamage: { type: Sequelize.INTEGER },
 			maxDamage: { type: Sequelize.INTEGER },
 			bonuses: { type: Sequelize.JSONB },

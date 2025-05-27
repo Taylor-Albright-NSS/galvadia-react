@@ -10,7 +10,11 @@ module.exports = {
 					ownerType: 'player',
 
 					name: 'Training Onehanded Sword',
-					damageType: ['slashing', 'piercing'],
+					damageTypes: JSON.stringify({
+						slashing: 0,
+						piercing: 0,
+						blunt: 0,
+					}),
 					minDamage: 3,
 					maxDamage: 5,
 					bonuses: JSON.stringify({

@@ -4,6 +4,8 @@ import EnemyType from '../models/enemyType.js'
 import LootTableEntry from '../models/lootTableEntry.js'
 import { sequelize } from '../config/db.js'
 import Item from '../models/item.js'
+import Armor from '../models/armor.js'
+import ArmorTemplate from '../models/armorTemplate.js'
 
 export const randomNumberRange = (min, max) => {
 	return Math.floor(Math.random() * (max - min + 1)) + min
@@ -12,7 +14,7 @@ export const randomNumberRange = (min, max) => {
 export const generateWeapon = async (weaponTemplate, enemyAreaId) => {
 	const transaction = await sequelize.transaction()
 	try {
-		const { name, id, templateType, damageType, weight, sellValue, isTwoHanded, description, keywords, bonuses } = weaponTemplate
+		const { name, id, templateType, damageTypes, weight, sellValue, isTwoHanded, description, keywords, bonuses } = weaponTemplate
 		const templateId = id
 		const ownerType = 'area'
 		const ownerId = enemyAreaId
@@ -26,9 +28,9 @@ export const generateWeapon = async (weaponTemplate, enemyAreaId) => {
 				ownerType,
 				templateId,
 				templateType,
-				// description,
-				// sellValue,
-				// weight,
+				description,
+				sellValue,
+				weight,
 				keywords,
 			},
 			{ transaction }
@@ -36,15 +38,11 @@ export const generateWeapon = async (weaponTemplate, enemyAreaId) => {
 		console.log(item, ' item')
 		const generatedWeapon = await Weapon.create(
 			{
-				// ownerId,
-				// ownerType,
-				// templateId,
-				// templateType,
 				itemId: item.id,
 				name,
 				ownerId,
 				ownerType,
-				damageType,
+				damageTypes,
 				minDamage,
 				maxDamage,
 				bonuses,
@@ -67,11 +65,63 @@ export const generateWeapon = async (weaponTemplate, enemyAreaId) => {
 		throw error
 	}
 }
+export const generateArmor = async (armorTemplate, enemyAreaId) => {
+	const transaction = await sequelize.transaction()
+	try {
+		const { name, id, templateType, armorValues, bonuses, slot, material, weight, sellValue, keywords, description } = armorTemplate
+		const templateId = id
+		const ownerType = 'area'
+		const ownerId = enemyAreaId
+
+		const item = await Item.create(
+			{
+				name,
+				ownerId,
+				ownerType,
+				templateId,
+				templateType,
+				description,
+				sellValue,
+				weight,
+				keywords,
+			},
+			{ transaction }
+		)
+		const generatedWeapon = await Armor.create(
+			{
+				itemId: item.id,
+				name,
+				armorValues,
+				slot,
+				material,
+				bonuses,
+				weight,
+				sellValue,
+				keywords,
+				description,
+			},
+			{ transaction }
+		)
+		console.log(generatedWeapon, ' gen weapon')
+		item.dataValues.weapon = generatedWeapon
+		item.setDataValue('armor', generatedWeapon)
+
+		await transaction.commit()
+		return item
+	} catch (error) {
+		await transaction.rollback()
+		throw error
+	}
+}
 
 export const itemFactory = async (lootTableEntry, enemyAreaId) => {
 	let generatedItem
 	if (lootTableEntry.templateType === 'weapon') {
 		const template = await WeaponTemplate.findByPk(lootTableEntry.templateId)
+		generatedItem = await generateWeapon(template, enemyAreaId)
+	}
+	if (lootTableEntry.templateType === 'armor') {
+		const template = await ArmorTemplate.findByPk(lootTableEntry.templateId)
 		generatedItem = await generateWeapon(template, enemyAreaId)
 	}
 

@@ -10,6 +10,9 @@ import { Weapon } from '../models/weapon.js'
 import Area from '../models/area.js'
 import { PlayerRace } from '../models/playerRace.js'
 import { PlayerClass } from '../models/playerClass.js'
+import Armor from '../models/armor.js'
+import { playerUpdateAllAttributes } from '../utils/calculations/calculationsPlayer.js'
+import { getPlayerWeapons, swingBuilderUtil } from '../utils/playerUtils.js'
 
 export let players = {}
 // prettier-ignore
@@ -69,23 +72,37 @@ export const playerAdvancesEnemy = async (data, ws, wss) => {
 export const playerRegularAttack = async (data, ws, wss) => {
 	try {
 		const { playerId, enemyId } = data
-
+		console.log(1)
 		const player = await Player.findByPk(playerId)
-		if (!player) {
-			throw new Error(`Error finding player by id`)
-		}
+		if (!player) throw new Error(`Error finding player by id`)
+		console.log(2)
+
 		const enemy = await Enemy.findByPk(enemyId)
-		if (!enemy) {
-			throw new Error(`Error finding enemy by id`)
+		if (!enemy) throw new Error(`Error finding enemy by id`)
+		console.log(3)
+
+		const weapons = await getPlayerWeapons(player.id)
+		console.log(4)
+		const swingBuilder = await swingBuilderUtil(player, weapons)
+		console.log(5)
+
+		const gamePlayer = new GamePlayer(player, { weapons })
+		if (!gamePlayer) throw new Error(`Error creating GamePlayer`)
+
+		const weaponsByLocation = {}
+		for (const weapon of weapons) {
+			weaponsByLocation[weapon.location] = weapon
 		}
 
-		const gamePlayer = new GamePlayer(player)
-		if (!gamePlayer) {
-			throw new Error(`Error creating GamePlayer`)
+		for (const swing of swingBuilder) {
+			const weaponSwung = weaponsByLocation[swing] || weapons[0]
+			const damageObject = gamePlayer.calculateDamageAgainstEnemy(enemy, weaponSwung)
+			const { actualDamage } = damageObject
+			enemy.health = Math.max(enemy.health - actualDamage, 0)
+			await enemy.save()
+			ws.send(JSON.stringify({ type: 'playerAction', action: 'playerAttackHitsEnemy', enemy, damageObject }))
+			if (enemy.health <= 0) break
 		}
-
-		const playerDamage = gamePlayer.rawDamage
-		enemy.health = Math.max(enemy.health - playerDamage, 0)
 
 		if (enemy.health <= 0) {
 			const loot = (await generateEnemyDrops(enemy)) || []
@@ -103,12 +120,14 @@ export const playerRegularAttack = async (data, ws, wss) => {
 				experience: player.experience + gainedExperience,
 			})
 			console.log(loot, ' LOOT')
-			ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyDies', enemy, experience: gainedExperience, damage: playerDamage, loot }))
+			ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyDies', enemy, experience: gainedExperience, loot }))
 		} else {
-			await enemy.save()
-			ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyTakesDamage', enemy, damage: playerDamage }))
+			//BATCH SEND HERE INSTEAD OF INDIVIDUAL SENDS IN THE FOR LOOP
+			// await enemy.save()
+			// ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyTakesDamage', enemy, damage: playerDamage }))
 		}
 	} catch (error) {
+		console.error(error)
 		ws.send(JSON.stringify({ type: 'error', message: error.message }))
 	}
 }
@@ -194,7 +213,7 @@ export const getPlayer1API = async (req, res) => {
 		console.log(player, ' player')
 		const playerItems = await Item.findAll({
 			where: { ownerId: playerId, ownerType: 'player' },
-			include: [{ model: Weapon }],
+			include: [Weapon, Armor],
 		})
 		if (!playerItems) {
 			return res.status(404).json({ message: 'Player items not found' })
@@ -274,6 +293,7 @@ export const getAllPlayerItems = async (req, res) => {
 				ownerId: playerId,
 				ownerType: 'player',
 			},
+			include: [{ model: Weapon }, { model: Armor }],
 		})
 		if (!playerItems) {
 			return res.status(204).json({ error: 'Player items not found' })
@@ -295,13 +315,16 @@ export const patchPlayerPacksItem = async (req, res) => {
 				ownerId: playerId,
 				ownerType: 'player',
 			},
+			include: [{ model: Weapon }, { model: Armor }],
 		})
 		if (!packedItem) {
 			return res.status(404).json({ message: 'Player has nothing in that hand to pack' })
 		}
 
+		if (packedItem.templateType === 'weapon') {
+			await playerUpdateAllAttributes(playerId, ws)
+		}
 		await packedItem.update({ location: 'inventory' })
-		// if (playerId <= 0 || itemId <= 0) {return res.status(404).json({message: "playerId and/or itemId invalid"})}
 		return res.status(200).json({ packedItem, message: 'You unpack your item' })
 	} catch (error) {
 		console.error(`Error packing item: `, error)
@@ -329,25 +352,30 @@ export const patchPlayerUnpacksItem = async (req, res) => {
 				ownerType: 'player',
 				location: 'inventory',
 			},
+			include: [{ model: Weapon }, { model: Armor }],
 		})
 		//If unpacked item is not found -- fail
 		if (!unpackedItem) {
 			return res.status(404).json({ message: 'No item to unpack' })
 		}
+		console.log(unpackedItem, ' unpackedItem')
 		//If one of player's hands is occupied and unpacked item is two-handed -- fail
 		if ((!leftHandOpen || !rightHandOpen) && unpackedItem.isTwoHanded) {
 			return res.status(422).json({ message: 'Both hands must be free in order to unpack a two-handed item' })
 		}
 
 		if (rightHandOpen && leftHandOpen && unpackedItem.isTwoHanded) {
-			await unpackedItem.update({ location: 'both_hands' })
+			await unpackedItem.update({ location: 'bothHands' })
 			return res.status(200).json({ unpackedItem, message: 'Item unpack to both hands' })
 		} else if (rightHandOpen) {
-			await unpackedItem.update({ location: 'right_hand' })
+			await unpackedItem.update({ location: 'rightHand' })
 			return res.status(200).json({ unpackedItem, message: 'Item unpacked to right hand' })
 		} else if (leftHandOpen) {
-			await unpackedItem.update({ location: 'left_hand' })
+			await unpackedItem.update({ location: 'leftHand' })
 			return res.status(200).json({ unpackedItem, message: 'Item unpacked to left hand' })
+		}
+		if (unpackedItem.templateType === 'weapon') {
+			await playerUpdateAllAttributes(playerId, ws)
 		}
 		// return res.status(200).json(unpackedItem)
 	} catch (error) {
@@ -359,10 +387,16 @@ export const patchPlayerUnpacksItem = async (req, res) => {
 export const patchPlayerDropsItem = async (req, res) => {
 	try {
 		const { areaId, itemId } = req.params
-		const item = await Item.findByPk(itemId)
+		const item = await Item.findByPk(itemId, {
+			include: [{ model: Weapon }, { model: Armor }],
+		})
 		if (!item) {
 			return res.status(404).json({ message: 'Item not found' })
 		}
+		//SEND PLAYER ID ON THE FRONT END THEN UNCOMMENT THIS OUT
+		// if (packedItem.templateType === 'weapon') {
+		// 	playerUpdateAllAttributes(playerId, ws)
+		// }
 		await item.update({ ownerId: areaId, ownerType: 'area', location: null })
 		return res.status(200).json(item)
 	} catch (error) {
@@ -370,7 +404,7 @@ export const patchPlayerDropsItem = async (req, res) => {
 	}
 }
 
-const playerItemInHandsCheck = async playerId => {
+export const playerItemInHandsCheck = async playerId => {
 	try {
 		const playerFullInventory = await Item.findAll({
 			where: { ownerType: 'player', ownerId: playerId },
@@ -380,9 +414,9 @@ const playerItemInHandsCheck = async playerId => {
 			leftHandOpen: true,
 		}
 		playerFullInventory.forEach(item => {
-			if (item.location == 'right_hand') hands.rightHandOpen = false
-			if (item.location == 'left_hand') hands.leftHandOpen = false
-			if (item.location == 'both_hands') {
+			if (item.location == 'rightHand') hands.rightHandOpen = false
+			if (item.location == 'leftHand') hands.leftHandOpen = false
+			if (item.location == 'bothHands') {
 				hands.rightHandOpen = false
 				hands.leftHandOpen = false
 			}

@@ -7,7 +7,11 @@ module.exports = {
 					id: 1,
 					templateType: 'weapon',
 					name: 'Training Onehanded Sword',
-					damageType: ['slashing', 'piercing'],
+					damageTypes: JSON.stringify({
+						slashing: 0,
+						piercing: 0,
+						blunt: 0,
+					}),
 					minDamageMin: 3,
 					maxDamageMin: 5,
 					minDamageMax: 7,
@@ -32,11 +36,25 @@ module.exports = {
 					id: 2,
 					templateType: 'weapon',
 					name: 'Dagger',
-					damageType: ['piercing'],
+					damageTypes: JSON.stringify({
+						slashing: 0,
+						piercing: 0,
+						blunt: 0,
+					}),
 					minDamageMin: 1,
 					maxDamageMin: 2,
 					minDamageMax: 3,
 					maxDamageMax: 4,
+					bonuses: JSON.stringify({
+						attributes: {
+							strength: 1,
+							dexterity: 1,
+							agility: 1,
+						},
+						skills: {
+							onehanded: 1,
+						},
+					}),
 					weight: 13,
 					sellValue: 23,
 					isTwoHanded: false,
@@ -47,12 +65,26 @@ module.exports = {
 					id: 3,
 					templateType: 'weapon',
 					name: 'Crossbow',
+					damageTypes: JSON.stringify({
+						slashing: 0,
+						piercing: 0,
+						blunt: 0,
+					}),
 					description: 'This is a Crossbow',
-					damageType: ['piercing'],
 					minDamageMin: 1,
 					maxDamageMin: 2,
 					minDamageMax: 3,
 					maxDamageMax: 4,
+					bonuses: JSON.stringify({
+						attributes: {
+							strength: 1,
+							dexterity: 1,
+							agility: 1,
+						},
+						skills: {
+							onehanded: 1,
+						},
+					}),
 					weight: 20,
 					sellValue: 100,
 
@@ -63,12 +95,26 @@ module.exports = {
 					id: 4,
 					templateType: 'weapon',
 					name: 'Twohanded Blue Sabre',
+					damageTypes: JSON.stringify({
+						slashing: 0,
+						piercing: 0,
+						blunt: 0,
+					}),
 					description: 'This is a Twohanded Blue Sabre',
-					damageType: ['slashing', 'piercing'],
 					minDamageMin: 1,
 					maxDamageMin: 2,
 					minDamageMax: 3,
 					maxDamageMax: 4,
+					bonuses: JSON.stringify({
+						attributes: {
+							strength: 1,
+							dexterity: 1,
+							agility: 1,
+						},
+						skills: {
+							onehanded: 1,
+						},
+					}),
 					weight: 25,
 					sellValue: 150,
 
@@ -79,12 +125,26 @@ module.exports = {
 					id: 5,
 					templateType: 'weapon',
 					name: 'Twohanded Bastard Sword',
+					damageTypes: JSON.stringify({
+						slashing: 0,
+						piercing: 0,
+						blunt: 0,
+					}),
 					description: 'This is a Twohanded Bastard Sword',
-					damageType: ['slashing', 'piercing'],
 					minDamageMin: 1,
 					maxDamageMin: 2,
 					minDamageMax: 3,
 					maxDamageMax: 4,
+					bonuses: JSON.stringify({
+						attributes: {
+							strength: 1,
+							dexterity: 1,
+							agility: 1,
+						},
+						skills: {
+							onehanded: 1,
+						},
+					}),
 					weight: 20,
 					sellValue: 500,
 
@@ -95,12 +155,26 @@ module.exports = {
 					id: 6,
 					templateType: 'weapon',
 					name: 'Shortsword',
+					damageTypes: JSON.stringify({
+						slashing: 0,
+						piercing: 0,
+						blunt: 0,
+					}),
 					description: 'A plain Shortsword',
-					damageType: ['slashing', 'piercing'],
 					minDamageMin: 1,
 					maxDamageMin: 2,
 					minDamageMax: 3,
 					maxDamageMax: 4,
+					bonuses: JSON.stringify({
+						attributes: {
+							strength: 1,
+							dexterity: 1,
+							agility: 1,
+						},
+						skills: {
+							onehanded: 1,
+						},
+					}),
 					weight: 15,
 					sellValue: 70,
 

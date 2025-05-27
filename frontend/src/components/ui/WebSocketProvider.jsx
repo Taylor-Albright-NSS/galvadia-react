@@ -5,6 +5,7 @@ import { messageHandlers } from '../../helpers/messageHandlers'
 import { playerAdvancesEnemySetter, playerLooksSetter, playerRetreatsSetter, playerRoomTransitionSetter, playerSpeaksToNpcSetter, playerUpdateAllAttributesSetter } from '../../setters/settersPlayer'
 import { enemyDiesSetter, enemySpawnsSetter, enemyTakesDamageSetter } from '../../setters/settersEnemy'
 import { areaCurrentAreaItemsSetter } from '../../setters/settersArea'
+import { playerEquipsArmorSetter, playerPacksItemSetter, playerPicksUpAllItemsSetter, playerPicksUpItemSetter, playerRemovesArmorSetter, playerUnpacksItemSetter } from '../../setters/settersItem'
 
 export const WebSocketProvider = ({ children }) => {
 	const wsRef = useRef(null)
@@ -18,7 +19,6 @@ export const WebSocketProvider = ({ children }) => {
 		const ws = wsRef.current
 		console.log(ws)
 		if (!ws) return
-
 		if (ws.readyState === WebSocket.CONNECTING) {
 			ws.onopen = () => {
 				console.log('WebSocket is now open, readState: ', ws.readyState)
@@ -44,6 +44,16 @@ export const WebSocketProvider = ({ children }) => {
 				if (data.action === 'playerRetreats') {playerRetreatsSetter(data, setGameData)}
 				if (data.action === 'playerLooks') {playerLooksSetter(data, setGameData, addLog)}
 				if (data.action === 'playerSpeaksToNpc') {playerSpeaksToNpcSetter(data, addLog)}
+				if (data.action === 'playerEquipsArmor') {playerEquipsArmorSetter(data, setGameData, addLog)}
+				if (data.action === 'playerRemovesArmor') {playerRemovesArmorSetter(data, setGameData, addLog)}
+				if (data.action === 'playerUnpacksItem') {playerUnpacksItemSetter(data, setGameData, addLog)}
+				if (data.action === 'playerPacksItem') {playerPacksItemSetter(data, setGameData, addLog)}
+				if (data.action === 'playerPicksUpItem') {playerPicksUpItemSetter(data, setGameData, addLog)}
+				if (data.action === 'playerPicksUpAllItems') {playerPicksUpAllItemsSetter(data, setGameData, addLog)}
+				if (data.action === 'playerAttackHitsEnemy') {enemyTakesDamageSetter(data, setGameData, addLog)}
+			}
+			if (data.type === 'error') {
+				console.log(data)
 			}
 			if (data.type === 'itemAction') {
 				if (data.action === 'currentAreaItems') {areaCurrentAreaItemsSetter(data, setGameData, addLog)}
@@ -52,13 +62,13 @@ export const WebSocketProvider = ({ children }) => {
 				if (data.action === 'playerGainsExperience') {
 					console.log('EXP GAIN')
 				}
+				if (data.action === 'updateAllAttributes') playerUpdateAllAttributesSetter(data, setGameData, addLog)
 			}
 			if (data.type === 'enemyAction') {
 				if (data.action === 'enemyTakesDamage') {enemyTakesDamageSetter(data, setGameData, addLog)}
 				if (data.action === 'enemyDies') {enemyDiesSetter(data, setGameData, addLog)}
 				if (data.action === 'enemySpawns') {enemySpawnsSetter(data, setGameData, addLog)}
 			}
-			if (data.type === 'retrievePlayerData') {playerUpdateAllAttributesSetter(data, setGameData, addLog)}
 			if (data.type === 'gamemessage') console.log(data, ' RECEIVED')
 			if (data.type === 'playerDialogue') {
 				addLog(data.dialogue)

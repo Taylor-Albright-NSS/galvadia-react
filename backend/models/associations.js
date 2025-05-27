@@ -1,5 +1,6 @@
 import { sequelize } from '../config/db.js'
 import Area from './area.js'
+import Armor from './armor.js'
 import { Enemy } from './enemy.js'
 import { EnemyType } from './enemyType.js'
 import { Item } from './item.js'
@@ -45,6 +46,9 @@ Keyword.belongsTo(Area, { foreignKey: 'area_id' })
 
 Item.hasOne(Weapon, { foreignKey: 'itemId' })
 Weapon.belongsTo(Item, { foreignKey: 'itemId' })
+
+Item.hasOne(Armor, { foreignKey: 'itemId' })
+Armor.belongsTo(Item, { foreignKey: 'itemId' })
 
 Player.belongsTo(PlayerRace, { foreignKey: 'raceId' })
 PlayerRace.hasMany(Player, { foreignKey: 'raceId' })

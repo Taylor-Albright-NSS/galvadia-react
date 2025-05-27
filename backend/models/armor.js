@@ -1,33 +1,31 @@
 import { Model, DataTypes } from 'sequelize'
 import { sequelize } from '../config/db.js'
 
-export class Weapon extends Model {}
+export class Armor extends Model {}
 
-Weapon.init(
+Armor.init(
 	{
 		id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true, allowNull: false },
 		itemId: { type: DataTypes.INTEGER, allowNull: false, unique: true, references: { model: 'Items', key: 'id' } },
 		templateId: { type: DataTypes.INTEGER },
 
 		name: { type: DataTypes.STRING },
-		damageTypes: { type: DataTypes.JSONB },
-		minDamage: { type: DataTypes.INTEGER },
-		maxDamage: { type: DataTypes.INTEGER },
+		armorValues: { type: DataTypes.JSONB },
+		slot: { type: DataTypes.STRING },
+		material: { type: DataTypes.STRING },
 		bonuses: { type: DataTypes.JSONB, defaultValue: {} },
 		weight: { type: DataTypes.INTEGER },
 		sellValue: { type: DataTypes.INTEGER },
-		isTwoHanded: { type: DataTypes.BOOLEAN, defaultValue: false },
-		//If ownerType is player, location is among these: rightHand, leftHand, all other slots
-		//If ownerType is anything but player, value is null
+		//If ownerType is player, location is among these: rightHand, leftHand, inventory, {slotName}
 		location: { type: DataTypes.STRING },
 		keywords: { type: DataTypes.ARRAY(DataTypes.STRING) },
 		description: { type: DataTypes.TEXT },
 	},
 	{
 		sequelize,
-		modelName: 'Weapon',
-		tableName: 'Weapons',
+		modelName: 'Armor',
+		tableName: 'Armors',
 	}
 )
 
-export default Weapon
+export default Armor
