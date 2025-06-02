@@ -25,6 +25,7 @@ module.exports = {
 			x: { type: Sequelize.INTEGER },
 			y: { type: Sequelize.INTEGER },
 			z: { type: Sequelize.INTEGER },
+			s: { type: Sequelize.STRING },
 			area_id: { type: Sequelize.INTEGER, allowNull: false },
 			createdAt: { type: Sequelize.DATE, allowNull: false },
 			updatedAt: { type: Sequelize.DATE, allowNull: false },

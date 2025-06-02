@@ -5,8 +5,10 @@ export const keywordMethods = {
         const response = await fetchDirectionToUnlock(currentArea.id, keyword.special.direction)
         return response
     },
-    examineKeyword: async function(player, currentArea, foundKeyword) {
+    examineKeyword: async function(player, foundKeyword, currentArea, ws) {
         const keywordResponse = await fetchKeywordActivation(player, currentArea, foundKeyword)
+        // const keywordResponse = await fetchKeywordActivation(player, currentArea, foundKeyword)
+
         return keywordResponse
         
         // const spawnItemResponse = await fetchItemToSpawn(currentArea.id, keyword.special)

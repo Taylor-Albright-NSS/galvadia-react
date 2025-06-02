@@ -1,3 +1,4 @@
+import Armor from '../../models/armor.js'
 import Item from '../../models/item.js'
 import Player from '../../models/player.js'
 import { PlayerClass } from '../../models/playerClass.js'
@@ -10,23 +11,23 @@ import Weapon from '../../models/weapon.js'
 // 	// console.log(player, ' player with added class and race models')
 // }
 
-export const playerUpdateAllAttributes = async (data, ws) => {
-	const { playerId } = data
+export const playerUpdateAllAttributes = async (playerId, ws) => {
 	const player = await Player.findByPk(playerId, {
 		include: [{ model: PlayerClass }, { model: PlayerRace }],
 	})
-	const allPlayerItems = await Item.findAll({ where: { ownerId: playerId, ownerType: 'player' }, include: [{ model: Weapon }] })
+	const allPlayerItems = await Item.findAll({ where: { ownerId: playerId, ownerType: 'player' }, include: [{ model: Weapon }, { model: Armor }] })
 
-	const playerEquippedItems = allPlayerItems.filter(item => item.location !== 'inventory')
+	const playerEquippedItems = allPlayerItems.filter(item => (item.templateType === 'weapon' && (item.location === 'leftHand' || item.location === 'rightHand')) || (item.templateType === 'armor' && item.location === item.Armor.slot))
 	const classAttributes = playerCalculateClassAttributes(player)
 	const raceAttributes = playerCalculateRaceAttributes(player)
 	let equipmentAttributes = {}
 	let totalAttributes = {}
 
 	playerEquippedItems.forEach(item => {
-		if (item?.Weapon?.bonuses?.attributes) {
-			for (const attribute in item.Weapon.bonuses.attributes) {
-				equipmentAttributes[attribute] = (equipmentAttributes[attribute] || 0) + (item.Weapon.bonuses.attributes[attribute] || 0)
+		const { attributes } = item?.Weapon?.bonuses || item?.Armor?.bonuses || {}
+		if (attributes) {
+			for (const attribute in attributes) {
+				equipmentAttributes[attribute] = (equipmentAttributes[attribute] || 0) + (attributes[attribute] || 0)
 			}
 		}
 	})
@@ -35,9 +36,8 @@ export const playerUpdateAllAttributes = async (data, ws) => {
 		totalAttributes[attribute] = (totalAttributes[attribute] || 0) + (classAttributes[attribute] || 0) + (raceAttributes[attribute] || 0) + (equipmentAttributes[attribute] || 0)
 	}
 
-	console.log(totalAttributes, ' totalAttributes')
-	player.update(totalAttributes)
-	ws.send(JSON.stringify({ type: 'retrievePlayerData', action: 'allAttributes', attributes: totalAttributes }))
+	player.update({ attributes: totalAttributes })
+	ws.send(JSON.stringify({ type: 'playerModify', action: 'updateAllAttributes', attributes: totalAttributes }))
 }
 
 export const playerCalculateClassAttributes = player => {

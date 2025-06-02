@@ -28,9 +28,16 @@ export const moveDirection = async (gameData, setGameData, inputDirection, addLo
 	const directionCoords = directionCoordsList[inputDirection]
 	const futureX = player.x + directionCoords.x
 	const futureY = player.y + directionCoords.y
+	const combinedCoords = {
+		x: futureX,
+		y: futureY
+	}
 	
 	//old REST API
     // const newAreaIfExists = await getAreaByCoords(combinedCoords)
+	// if (!newAreaIfExists) {
+	// 	addLog(`Area does not exist`)
+	// }
 	
 	// if (newAreaIfExists && !currentArea?.exitsBool?.[inputDirection]) {
 	// 	addLog(`(This should not happen. Room exists, but direction is not part of exits bool)`)

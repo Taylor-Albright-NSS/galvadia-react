@@ -3,15 +3,20 @@ import { npcSpeaks } from "../DOMrenders/npcActions"
 import { keywordMethods } from "../utils/keywordMethods"
 import { findNpcById } from "../utils/utilsNpc"
 
-export const playerRoomTransitionSetter = (data, setGameData) => {
+export const playerRoomTransitionSetter = (data, setGameData, addLog) => {
+    console.log(addLog, ' ADD LOG')
+    if (data.updatedGameData === null) {
+        addLog(`You cannot move in that direction.`)
+        return
+    }
     const { area, enemies, itemsInArea, npcs, players } = data.updatedGameData
-    console.log(npcs, " NPCS from MOVING")
     if (area.Keywords.length > 0) {
         area.Keywords.map(keyword => {
             const method = keywordMethods[keyword.methodCode]
             keyword[keyword.methodCode] = method
         })
     }
+    console.log(area)
     setGameData(prev => ({
         ...prev,
         player: data.updatedPlayer,

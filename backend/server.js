@@ -6,13 +6,14 @@ import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playe
 import db from './models/associations.js'
 import cors from 'cors'
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js'
-import { getCurrentAreaNpcs, getNpcById, getNpcDialogue, getEveryNpc, getNpcDialogueAll, getNpcQuestDialogue, getNpcQuest, postNpcRequirements, patchDecrementQuestStage, patchIncrementQuestStage } from './controllers/npcController.js'
+import { getCurrentAreaNpcs, getNpcById, getNpcDialogue, getEveryNpc, getNpcDialogueAll, getNpcQuestDialogue, getNpcQuest, postNpcRequirements, patchDecrementQuestStage, patchIncrementQuestStage, getPlayerNpcRelationship } from './controllers/npcController.js'
 import { createEnemy, deleteEnemy, enemySpawns, enemyTakesDamage, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './controllers/enemyController.js'
-import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, postCrossbow, postDagger, postNewItem, postOnehandedSword, postSpawnItemToPlayer, postTwohandedSword, putCurrentAreaItemsToPlayer } from './controllers/itemController.js'
+import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, postOnehandedSword, postSpawnItemToPlayer, postTwohandedSword, putCurrentAreaItemsToPlayer } from './controllers/itemController.js'
 import { app } from './websocket.js'
 import { getUser } from './controllers/userController.js'
 import { patchKeywordActivation, patchToggleKeywordFalse } from './controllers/keywordController.js'
 import { getGameData } from './controllers/gameStateController.js'
+import { playerSpeaksNpcUnlocksDirection } from './controllerServices/playerActionsServices.js'
 
 app.use(express.json())
 app.use(cors())
@@ -43,8 +44,8 @@ app.delete('/items', deleteAllItems)
 app.post('/item/onehandedsword/:areaId', postOnehandedSword)
 // app.post('/item/dagger/:areaId', postDagger)
 // app.post('/item/crossbow/:areaId', postCrossbow)
-app.patch('/item/pack/:playerId/:itemId', patchPlayerPacksItem)
-app.patch('/item/unpack/:playerId/:itemId', patchPlayerUnpacksItem)
+// app.patch('/item/pack/:playerId/:itemId', patchPlayerPacksItem)
+// app.patch('/item/unpack/:playerId/:itemId', patchPlayerUnpacksItem)
 app.patch('/item/drop/:areaId/:itemId', patchPlayerDropsItem)
 app.post(`/area/:areaId/spawnItem`, postAreaKeywordSpawn)
 app.post(`/spawnToPlayer/:playerId`, postSpawnItemToPlayer)
@@ -53,6 +54,8 @@ app.get('/npcs', getEveryNpc)
 app.get('/npcs/:areaId/:playerId', getCurrentAreaNpcs)
 app.get('/npc/:id', getNpcById)
 app.get('/npc/:id/dialogue', getNpcDialogue)
+app.get('/playernpcrelationship/', getPlayerNpcRelationship)
+app.post('/createplayernpcrelationship', playerSpeaksNpcUnlocksDirection)
 //--------PLAYERS
 //(SINGLE)
 // app.patch('/player/:id/coordinates', playerRoomTransition)

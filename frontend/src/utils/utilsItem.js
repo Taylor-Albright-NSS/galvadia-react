@@ -1,10 +1,9 @@
 export const unpackItemByKeyword = function(playerItems, command2) {
     return playerItems
-    .filter(item => item.location != 'right_hand' && item.location != 'left_hand')
+    .filter(item => item.location != 'rightHand' && item.location != 'leftHand')
     .find(({ keywords }) => keywords.includes(command2))
 }
 export const dropItemByKeyword = function(playerItems, command2) {
-    console.log(playerItems, " playeritems")
     return playerItems.find(({ keywords }) => keywords.includes(command2))
 }
 
@@ -12,10 +11,10 @@ export const findItemsByKeyword = function(playerItems, command2) {
     return playerItems.filter(({ keywords }) => keywords.includes(command2))
 }
 export const findItemByRight = function(playerItems) {
-    return playerItems.find(item => item.location == "right_hand" || item.location == "both_hands")
+    return playerItems.find(item => item.location == "rightHand" || item.location == "bothHands")
 }
 export const findItemByLeft = function(playerItems) {
-    return playerItems.find(item => item.location == "left_hand" || item.location == "both_hands")
+    return playerItems.find(item => item.location == "leftHand" || item.location == "bothHands")
 }
 export const findItemByNumber = function(playerItems, command2) {
     let foundItem = playerItems

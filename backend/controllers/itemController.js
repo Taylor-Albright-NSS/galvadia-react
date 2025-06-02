@@ -66,20 +66,17 @@ export const putCurrentAreaItemsToPlayer = async (req, res) => {
 	}
 }
 
-export const postSpawnItemToPlayer = async (req, res) => {
+export const postSpawnItemToPlayer = async (playerId, name, keywords, ws) => {
 	try {
-		const { player, keyword } = req.body
-		const playerId = player.id
-		const { name, keywords } = keyword.special
-		const item = await Item.create({ name: name, ownerId: playerId, ownerType: 'player', keywords: keywords, location: 'inventory' })
+		const item = await Item.create({ name, ownerId: playerId, ownerType: 'player', keywords, location: 'inventory' })
 		console.log(item, ' item')
 		if (!item) {
-			return res.status(500).json({ message: 'Item failed to be created' })
+			throw new Error(`Item failed to be created`)
 		}
-		return res.status(201).json(item)
+		return ws.send(JSON.stringify({ type: 'itemAction', action: 'itemToPlayer', item }))
 	} catch (error) {
-		console.log('Duplicate ID?')
-		return res.status(500).json({ message: "Internal server error. I think it's because of the unique ID contraint" })
+		console.error(`Error: `, error)
+		return ws.send(JSON.stringify({ type: 'error', message: "Internal server error. I think it's because of the unique ID contraint" }))
 	}
 }
 export const postAreaKeywordSpawn = async (req, res) => {

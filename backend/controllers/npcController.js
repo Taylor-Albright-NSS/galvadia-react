@@ -88,6 +88,20 @@ export const getNpcQuestDialogue = async (req, res) => {
 	return res.status(200).json({ success: true, message: dialogueArray })
 }
 
+export const getPlayerNpcRelationship = async (req, res) => {
+	const { playerId, npcId } = req.query
+	const playerNpc = await PlayerNpc.findOne({
+		where: {
+			playerId,
+			npcId,
+		},
+	})
+	if (!playerNpc) {
+		return res.status(404).json({ message: ' playerNpc relationship not found' })
+	}
+	return res.status(200).json(playerNpc)
+}
+
 export const getNpcDialogue = async (req, res) => {
 	const { npcId } = req.params
 	const { playerId } = req.query

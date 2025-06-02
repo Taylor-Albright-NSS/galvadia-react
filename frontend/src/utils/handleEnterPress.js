@@ -47,7 +47,10 @@ const commandAliases = (command1) => {
         p: "pack",
         a: "attack",
         ad: "advance",
-        re: "retreat"
+        re: "retreat",
+        don: 'equip',
+        wear: "equip",
+        unequip: 'remove,'
     }
     return commandAliases[command1] || command1
 }
