@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 import { broadcastToRoom } from '../broadcasts/broadcast.js'
 import { getGameData } from '../controllers/gameStateController.js'
-import { playerAdvancesEnemy, playerItemInHandsCheck, playerRegularAttack, playerRetreats, playerRoomTransition, players } from '../controllers/playerController.js'
+import { playerAdvancesEnemy, playerItemInHandsCheck, playerRegularAttack, playerRetreats, playerRoomTransition } from '../controllers/playerController.js'
 import Area from '../models/area.js'
 import Enemy from '../models/enemy.js'
 import Item from '../models/item.js'
@@ -22,6 +22,7 @@ export const playerRoomTransitionService = async (data, ws, wss) => {
 		const { futureX, futureY, player } = data
 		const newArea = await Area.findOne({ where: { x: futureX, y: futureY } })
 		if (!newArea) {
+			ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRoomTransition', updatedGameData: null }))
 			throw new Error(`Anticipated area not found`)
 		}
 
@@ -37,10 +38,12 @@ export const playerRoomTransitionService = async (data, ws, wss) => {
 		const gameData = { playerId: updatedPlayer.id, areaId: updatedPlayer.area_id }
 		console.log('Before updatedGameData')
 		const updatedGameData = await getGameData(gameData)
+		console.log(updatedGameData, 'updated game data')
 		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRoomTransition', updatedPlayer, updatedGameData }))
 		broadcastToRoom(wss, updatedPlayer, newData.areaId)
 	} catch (error) {
-		ws.send(JSON.stringify({ type: 'error', message: error.message }))
+		console.error(error)
+		ws.send(JSON.stringify({ type: 'error', message: error }))
 	}
 }
 
@@ -124,12 +127,12 @@ export const playerRemovesArmorService = async (data, ws) => {
 }
 
 export const playerSpeaksToNpcService = async (data, ws) => {
-	const { playerId, npcId } = data
+	const { playerId, npcId, areaId } = data
 	console.log(playerId, npcId, ' playerId --- npcId')
 	let playerNpc = await PlayerNpc.findOne({ where: { playerId, npcId } })
 
 	if (!playerNpc && playerId > 0) {
-		playerNpc = await PlayerNpc.create({ playerId, npcId })
+		playerNpc = await PlayerNpc.create({ playerId, npcId, area_id: areaId })
 	}
 
 	if (!playerNpc && (isNaN(playerId) || isNaN(npcId))) {
@@ -159,6 +162,30 @@ export const playerSpeaksToNpcService = async (data, ws) => {
 	playerNpc.dialogueIndex = (dialogueIndex + 1) % dialogueArray.length
 	await playerNpc.save()
 	ws.send(JSON.stringify({ type: 'playerAction', action: 'playerSpeaksToNpc', dialogue, npc }))
+}
+
+export const playerSpeaksNpcUnlocksDirection = async (req, res) => {
+	try {
+		const { playerId, npcId, areaId } = req.body
+		console.log(playerId, npcId, areaId, ' playerId, npcId, areaId')
+		const playerNpc = await PlayerNpc.findOne({ where: { playerId, npcId } })
+		if (!playerNpc) {
+			throw new Error(`PlayerNpc could not be found`)
+		}
+		playerNpc.dialogueStage++
+		await playerNpc.save()
+		const newPlayerArea = await PlayerArea.create({
+			playerId,
+			area_id: areaId,
+			unblockedDirections: {
+				west: true,
+			},
+		})
+		await newPlayerArea.save()
+	} catch (error) {
+		console.error(`Error: `, error)
+		ws.send(JSON.stringify({ type: 'error', error }))
+	}
 }
 
 export const playerLooksService = async (data, ws) => {
@@ -251,11 +278,11 @@ export const playerUnpacksItemService = async (data, ws) => {
 			include: [{ model: Weapon }, { model: Armor }],
 		})
 
-		if ((!leftHandOpen || !rightHandOpen) && itemToUnpack.isTwoHanded) throw new Error('Both hands must be free in order to unpack a twohanded item')
+		if ((!leftHandOpen || !rightHandOpen) && itemToUnpack.weaponSkill === 'twohanded') throw new Error('Both hands must be free in order to unpack a twohanded item')
 		if (itemToUnpack.location !== 'inventory') throw new Error(`Item must be in inventory to unpack`)
 		if (!itemToUnpack) throw new Error(`Item not found`)
 
-		if (rightHandOpen && leftHandOpen && itemToUnpack.isTwoHanded) await itemToUnpack.update({ location: 'bothHands' })
+		if (rightHandOpen && leftHandOpen && itemToUnpack.weaponSkill === 'twohanded') await itemToUnpack.update({ location: 'bothHands' })
 		if (rightHandOpen) await itemToUnpack.update({ location: 'rightHand' })
 		else if (leftHandOpen) await itemToUnpack.update({ location: 'leftHand' })
 		if (itemToUnpack.templateType === 'weapon') await playerUpdateAllAttributes(playerId, ws)

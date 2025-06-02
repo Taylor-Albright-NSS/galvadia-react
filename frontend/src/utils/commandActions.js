@@ -1,6 +1,6 @@
 import { moveDirection } from "../playerActions/playerMovement"
 import { playerAdvances, playerAttackSender, playerDropsItem, playerEquipsArmorService, playerExamineService, playerInspectService, playerLookService, playerOffersQuest, 
-            playerPacksItemService, playerPicksUpItemService, playerPull, playerRemovesArmorService, playerRetreats, playerSpeaksToNpcService, playerSpeakToNpcQuest, 
+            playerPacksItemService, playerPicksUpItemService, playerPull, playerRecallsService, playerRemovesArmorService, playerRetreats, playerSpeaksToNpcService, playerSpeakToNpcQuest, 
             playerUnpacksItemService
         } from "../services/servicesPlayer"
 
@@ -26,7 +26,8 @@ export const commandActions = {
     advance: async (commandObject) => playerAdvances(commandObject),
     retreat: async (commandObject) => playerRetreats(commandObject),
     equip: async (commandObject) => playerEquipsArmorService(commandObject),
-    remove: async (commandObject) => playerRemovesArmorService(commandObject)
+    remove: async (commandObject) => playerRemovesArmorService(commandObject),
+    recall: async (commandObject) => playerRecallsService(commandObject),
 };
 
 export const actionList = async (commandObject) => {

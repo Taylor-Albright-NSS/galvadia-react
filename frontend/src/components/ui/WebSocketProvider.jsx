@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useRef } from 'react'
 import { zGameContext } from './zGameContext'
 import { WebSocketContext } from './WebSocketContext'
-import { messageHandlers } from '../../helpers/messageHandlers'
 import { playerAdvancesEnemySetter, playerLooksSetter, playerRetreatsSetter, playerRoomTransitionSetter, playerSpeaksToNpcSetter, playerUpdateAllAttributesSetter } from '../../setters/settersPlayer'
 import { enemyDiesSetter, enemySpawnsSetter, enemyTakesDamageSetter } from '../../setters/settersEnemy'
-import { areaCurrentAreaItemsSetter } from '../../setters/settersArea'
+import { areaCurrentAreaItemsSetter, itemToPlayerSetter } from '../../setters/settersArea'
 import { playerEquipsArmorSetter, playerPacksItemSetter, playerPicksUpAllItemsSetter, playerPicksUpItemSetter, playerRemovesArmorSetter, playerUnpacksItemSetter } from '../../setters/settersItem'
+import { keywordActivationSetter, keywordAlreadyActivated } from '../../setters/settersKeyword'
 
 export const WebSocketProvider = ({ children }) => {
 	const wsRef = useRef(null)
@@ -30,16 +30,19 @@ export const WebSocketProvider = ({ children }) => {
 			addLog('WebSocket is already open')
 			ws.send(JSON.stringify({ type: 'join', playerId: player.id, areaId: player.area_id, name: player.name }))
 		}
-
 		ws.onmessage = event => {
 			const data = JSON.parse(event.data)
-			const handler = messageHandlers[data.action]
-			if (handler) {
-				handler(data, setGameData)
-			}
+			// Will need to make a new module to house the messageHandlers
+			// const handler = messageHandlers[data.action]
+			// if (handler) {
+			// 	handler(data, setGameData)
+			// }
 			console.log(data, " DATA")
 			if (data.type === 'playerAction') {
-				if (data.action === 'playerRoomTransition') {playerRoomTransitionSetter(data, setGameData)}
+				if (data.action === 'playerRoomTransition') {
+					console.log(addLog, " FIRST ADD LOG")
+					playerRoomTransitionSetter(data, setGameData, addLog)
+				}
 				if (data.action === 'playerAdvancesEnemy') {playerAdvancesEnemySetter(data, setGameData)}
 				if (data.action === 'playerRetreats') {playerRetreatsSetter(data, setGameData)}
 				if (data.action === 'playerLooks') {playerLooksSetter(data, setGameData, addLog)}
@@ -52,11 +55,17 @@ export const WebSocketProvider = ({ children }) => {
 				if (data.action === 'playerPicksUpAllItems') {playerPicksUpAllItemsSetter(data, setGameData, addLog)}
 				if (data.action === 'playerAttackHitsEnemy') {enemyTakesDamageSetter(data, setGameData, addLog)}
 			}
+			if (data.type === 'keyword') {
+				console.log(data.action, " DATA ACTION")
+				if (data.action === 'activateSuccess') keywordActivationSetter(data, addLog)
+				if (data.action === 'activateFail') keywordAlreadyActivated(data, addLog)
+			}
 			if (data.type === 'error') {
 				console.log(data)
 			}
 			if (data.type === 'itemAction') {
 				if (data.action === 'currentAreaItems') {areaCurrentAreaItemsSetter(data, setGameData, addLog)}
+				if (data.action === 'itemToPlayer') {itemToPlayerSetter(data, setGameData, addLog)}
 			}
 			if (data.type === 'playerModify') {
 				if (data.action === 'playerGainsExperience') {

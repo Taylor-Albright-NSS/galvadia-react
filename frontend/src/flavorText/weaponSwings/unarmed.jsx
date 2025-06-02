@@ -3,7 +3,7 @@ export const unarmedSwing = (damageObject) => {
     console.log(weapon, ' weapon')
     console.log(enemy, ' enemy')
     return (
-        <span style={{display: 'flex', flexDirection: 'column', marginTop: '5px', marginBottom: '5px'}}>
+        <span style={{display: 'flex', flexDirection: 'column', marginTop: '9px', marginBottom: '9px'}}>
             <span style={{display: 'inline'}}>
                 <span className="light-blue">You </span>
                 <span>{swingVerb} your </span> 

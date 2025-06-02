@@ -223,7 +223,7 @@ export const getPlayer1API = async (req, res) => {
 			return res.status(404).json({ message: 'Player not found' })
 		}
 
-		res.json(player) // Send player data to the frontend
+		res.status(200).json(player) // Send player data to the frontend
 	} catch (error) {
 		console.error('Error fetching player:', error)
 		res.status(500).json({ message: 'Internal server error' })
@@ -360,11 +360,11 @@ export const patchPlayerUnpacksItem = async (req, res) => {
 		}
 		console.log(unpackedItem, ' unpackedItem')
 		//If one of player's hands is occupied and unpacked item is two-handed -- fail
-		if ((!leftHandOpen || !rightHandOpen) && unpackedItem.isTwoHanded) {
+		if ((!leftHandOpen || !rightHandOpen) && unpackedItem.weaponSkill === 'twohanded') {
 			return res.status(422).json({ message: 'Both hands must be free in order to unpack a two-handed item' })
 		}
 
-		if (rightHandOpen && leftHandOpen && unpackedItem.isTwoHanded) {
+		if (rightHandOpen && leftHandOpen && unpackedItem.weaponSkill === 'twohanded') {
 			await unpackedItem.update({ location: 'bothHands' })
 			return res.status(200).json({ unpackedItem, message: 'Item unpack to both hands' })
 		} else if (rightHandOpen) {

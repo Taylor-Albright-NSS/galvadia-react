@@ -14,8 +14,8 @@ export const playerLooksSender = (playerId, areaId, ws) => {
 	ws.send(JSON.stringify({ type: "playerAction", action: "playerLooks", playerId, areaId }))
 }
 
-export const playerSpeaksToNpcSender = (playerId, npcId, ws) => {
-	ws.send(JSON.stringify({ type: "playerAction", action: "playerSpeaksToNpc", playerId, npcId }))
+export const playerSpeaksToNpcSender = (playerId, npcId, areaId, ws) => {
+	ws.send(JSON.stringify({ type: "playerAction", action: "playerSpeaksToNpc", playerId, npcId, areaId }))
 }
 
 export const playerEquipsArmorSender = (playerId, itemId, ws) => {
@@ -35,6 +35,10 @@ export const playerUnpacksItemSender = (playerId, itemId, itemLocation, ws) => {
 
 export const playerPicksUpItemSender = (playerId, itemId, areaId, command2, ws) => {
 	ws.send(JSON.stringify({ type: 'playerAction', action: 'playerPicksUpItem', playerId, itemId, areaId, command2 }))
+}
+
+export const playerRecallsSender = (playerId, areaId, ws) => {
+
 }
 
 // export const currentAreaItemsSender = async (playerId, areaId, ws) => {

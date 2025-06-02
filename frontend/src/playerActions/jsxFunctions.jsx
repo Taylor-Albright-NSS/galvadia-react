@@ -13,7 +13,7 @@ export const playerPicksUpAllItemsJSX = function () {
 
 
 export const playerEquipsArmorJSX = function (equippedItem) {
-    return (<span>You unequip your <span className={equippedItem?.color || "green"}>{equippedItem.name}</span></span>)
+    return (<span>You equip your <span className={equippedItem?.color || "green"}>{equippedItem.name}</span></span>)
 }
 export const playerRemovesArmorJSX = function (removedItem) {
     return (<span>You remove your <span className={removedItem?.color || "green"}>{removedItem.name}</span></span>)

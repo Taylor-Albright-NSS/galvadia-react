@@ -15,8 +15,10 @@ Weapon.init(
 		maxDamage: { type: DataTypes.INTEGER },
 		bonuses: { type: DataTypes.JSONB, defaultValue: {} },
 		weight: { type: DataTypes.INTEGER },
+
+		weaponSkill: { type: DataTypes.STRING },
 		sellValue: { type: DataTypes.INTEGER },
-		isTwoHanded: { type: DataTypes.BOOLEAN, defaultValue: false },
+		weaponSkill: { type: DataTypes.STRING },
 		//If ownerType is player, location is among these: rightHand, leftHand, all other slots
 		//If ownerType is anything but player, value is null
 		location: { type: DataTypes.STRING },

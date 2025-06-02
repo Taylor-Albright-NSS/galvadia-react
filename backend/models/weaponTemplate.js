@@ -16,7 +16,7 @@ WeaponTemplate.init(
 		bonuses: { type: DataTypes.JSONB },
 		weight: { type: DataTypes.INTEGER },
 		sellValue: { type: DataTypes.INTEGER },
-		isTwoHanded: { type: DataTypes.BOOLEAN },
+		weaponSkill: { type: DataTypes.STRING },
 		keywords: { type: DataTypes.ARRAY(DataTypes.STRING) },
 		description: { type: DataTypes.STRING },
 

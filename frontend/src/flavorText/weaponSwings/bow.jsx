@@ -5,8 +5,7 @@ export const bowSwing = (damageObject) => {
     return (
         <span style={{display: 'flex', flexDirection: 'column', marginTop: '5px', marginBottom: '5px'}}>
             <span style={{display: 'inline'}}>
-                <span className="light-blue">You </span>
-                <span>{swingVerb} your </span> 
+                <span className="light-blue">You fire an arrow from your </span>
                 <span className={weapon?.color || 'green'}>{weapon.name} </span>
                 <span>{preposition} the </span>
                 <span className={enemy?.color || 'red'}>{enemy.name}</span>

@@ -29,11 +29,45 @@ module.exports = {
 					}),
 					weight: 10,
 					sellValue: 50,
-					isTwoHanded: false,
+					weaponSkill: 'onehanded',
 
 					location: 'inventory',
 					keywords: ['training', 'onehanded', 'sword', 'training onehanded', 'onehanded sword', 'training onehanded sword'],
 					description: 'A Training Onehanded Sword',
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+				{
+					itemId: 2,
+					templateId: 5,
+					ownerId: 1,
+					ownerType: 'player',
+
+					name: 'Training TwoHanded Sword',
+					damageTypes: JSON.stringify({
+						slashing: 0,
+						piercing: 0,
+						blunt: 0,
+					}),
+					minDamage: 10,
+					maxDamage: 20,
+					bonuses: JSON.stringify({
+						attributes: {
+							strength: 1,
+							dexterity: 1,
+							agility: 1,
+						},
+						skills: {
+							twohanded: 1,
+						},
+					}),
+					weight: 10,
+					sellValue: 50,
+					weaponSkill: 'twohanded',
+
+					location: 'inventory',
+					keywords: ['training', 'twohanded', 'sword', 'training twohanded', 'twohanded sword', 'training twohanded sword'],
+					description: 'A Training Twohanded Sword',
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
