@@ -11,7 +11,7 @@ module.exports = {
 			},
 			templateType: { type: Sequelize.STRING },
 			name: { type: Sequelize.STRING },
-			damageType: { type: Sequelize.ARRAY(Sequelize.DataTypes.STRING) },
+			damageTypes: { type: Sequelize.JSONB },
 			minDamageMin: { type: Sequelize.INTEGER },
 			maxDamageMin: { type: Sequelize.INTEGER },
 			minDamageMax: { type: Sequelize.INTEGER },
@@ -19,7 +19,7 @@ module.exports = {
 			bonuses: { type: Sequelize.JSONB },
 			weight: { type: Sequelize.INTEGER },
 			sellValue: { type: Sequelize.INTEGER },
-			isTwoHanded: { type: Sequelize.BOOLEAN },
+			weaponSkill: { type: Sequelize.STRING },
 			keywords: { type: Sequelize.ARRAY(Sequelize.DataTypes.STRING) },
 			description: { type: Sequelize.STRING },
 

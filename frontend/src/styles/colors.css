@@ -11,8 +11,22 @@
 .blue {
     color: blue;
 }
+.light-blue {
+	color: rgb(163, 247, 255);
+}
+
+.slashing {
+    color: rgb(183, 202, 255);
+}
+.piercing {
+    color: rgb(255, 212, 190);
+}
+.blunt {
+    color: rgb(143, 111, 91);
+}
+
 .parchment {
-    color: rgb(252, 252, 181)
+    color: rgb(252, 252, 181);
 }
 
 .trainingHallsBasement {

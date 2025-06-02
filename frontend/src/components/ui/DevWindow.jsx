@@ -3,7 +3,7 @@ import { createEnemy, enemyDies, enemyTakesDamage, fetchAllEnemies, fetchEnemies
 import { useContext, useState } from 'react'
 import { fetchCurrentArea } from '../../fetches/areas/areas'
 import { zGameContext } from './zGameContext'
-import { fetchAllItemsThatBelongToPlayer, fetchCreateCrossbow, fetchCreateDagger, fetchCreateItem, fetchCreateOnehandedSword, fetchCreateTwohandedSword, fetchCurrentAreaItems, fetchDeleteAllItems, fetchEveryItem, fetchPlayerUnpacksItem } from '../../fetches/items/items'
+import { fetchAllItemsThatBelongToPlayer, fetchCreateCrossbow, fetchCreateDagger, fetchCreateOnehandedSword, fetchCreateTwohandedSword, fetchCurrentAreaItems, fetchDeleteAllItems, fetchEveryItem } from '../../fetches/items/items'
 // import { pickupItem, joshTest } from "../../websocket"
 
 import { getPlayer1, getPlayer2, playerGainsExperienceRequest } from '../../fetches/players/players'
@@ -11,7 +11,6 @@ import { fetchIncreasePlayerExperience } from '../../fetches/players/players'
 import { fetchGameData } from '../../fetches/gameData/gameData'
 import { WebSocketContext } from './WebSocketContext'
 import { enemySpawnsSender } from '../../senders/sendersEnemy'
-import { playerUpdateAllAttributesSender } from '../../services/servicesPlayer'
 
 export const DevWindow = () => {
 	const { gameData, setGameData, addLog, playerStatus } = useContext(zGameContext)
@@ -206,10 +205,6 @@ export const DevWindow = () => {
 		}))
 		addLog(data.message)
 	}
-	async function playerUnpacksItem() {
-		const playerId = player.id
-		const data = await fetchPlayerUnpacksItem(playerId)
-	}
 
 	function playerCheckGameStatus() {
 		console.log(playerStatus)
@@ -232,9 +227,6 @@ export const DevWindow = () => {
 	return (
 		<Container className="d-flex">
 			<Row className="d-flex align-content-start">
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={() => playerUpdateAllAttributesSender(player.id, ws)}>
-					Retrieve Player Stats
-				</button>
 				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={enemySpawnsDev}>
 					Spawn enemy
 				</button>

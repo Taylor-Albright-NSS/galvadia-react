@@ -23,13 +23,13 @@ module.exports = {
 			ownerType: { type: Sequelize.STRING },
 
 			name: { type: Sequelize.STRING },
-			damageType: { type: Sequelize.ARRAY(Sequelize.DataTypes.STRING) },
+			damageTypes: { type: Sequelize.JSONB },
 			minDamage: { type: Sequelize.INTEGER },
 			maxDamage: { type: Sequelize.INTEGER },
 			bonuses: { type: Sequelize.JSONB },
 			weight: { type: Sequelize.INTEGER },
 			sellValue: { type: Sequelize.INTEGER },
-			isTwoHanded: { type: Sequelize.BOOLEAN },
+			weaponSkill: { type: Sequelize.STRING },
 			description: { type: Sequelize.STRING },
 
 			location: { type: Sequelize.STRING },

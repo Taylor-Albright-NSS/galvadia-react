@@ -77,7 +77,7 @@ export const areaDisplay = (area, enemies, npcs, items, players) => {
 					<p>Enemies: </p>
 					{enemies.map((enemy, index) => {
 						return (
-							<p className="mx-1 green" key={index}>
+							<p className="mx-1 red" key={index}>
 								{enemy.name}
 							</p>
 						)

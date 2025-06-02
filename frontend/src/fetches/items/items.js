@@ -77,40 +77,40 @@ export const fetchDeleteAllItems = async () => {
     return data
 }
 
-export const fetchPlayerUnpacksItem = async (playerId, itemId) => {
-    try {
-        const response = await fetch(`${api}/item/unpack/${playerId}/${itemId}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        if (!response.ok) {
-            throw new Error({message: "Not sure what's going on"})
-        }
-        const data = await response.json()
-        return data
-    } catch(error) {
-        console.error(`Internal error: `, error.message)
-    }
-}
-export const fetchPlayerPacksItem = async (playerId, itemId) => {
-    try {
-        const response = await fetch(`${api}/item/pack/${playerId}/${itemId}`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        })
-        if (!response.ok) {
-            throw new Error({message: "Not sure what's going on"})
-        }
-        const data = await response.json()
-        return data
-    } catch(error) {
-        console.error(`Internal error: `, error.message)
-    }
-}
+// export const fetchPlayerUnpacksItem = async (playerId, itemId) => {
+//     try {
+//         const response = await fetch(`${api}/item/unpack/${playerId}/${itemId}`, {
+//             method: "PATCH",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             }
+//         })
+//         if (!response.ok) {
+//             throw new Error({message: "Not sure what's going on"})
+//         }
+//         const data = await response.json()
+//         return data
+//     } catch(error) {
+//         console.error(`Internal error: `, error.message)
+//     }
+// }
+// export const fetchPlayerPacksItem = async (playerId, itemId) => {
+//     try {
+//         const response = await fetch(`${api}/item/pack/${playerId}/${itemId}`, {
+//             method: "PATCH",
+//             headers: {
+//                 "Content-Type": "application/json"
+//             }
+//         })
+//         if (!response.ok) {
+//             throw new Error({message: "Not sure what's going on"})
+//         }
+//         const data = await response.json()
+//         return data
+//     } catch(error) {
+//         console.error(`Internal error: `, error.message)
+//     }
+// }
 
 export const fetchPlayerDropsItem = async (areaId, itemId) => {
     try {

@@ -1,5 +1,13 @@
+import { bowSwing } from "../flavorText/weaponSwings/bow"
+import { daggerSwing } from "../flavorText/weaponSwings/dagger"
+import { enemyDeath } from "../flavorText/weaponSwings/enemyDeath"
+import { onehandedSwing } from "../flavorText/weaponSwings/onehanded"
+import { twohandedSwing } from "../flavorText/weaponSwings/twohanded"
+import { unarmedSwing } from "../flavorText/weaponSwings/unarmed"
+
 export const enemyTakesDamageSetter = (data, setGameData, addLog) => {
-    const { enemy, damage } = data
+    const { enemy, damageObject } = data
+    console.log(data, " data coming from enemyTakesDamageSetter")
     setGameData(prev => ({
         ...prev,
         enemies: prev.enemies.map(prevEnemy => {
@@ -13,10 +21,16 @@ export const enemyTakesDamageSetter = (data, setGameData, addLog) => {
             }
         })
     }))
-    addLog(`You deal ${damage} damage to the ${enemy.name}!`)
+    let message
+    if (damageObject.weapon.Weapon.weaponSkill === 'unarmed') message = unarmedSwing(damageObject)
+    if (damageObject.weapon.Weapon.weaponSkill === 'onehanded') message = onehandedSwing(damageObject)
+    if (damageObject.weapon.Weapon.weaponSkill === 'twohanded') message = twohandedSwing(damageObject)
+    if (damageObject.weapon.Weapon.weaponSkill === 'dagger') message = daggerSwing(damageObject)
+    if (damageObject.weapon.Weapon.weaponSkill === 'bow') message = bowSwing(damageObject)
+    addLog(message)
 }
 export const enemyDiesSetter = (data, setGameData, addLog) => {
-    const { enemy, damage, experience, loot } = data
+    const { enemy, experience, loot } = data
     console.log(loot, " LOOT")
     console.log(experience, " EXPERIENCE")
     setGameData(prev => ({
@@ -28,11 +42,12 @@ export const enemyDiesSetter = (data, setGameData, addLog) => {
         items: [...prev.items, ...loot],
         enemies: prev.enemies.filter(prevEnemy => prevEnemy.id !== enemy.id)
     }))
-    addLog(`You deal ${damage} damage to the ${enemy.name}!`)
-    addLog(`${enemy.name} dies!`)
-    loot.forEach(item => {
-        addLog(`Enemy drops ${item.name}!`)
-    })
+    const enemyDeathMessage = enemyDeath(enemy, experience, loot)
+    addLog(enemyDeathMessage)
+    // addLog(`The ${enemy.name} !`)
+    // loot.forEach(item => {
+    //     addLog(`Enemy drops ${item.name}!`)
+    // })
 }
 
 export const enemySpawnsSetter = (data, setGameData, addLog) => {

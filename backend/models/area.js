@@ -5,43 +5,23 @@ import { sequelize } from '../config/db.js'
 class Area extends Model {}
 
 Area.init(
-  {
-    id: {
-      type: DataTypes.INTEGER,  // Define the type as integer
-      primaryKey: true,         // Mark this field as the primary key
-      autoIncrement: true,      // Auto increment the ID
-    },
-    name: {
-      type: DataTypes.STRING,
-    },
-    heading: {
-      type: DataTypes.STRING,
-    },
-    headingColor: {
-      type: DataTypes.STRING,
-    },
-    description: {
-      type: DataTypes.TEXT,
-    },
-    exitsBool: {
-      type: DataTypes.JSON,
-      defaultValue: {}
-    },
-    x: {
-      type: DataTypes.INTEGER,
-    },
-    y: {
-      type: DataTypes.INTEGER,
-    },
-    z: {
-      type: DataTypes.INTEGER,
-    },
-  }, 
-  {
-    sequelize,
-    modelName: 'Area',
-    timestamps: true,
-  }
+	{
+		id: { type: DataTypes.INTEGER, primaryKey: true },
+		name: { type: DataTypes.STRING },
+		heading: { type: DataTypes.STRING },
+		headingColor: { type: DataTypes.STRING },
+		description: { type: DataTypes.TEXT },
+		exitsBool: { type: DataTypes.JSON, defaultValue: {} },
+		x: { type: DataTypes.INTEGER },
+		y: { type: DataTypes.INTEGER },
+		z: { type: DataTypes.INTEGER },
+		s: { type: DataTypes.STRING },
+	},
+	{
+		sequelize,
+		modelName: 'Area',
+		timestamps: true,
+	}
 )
 
 export default Area

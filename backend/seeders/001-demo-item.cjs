@@ -14,6 +14,17 @@ module.exports = {
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},
+				{
+					name: 'Leather Armor',
+					ownerId: 1,
+					ownerType: 'player',
+					templateId: 1,
+					templateType: 'armor',
+					location: 'inventory',
+					keywords: ['leather armor', 'leather', 'armor'],
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
 			],
 			{}
 		)
