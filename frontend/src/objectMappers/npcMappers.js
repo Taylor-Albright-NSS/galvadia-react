@@ -7,7 +7,7 @@ export const npcSpeakMapper = {
         const playerNpc = await fetchPlayerNpcRelationship(playerId, npcId, areaId)
         if (playerNpc.dialogueStage === 1) {
             console.log(playerNpc, " playerNPC")
-            fetchCreatePlayerArea(playerId, npcId, areaId)
+            await fetchCreatePlayerArea(playerId, npcId, areaId)
             // ws.send(JSON.stringify({ type: "playerAction", action: "playerSpeaksToNpc"}))
         }
     }

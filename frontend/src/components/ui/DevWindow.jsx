@@ -6,7 +6,7 @@ import { zGameContext } from './zGameContext'
 import { fetchAllItemsThatBelongToPlayer, fetchCreateCrossbow, fetchCreateDagger, fetchCreateOnehandedSword, fetchCreateTwohandedSword, fetchCurrentAreaItems, fetchDeleteAllItems, fetchEveryItem } from '../../fetches/items/items'
 // import { pickupItem, joshTest } from "../../websocket"
 
-import { getPlayer1, getPlayer2, playerGainsExperienceRequest } from '../../fetches/players/players'
+import { getPlayer1, getPlayer2 } from '../../fetches/players/players'
 import { fetchIncreasePlayerExperience } from '../../fetches/players/players'
 import { fetchGameData } from '../../fetches/gameData/gameData'
 import { WebSocketContext } from './WebSocketContext'
@@ -163,7 +163,7 @@ export const DevWindow = () => {
 		const experienceGain = 100
 		const playerPreviousLevel = player.level
 		console.log(playerPreviousLevel, ' playerPreviousLevel')
-		const updatedPlayer = await playerGainsExperienceRequest(ws, playerId, experienceGain)
+		const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
 		// const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
 		if (updatedPlayer) {
 			addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
@@ -182,7 +182,7 @@ export const DevWindow = () => {
 		const experienceGain = -100
 		const playerPreviousLevel = player.level
 		console.log(playerPreviousLevel, ' playerPreviousLevel')
-		const updatedPlayer = await playerGainsExperienceRequest(ws, playerId, experienceGain)
+		const updatedPlayer = await fetchIncreasePlayerExperience(ws, playerId, experienceGain)
 		// const updatedPlayer = await fetchIncreasePlayerExperience(ws, playerId, experienceGain)
 		if (updatedPlayer) {
 			addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
