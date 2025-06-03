@@ -36,7 +36,8 @@ export const playerOffersQuest = async commandObject => {
 	}
 	if (npcs.length > 1) {
 		const foundNpc = findNpcByName(npcs, command2)
-		const npcName = foundNpc.Npc.name
+		console.log(foundNpc)
+		const npcName = foundNpc?.Npc.name
 		body.npcId = foundNpc.id
 		const questOffering = await questRequirementCheck(body)
 		if (questOffering.message === '404') {
@@ -82,6 +83,7 @@ export const playerSpeaksToNpcService = async commandObject => {
 		console.log(foundNpc)
 		playerSpeaksToNpcSender(player.id, foundNpc.Npc.id, currentArea.id, ws)
 		if (foundNpc.Npc.speakInteraction) {
+			console.log("FOUNDNP . NPC . SPEAK INTERACTION FOUND")
 			npcSpeakMapper[foundNpc.Npc.name](player.id, foundNpc.Npc.id, currentArea.id, ws)
 		}
 

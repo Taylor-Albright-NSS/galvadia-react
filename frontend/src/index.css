@@ -81,3 +81,9 @@ button:focus-visible {
   margin-top: 9px;
   margin-bottom: 9px;
 }
+
+.npc-dialogue {
+  display: block;
+  margin-top: 9px;
+  margin-bottom: 9px;
+}

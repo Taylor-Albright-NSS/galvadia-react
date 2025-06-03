@@ -5,7 +5,8 @@ import { playerAdvancesEnemySetter, playerLooksSetter, playerRetreatsSetter, pla
 import { enemyDiesSetter, enemySpawnsSetter, enemyTakesDamageSetter } from '../../setters/settersEnemy'
 import { areaCurrentAreaItemsSetter, itemToPlayerSetter } from '../../setters/settersArea'
 import { playerEquipsArmorSetter, playerPacksItemSetter, playerPicksUpAllItemsSetter, playerPicksUpItemSetter, playerRemovesArmorSetter, playerUnpacksItemSetter } from '../../setters/settersItem'
-import { keywordActivationSetter, keywordAlreadyActivated } from '../../setters/settersKeyword'
+import { keywordActivationSetter, keywordAlreadyActivated, keywordItemToPlayerSetter } from '../../setters/settersKeyword'
+import { npcMovesSetter } from '../../setters/settersNpc'
 
 export const WebSocketProvider = ({ children }) => {
 	const wsRef = useRef(null)
@@ -55,10 +56,16 @@ export const WebSocketProvider = ({ children }) => {
 				if (data.action === 'playerPicksUpAllItems') {playerPicksUpAllItemsSetter(data, setGameData, addLog)}
 				if (data.action === 'playerAttackHitsEnemy') {enemyTakesDamageSetter(data, setGameData, addLog)}
 			}
+			if (data.type === 'npcEvent') {
+				if (data.action === 'npcMoves') {
+					npcMovesSetter(data, setGameData, addLog)
+				}
+			}
 			if (data.type === 'keyword') {
 				console.log(data.action, " DATA ACTION")
 				if (data.action === 'activateSuccess') keywordActivationSetter(data, addLog)
 				if (data.action === 'activateFail') keywordAlreadyActivated(data, addLog)
+				if (data.action === 'itemToPlayer') keywordItemToPlayerSetter(data, setGameData, addLog)
 			}
 			if (data.type === 'error') {
 				console.log(data)
