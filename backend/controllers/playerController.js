@@ -180,29 +180,18 @@ export const createPlayer = async (req, res) => {
 	}
 }
 
-export const playerGainsExperience = async data => {
-	const { playerId, experienceGain } = data
+export const playerGainsExperience = async (req, res) => {
+	const { playerId } = req.params
+	const { experienceGain } = req.body
 	const player = await Player.findByPk(playerId)
 	if (!player) {
 		return res.status(404).json({ message: 'Player not found' })
 	}
 	player.experience = Math.max(player.experience + experienceGain, 0)
 	player.level = player.levelCalc
-	await player.save()
-	return player
+	player.save()
+	return res.status(200).json(player)
 }
-// export const playerGainsExperience = async (req, res) => {
-//   const { playerId } = req.params
-//   const { experienceGain } = req.body
-//   const player = await Player.findByPk(playerId)
-//   if (!player) {
-//     return res.status(404).json({message: "Player not found"})
-//   }
-//   player.experience = Math.max(player.experience + experienceGain, 0)
-//   player.level = player.levelCalc
-//   player.save()
-//   return res.status(200).json(player)
-// }
 
 export const getPlayer1API = async (req, res) => {
 	try {

@@ -22,22 +22,35 @@ export const getCurrentAreaNpcs = async (req, res) => {
 	try {
 		const { areaId, playerId } = req.params
 		// console.log(areaId, " get current area npcs -> area id")
-		const playerNpcs = await PlayerNpc.findAll({ where: { area_id: areaId, playerId: playerId } })
+		const playerNpcs = await PlayerNpc.findAll({ where: { playerId: playerId } })
 		const allNpcs = await Npc.findAll({ where: { area_id: areaId } })
 		//filters npcs that the player has not yet interacted with
 		const missingNpcs = allNpcs.filter(npc => !playerNpcs.some(playerNpc => playerNpc.npcId === npc.id))
 		const newPlayerNpcs = await Promise.all(
-			missingNpcs.map(npc => {
-				PlayerNpc.create({
-					playerId: playerId,
-					npcId: npc.id,
-					area_id: areaId,
-					// dialogueStage: npc.dialogueStage,
-					// dialogueIndex: npc.dialogueIndex,
-					// questStage: npc.questStage,
-				})
+			missingNpcs.map(async npc => {
+				//Might not work, delete below if doesn't work
+				const modelNpc = Npc.findByPk(npc.id)
+				if (modelNpc.behavior === 'event') {
+					console.log(1)
+					await PlayerNpc.create({ name: npc.name, playerId: playerId, npcId: npc.id, area_id: areaId, eventStage: 1 })
+				} else {
+					await PlayerNpc.create({ name: npc.name, playerId: playerId, npcId: npc.id, area_id: areaId })
+				}
+				//Might not work, delete above if doesn't work
+
+				// PlayerNpc.create({
+				// 	playerId: playerId,
+				// 	npcId: npc.id,
+				// 	area_id: areaId,
+				// 	// dialogueStage: npc.dialogueStage,
+				// 	// dialogueIndex: npc.dialogueIndex,
+				// 	// questStage: npc.questStage,
+				// })
 			})
 		)
+		if (!newPlayerNpcs) {
+			return res.status(404).json({ error: `PlayerNpcs not found` })
+		}
 
 		const updatedPlayerNpcs = await PlayerNpc.findAll({
 			where: { area_id: areaId, playerId },
@@ -69,7 +82,14 @@ export const getNpcQuestDialogue = async (req, res) => {
 
 	//If the player_npc relationship does not exist, create one and reassign its value to playerNpc
 	if (!playerNpc && npcId > 0 && playerId > 0) {
-		playerNpc = await PlayerNpc.create({ playerId: playerId, npcId: npcId })
+		const modelNpc = await Npc.findByPk(npcId)
+		console.log(3)
+
+		if (modelNpc.behavior === 'event') {
+			playerNpc = await PlayerNpc.create({ name: modelNpc.name, playerId: playerId, npcId: npcId, eventStage: 1 })
+		} else {
+			playerNpc = await PlayerNpc.create({ name: modelNpc.name, playerId: playerId, npcId: npcId })
+		}
 	}
 	if (!playerNpc && (isNaN(npcId) || isNaN(playerId))) {
 		return res.status(404).json({ message: 'PlayerNpc not found' })
@@ -107,14 +127,21 @@ export const getNpcDialogue = async (req, res) => {
 	const { playerId } = req.query
 	let playerNpc = await PlayerNpc.findOne({
 		where: {
-			playerId: playerId,
-			npcId: npcId,
+			playerId,
+			npcId,
 		},
 	})
 
-	//If the player_npc relationship does not exist, create one and reassign its value to playerNpc
+	//If the PlayerNpc relationship does not exist, create one and reassign its value to playerNpc
 	if (!playerNpc && npcId > 0 && playerId > 0) {
-		playerNpc = await PlayerNpc.create({ playerId: playerId, npcId: npcId })
+		const modelNpc = await Npc.findByPk(npcId)
+		console.log(4)
+
+		if (modelNpc.behavior === 'event') {
+			playerNpc = await PlayerNpc.create({ name: modelNpc.name, playerId: playerId, npcId: npcId, eventStage: 1 })
+		} else {
+			playerNpc = await PlayerNpc.create({ name: modelNpc.name, playerId: playerId, npcId: npcId })
+		}
 	}
 	if (!playerNpc && (isNaN(npcId) || isNaN(playerId))) {
 		return res.status(404).json({ message: 'PlayerNpc not found' })
@@ -156,67 +183,81 @@ export const getNpcQuest = async (req, res) => {
 	return res.status(200).json(quest)
 }
 
-export const postNpcRequirements = async (req, res) => {
-	const { npcId, playerId, playerLevel, playerInventory, playerKillList } = req.body
-	let playerNpc = await PlayerNpc.findOne({ where: { playerId: playerId, npcId: npcId } })
+// export const postNpcRequirements = async (req, res) => {
+// 	const { npcId, playerId, playerLevel, playerInventory, playerKillList } = req.body
+// 	try {
+// 		let playerNpc = await PlayerNpc.findOne({ where: { playerId, npcId } })
 
-	// if (!playerNpc && (npcId > 0 && playerId > 0)) {
-	//   playerNpc = await PlayerNpc.create({playerId: playerId, npcId: npcId})
-	// }
-	// if (!playerNpc && (isNaN(npcId) || isNaN(playerId))) {
-	//   return res.status(404).json({message: "PlayerNpc not found"})
-	// }
+// 		let playersRequiredItems
+// 		if (!playerNpc) {
+// 			const modelNpc = await Npc.findByPk(npcId)
+// 			let playerNpc
+// 			console.log(5)
 
-	let playersRequiredItems
-	if (!playerNpc) {
-		playerNpc = await PlayerNpc.create({ playerId: playerId, npcId: npcId })
-		// return res.status(404).json({message: "Player_Npc relationship not found"})
-	}
-	const quest = await NpcQuest.findOne({ where: { npcId, questStage: playerNpc.questStage } })
-	if (!quest) {
-		return res.status(404).json({ message: '404' })
-	}
+// 			if (modelNpc.behavior === 'event') {
+// 				playerNpc = await PlayerNpc.create({ playerId: playerId, npcId: npcId, eventStage: 1 })
+// 			} else {
+// 				playerNpc = await PlayerNpc.create({ playerId: playerId, npcId: npcId })
+// 			}
+// 			// return res.status(404).json({message: "Player_Npc relationship not found"})
+// 		}
+// 		const quest = await NpcQuest.findOne({ where: { npcId, questStage: playerNpc.questStage } })
+// 		if (!quest) {
+// 			throw new Error(`Quest not found`)
+// 			// return res.status(404).json({ message: '404' })
+// 		}
 
-	if (playerLevel < quest.requirements.requiredLevel) {
-		return res.status(400).json({ message: 'level' })
-	}
+// 		if (playerLevel < quest.requirements.requiredLevel) {
+// 			return res.status(400).json({ message: 'level' })
+// 		}
+// 		if (quest.requirements.requiredItems) {
+// 			const hasRequiredItem = quest.requirements.requiredItems.every(item => {
+// 				console.log(item, ' ITEM')
+// 				return playerInventory.some(invItem => {
+// 					console.log(invItem.name, ' INV ITEM NAME')
+// 					return invItem.name === item
+// 				})
+// 			})
+// 			console.log(hasRequiredItem)
 
-	if (quest.requirements.requiredItems) {
-		const hasRequiredItem = quest.requirements.requiredItems.every(item => playerInventory.some(invItem => invItem.name.includes(item)))
-		playersRequiredItems = quest.requirements.requiredItems.map(itemName => playerInventory.find(item => item.name == itemName)).filter(Boolean)
-		if (!hasRequiredItem) {
-			return res.status(400).json({ message: 'item' })
-		}
-		if (!playersRequiredItems) {
-			return res.status(400).json({ message: 'required items not met' })
-		}
-		await Promise.all(
-			playersRequiredItems.map(async item => {
-				const itemToDestroy = await Item.findOne({ where: { id: item.id } })
-				if (itemToDestroy) {
-					await itemToDestroy.destroy()
-				}
-			})
-		)
-	}
-	const player = await Player.findByPk(playerId)
-	if (!player) {
-		return res.status(404).json({ message: 'Player not found' })
-	}
+// 			playersRequiredItems = quest.requirements.requiredItems.map(itemName => playerInventory.find(item => item.name == itemName)).filter(Boolean)
+// 			if (!hasRequiredItem) {
+// 				throw new Error(`Player does not have required item 1`)
+// 			}
+// 			if (!playersRequiredItems) {
+// 				throw new Error(`Player does not have required item 2`)
+// 			}
+// 			await Promise.all(
+// 				playersRequiredItems.map(async item => {
+// 					const itemToDestroy = await Item.findOne({ where: { id: item.id } })
+// 					if (itemToDestroy) {
+// 						await itemToDestroy.destroy()
+// 					}
+// 				})
+// 			)
+// 		}
+// 		console.log(2)
+// 		const player = await Player.findByPk(playerId)
+// 		if (!player) {
+// 			return res.status(404).json({ message: 'Player not found' })
+// 		}
 
-	player.gold += quest.rewards.gold || 0
-	player.experience += quest.rewards.experience || 0
-	player.skillPoints += quest.rewards.skillPoints || 0
-	player.attributePoints += quest.rewards.attributePoints || 0
-	playerNpc.questStage++
-	console.log('activation should happen here')
-	questCompleteActivateSomething(playerNpc)
+// 		player.gold += quest.rewards.gold || 0
+// 		player.experience += quest.rewards.experience || 0
+// 		player.skillPoints += quest.rewards.skillPoints || 0
+// 		player.attributePoints += quest.rewards.attributePoints || 0
+// 		playerNpc.questStage++
+// 		console.log('activation should happen here')
+// 		questCompleteActivateSomething(playerNpc)
 
-	await player.save()
-	await playerNpc.save()
+// 		await player.save()
+// 		await playerNpc.save()
 
-	return res.status(200).json({ player, completionDialogue: quest.completionDialogue })
-}
+// 		return res.status(200).json({ player, completionDialogue: quest.completionDialogue })
+// 	} catch (error) {
+// 		console.error(`Error: `, error)
+// 	}
+// }
 
 export const patchDecrementQuestStage = async (req, res) => {
 	const { npcId, playerId } = req.params
@@ -237,4 +278,34 @@ export const patchIncrementQuestStage = async (req, res) => {
 	playerNpc.questStage = playerNpc.questStage + 1
 	playerNpc.save()
 	return res.status(200).json({ message: `quest stage incremented to ${playerNpc.questStage}` })
+}
+export const patchPlayerNpcDecrementDialogueStage = async (req, res) => {
+	try {
+		const { playerId, npcId } = req.params
+		const playerNpc = await PlayerNpc.findOne({ where: { npcId, playerId } })
+		if (!playerNpc) {
+			return res.status(404).json({ message: `PlayerNpc not found` })
+		}
+		playerNpc.dialogueStage = Math.max(playerNpc.dialogueStage - 1, 0)
+		await playerNpc.save()
+		return res.status(200).json({ message: `dialogue stage of npcId: ${npcId} decremented to ${playerNpc.dialogueStage}` })
+	} catch (error) {
+		console.error(`Error: `, error)
+		return res.status(500).json({ message: `An unexpected error has occurred` })
+	}
+}
+export const patchPlayerNpcIncrementDialogueStage = async (req, res) => {
+	try {
+		const { playerId, npcId } = req.params
+		const playerNpc = await PlayerNpc.findOne({ where: { npcId, playerId } })
+		if (!playerNpc) {
+			return res.status(404).json({ message: `PlayerNpc not found` })
+		}
+		playerNpc.dialogueStage = Math.max(playerNpc.dialogueStage + 1, 0)
+		await playerNpc.save()
+		return res.status(200).json({ message: `dialogue stage of npcId: ${npcId} incremented to ${playerNpc.dialogueStage}` })
+	} catch (error) {
+		console.error(`Error: `, error)
+		return res.status(500).json({ message: `An unexpected error has occurred` })
+	}
 }

@@ -6,23 +6,38 @@ import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playe
 import db from './models/associations.js'
 import cors from 'cors'
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js'
-import { getCurrentAreaNpcs, getNpcById, getNpcDialogue, getEveryNpc, getNpcDialogueAll, getNpcQuestDialogue, getNpcQuest, postNpcRequirements, patchDecrementQuestStage, patchIncrementQuestStage, getPlayerNpcRelationship } from './controllers/npcController.js'
+import {
+	getCurrentAreaNpcs,
+	getNpcById,
+	getNpcDialogue,
+	getEveryNpc,
+	getNpcDialogueAll,
+	getNpcQuestDialogue,
+	getNpcQuest,
+	patchDecrementQuestStage,
+	patchIncrementQuestStage,
+	getPlayerNpcRelationship,
+	patchPlayerNpcDecrementDialogueStage,
+	patchPlayerNpcIncrementDialogueStage,
+} from './controllers/npcController.js'
 import { createEnemy, deleteEnemy, enemySpawns, enemyTakesDamage, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './controllers/enemyController.js'
 import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, postOnehandedSword, postSpawnItemToPlayer, postTwohandedSword, putCurrentAreaItemsToPlayer } from './controllers/itemController.js'
 import { app } from './websocket.js'
 import { getUser } from './controllers/userController.js'
 import { patchKeywordActivation, patchToggleKeywordFalse } from './controllers/keywordController.js'
 import { getGameData } from './controllers/gameStateController.js'
-import { playerSpeaksNpcUnlocksDirection } from './controllerServices/playerActionsServices.js'
+// import { playerSpeaksNpcUnlocksDirection } from './controllerServices/playerActionsServices.js'
 
 app.use(express.json())
 app.use(cors())
 //--------ROUTE TESTING
 app.get('/npcquest/:npcId/:playerId', getNpcQuest)
+app.patch(`/dialoguestage/:playerId/:npcId/decrement`, patchPlayerNpcDecrementDialogueStage)
+app.patch(`/dialoguestage/:playerId/:npcId/increment`, patchPlayerNpcIncrementDialogueStage)
 //--------GAME DATA
 app.get('/gamedata/:playerId/:areaId', getGameData)
 //--------NPC QUEST
-app.post('/questcomplete', postNpcRequirements)
+// app.post('/questcomplete', postNpcRequirements)
 app.patch('/queststage/decrement/:npcId/:playerId', patchDecrementQuestStage)
 app.patch('/queststage/increment/:npcId/:playerId', patchIncrementQuestStage)
 //--------NPC DIALOGUE
@@ -55,7 +70,7 @@ app.get('/npcs/:areaId/:playerId', getCurrentAreaNpcs)
 app.get('/npc/:id', getNpcById)
 app.get('/npc/:id/dialogue', getNpcDialogue)
 app.get('/playernpcrelationship/', getPlayerNpcRelationship)
-app.post('/createplayernpcrelationship', playerSpeaksNpcUnlocksDirection)
+// app.post('/createplayernpcrelationship', playerSpeaksNpcUnlocksDirection)
 //--------PLAYERS
 //(SINGLE)
 // app.patch('/player/:id/coordinates', playerRoomTransition)
@@ -91,8 +106,8 @@ app.post('/areas', async (req, res) => {
 	}
 })
 //--------KEYWORDS
-app.patch('/keywordActivation/', patchKeywordActivation)
-app.patch('/keywordActivation/:keywordId', patchToggleKeywordFalse)
+// app.patch('/keywordActivation/', patchKeywordActivation)
+// app.patch('/keywordActivation/:keywordId', patchToggleKeywordFalse)
 //--------ENEMIES
 app.delete('/enemy/:id', deleteEnemy)
 app.post('/enemy/:areaId', enemySpawns)

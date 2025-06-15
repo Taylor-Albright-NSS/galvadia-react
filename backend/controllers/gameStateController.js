@@ -27,15 +27,18 @@ export const getGameData = async data => {
 		const enemies = await Enemy.findAll({ where: { area_id: areaId } })
 		const itemsInArea = await Item.findAll({ where: { ownerId: areaId, ownerType: 'area' } })
 		const players = await Player.findAll({ where: { area_id: areaId, id: { [Op.ne]: playerId } } })
-		const playerNpcs = await PlayerNpc.findAll({ where: { area_id: areaId, playerId: playerId } })
+		const playerNpcs = await PlayerNpc.findAll({ where: { playerId } })
 		const allNpcs = await Npc.findAll({ where: { area_id: areaId } })
 		const missingNpcs = allNpcs.filter(npc => !playerNpcs.some(playerNpc => playerNpc.npcId === npc.id))
+		console.log(2)
 		await Promise.all(
-			missingNpcs.map(npc => {
-				PlayerNpc.create({
+			missingNpcs.map(async npc => {
+				await PlayerNpc.create({
+					name: npc.name,
 					playerId: playerId,
 					npcId: npc.id,
 					area_id: areaId,
+					behavior: npc.behavior,
 					// dialogueStage: npc.dialogueStage,
 					// dialogueIndex: npc.dialogueIndex,
 					// questStage: npc.questStage,

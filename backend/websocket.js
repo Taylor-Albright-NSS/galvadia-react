@@ -6,6 +6,9 @@ import { handlePlayerAction, handlePlayerModify } from './controllerHandlers/pla
 import { handleEnemyAction } from './controllerHandlers/enemyActionsHandler.js'
 import { handlePlayerDataRetrieval } from './controllerHandlers/playerRetrieveDataHandler.js'
 import { handleKeywordActions } from './controllerHandlers/keywordActionsHandler.js'
+import { handleItemAction } from './controllerHandlers/itemActionsHandler.js'
+import { handleAdminActions } from './controllerHandlers/adminActionsHandler.js'
+import { handleQuestActions } from './controllerHandlers/questActionsHandler.js'
 
 export const app = express()
 export const server = http.createServer(app)
@@ -20,6 +23,12 @@ wss.on('connection', ws => {
 			data = JSON.parse(message)
 		} catch (error) {
 			return ws.send(JSON.stringify({ error: 'Failed to parse data' }))
+		}
+		if (data.type === 'admin') {
+			handleAdminActions(data, ws)
+		}
+		if (data.type === 'quest') {
+			handleQuestActions(data, ws)
 		}
 		if (data.type === 'playerAction') {
 			handlePlayerAction(data, ws, wss)

@@ -7,6 +7,7 @@ module.exports = {
 			area_id: { type: Sequelize.INTEGER, allowNull: false },
 			name: { type: Sequelize.STRING, allowNull: false },
 			speakInteraction: { type: Sequelize.BOOLEAN },
+			behavior: { type: Sequelize.STRING },
 			createdAt: { type: Sequelize.DATE, allowNull: false },
 			updatedAt: { type: Sequelize.DATE, allowNull: false },
 		})

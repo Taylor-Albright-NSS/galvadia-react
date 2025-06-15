@@ -51,3 +51,9 @@ for (const swing of swingResults) {
   const damage = gamePlayer.calculateDamageAgainst(enemy, weapon)
   enemy.health = Math.max(enemy.health - damage, 0)
 }
+
+
+keyword = {
+  name: 'keyword',
+  event: 'lever',
+}

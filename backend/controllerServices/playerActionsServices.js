@@ -15,6 +15,7 @@ import Weapon from '../models/weapon.js'
 import { NpcDialogue } from '../models/npcDialogue.js'
 import Armor from '../models/armor.js'
 import { playerUpdateAllAttributes } from '../utils/calculations/calculationsPlayer.js'
+import { npcMapper } from '../utils/npcUtils.js'
 
 export const playerRoomTransitionService = async (data, ws, wss) => {
 	console.log('WEBSOCKET PLAYER ROOM TRANSITION')
@@ -128,65 +129,81 @@ export const playerRemovesArmorService = async (data, ws) => {
 
 export const playerSpeaksToNpcService = async (data, ws) => {
 	const { playerId, npcId, areaId } = data
-	console.log(playerId, npcId, ' playerId --- npcId')
-	let playerNpc = await PlayerNpc.findOne({ where: { playerId, npcId } })
-
-	if (!playerNpc && playerId > 0) {
-		playerNpc = await PlayerNpc.create({ playerId, npcId, area_id: areaId })
-	}
-
-	if (!playerNpc && (isNaN(playerId) || isNaN(npcId))) {
-		return ws.send(JSON.stringify({ type: 'error', message: 'Invalid playerNpc' }))
-	}
-
-	const npcDialogue = await NpcDialogue.findOne({
-		where: {
-			npcId,
-			dialogueStage: playerNpc.dialogueStage,
-		},
-	})
-
-	if (!npcDialogue) {
-		return ws.send(JSON.stringify({ type: 'error', message: 'Dialogue not found' }))
-	}
-
-	const npc = await Npc.findByPk(npcId)
-
-	if (!npc) {
-		return ws.send(JSON.stringify({ type: 'error', message: 'Npc not found' }))
-	}
-
-	const dialogueArray = npcDialogue.dialogue
-	const dialogueIndex = playerNpc.dialogueIndex % dialogueArray.length
-	const dialogue = dialogueArray[dialogueIndex]
-	playerNpc.dialogueIndex = (dialogueIndex + 1) % dialogueArray.length
-	await playerNpc.save()
-	ws.send(JSON.stringify({ type: 'playerAction', action: 'playerSpeaksToNpc', dialogue, npc }))
-}
-
-export const playerSpeaksNpcUnlocksDirection = async (req, res) => {
 	try {
-		const { playerId, npcId, areaId } = req.body
-		console.log(playerId, npcId, areaId, ' playerId, npcId, areaId')
-		const playerNpc = await PlayerNpc.findOne({ where: { playerId, npcId } })
-		if (!playerNpc) {
-			throw new Error(`PlayerNpc could not be found`)
+		let playerNpc = await PlayerNpc.findOne({ where: { playerId, npcId } })
+		if (!playerNpc && (isNaN(playerId) || isNaN(npcId))) {
+			throw new Error(`Invalid PlayerNpc`)
 		}
-		playerNpc.dialogueStage++
-		await playerNpc.save()
-		const newPlayerArea = await PlayerArea.create({
-			playerId,
-			area_id: areaId,
-			unblockedDirections: {
-				west: true,
+
+		if (!playerNpc) {
+			const modelNpc = await Npc.findByPk(npcId)
+			let playerNpc
+			console.log(6)
+			if (modelNpc.behavior === 'event') {
+				playerNpc = await PlayerNpc.create({ name: modelNpc.name, playerId: playerId, npcId: npcId, area_id: areaId, eventStage: 1 })
+			} else {
+				playerNpc = await PlayerNpc.create({ name: modelNpc.name, playerId: playerId, npcId: npcId, area_id: areaId })
+			}
+		}
+		const npcDialogue = await NpcDialogue.findOne({
+			where: {
+				npcId,
+				dialogueStage: playerNpc.dialogueStage,
 			},
 		})
-		await newPlayerArea.save()
+		console.log(npcId, ' NPC ID')
+		console.log(playerNpc.dialogueStage, ' playerNpc.dialogueStage')
+		console.log(playerNpc, ' playerNpc in question')
+
+		if (!npcDialogue) throw new Error(`Dialogue not found`)
+
+		const npc = await Npc.findByPk(npcId)
+
+		if (!npc) throw new Error(`Npc not found`)
+
+		const dialogueArray = npcDialogue.dialogue
+		const dialogueIndex = playerNpc.dialogueIndex % dialogueArray.length
+		const dialogue = dialogueArray[dialogueIndex]
+		playerNpc.dialogueIndex = (dialogueIndex + 1) % dialogueArray.length
+
+		await playerNpc.save()
+		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerSpeaksToNpc', dialogue, npc }))
+
+		if (npc.behavior === 'event') {
+			console.log(npc, ' NPC')
+			const payload = await npcMapper[npc.name](playerNpc, npc.name, areaId, ws)
+			if (payload) {
+				return ws.send(JSON.stringify({ type: payload.type, action: payload.action, payload }))
+			}
+		}
 	} catch (error) {
 		console.error(`Error: `, error)
-		ws.send(JSON.stringify({ type: 'error', error }))
+		ws.send(JSON.stringify({ type: 'error', message: error.message }))
 	}
 }
+
+// export const playerSpeaksNpcUnlocksDirection = async (req, res) => {
+// 	try {
+// 		const { playerId, npcId, areaId } = req.body
+// 		console.log(playerId, npcId, areaId, ' playerId, npcId, areaId')
+// 		const playerNpc = await PlayerNpc.findOne({ where: { playerId, npcId } })
+// 		if (!playerNpc) {
+// 			throw new Error(`PlayerNpc could not be found`)
+// 		}
+// 		playerNpc.dialogueStage++
+// 		await playerNpc.save()
+// 		await PlayerArea.create({
+// 			playerId,
+// 			area_id: areaId,
+// 			unblockedDirections: {
+// 				west: true,
+// 			},
+// 		})
+// 	} catch (error) {
+// 		console.error(`Error: `, error)
+// 		ws.send(JSON.stringify({ type: 'error', error }))
+// 	}
+// }
 
 export const playerLooksService = async (data, ws) => {
 	try {
@@ -207,19 +224,21 @@ export const playerLooksService = async (data, ws) => {
 			Npc.findAll({ where: { area_id: areaId } }),
 			Item.findAll({ where: { ownerId: areaId, ownerType: 'area' }, include: [{ model: Weapon }] }),
 			Player.findAll({ where: { area_id: areaId, id: { [Op.ne]: playerId } } }),
-			PlayerNpc.findAll({ where: { area_id: areaId, playerId } }),
+			PlayerNpc.findAll({ where: { playerId } }),
 		])
 		const missingNpcs = baseNpcs.filter(npc => !playerNpcs.some(playerNpc => playerNpc.npcId === npc.id))
+		console.log(7)
 		await Promise.all(
-			missingNpcs.map(npc => {
-				PlayerNpc.create({
-					playerId: playerId,
-					npcId: npc.id,
-					area_id: areaId,
-					// dialogueStage: npc.dialogueStage,
-					// dialogueIndex: npc.dialogueIndex,
-					// questStage: npc.questStage,
-				})
+			missingNpcs.map(async npc => {
+				console.log(npc, ' this is the missing npc to add')
+				const modelNpc = await Npc.findByPk(npc.id)
+				let playerNpc
+				if (modelNpc.behavior === 'event') {
+					playerNpc = await PlayerNpc.create({ name: modelNpc.name, playerId: playerId, npcId: npc.id, area_id: areaId, eventStage: 1 })
+				} else {
+					playerNpc = await PlayerNpc.create({ name: modelNpc.name, playerId: playerId, npcId: npc.id, area_id: areaId })
+				}
+				console.log(playerNpc, ' newly created playerNpc')
 			})
 		)
 
