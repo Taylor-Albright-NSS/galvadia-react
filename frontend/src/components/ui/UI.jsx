@@ -7,10 +7,16 @@ import { CommandLine } from './CommandLine'
 import { DevWindow } from './DevWindow'
 import { useContext } from 'react'
 import { zGameContext } from './zGameContext'
+import { useNavigate } from 'react-router-dom'
 
 export const UI = () => {
+	const token = localStorage.getItem('token')
+	const navigate = useNavigate()
+	if (!token) {
+		navigate('/login')
+	}
 	const { gameData, ws } = useContext(zGameContext)
-	const { player } = gameData
+	const player = gameData?.player ? gameData.player : null
 	return (
 		<Container
 			style={{

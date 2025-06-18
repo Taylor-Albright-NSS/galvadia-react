@@ -6,7 +6,7 @@ import { zGameContext } from './zGameContext'
 import { fetchAllItemsThatBelongToPlayer, fetchCreateCrossbow, fetchCreateDagger, fetchCreateOnehandedSword, fetchCreateTwohandedSword, fetchCurrentAreaItems, fetchDeleteAllItems, fetchEveryItem } from '../../fetches/items/items'
 // import { pickupItem, joshTest } from "../../websocket"
 
-import { getPlayer1, getPlayer2, playerGainsExperienceRequest } from '../../fetches/players/players'
+import { getPlayer1, getPlayer2 } from '../../fetches/players/players'
 import { fetchIncreasePlayerExperience } from '../../fetches/players/players'
 import { fetchGameData } from '../../fetches/gameData/gameData'
 import { WebSocketContext } from './WebSocketContext'
@@ -22,56 +22,12 @@ export const DevWindow = () => {
 	const [logState, setLogState] = useState('')
 	console.log(currentArea)
 
+	function resetPlayer() {
+		ws.send(JSON.stringify({ type: 'admin', action: 'resetPlayer', playerId: player.id }))
+	}
+	
 	function enemySpawnsDev() {
 		enemySpawnsSender(currentArea.id, ws)
-	}
-
-	function retrieveAllEnemies() {
-		fetchAllEnemies().then(enemies => {
-			console.log(enemies)
-		})
-	}
-	function retrieveAreaEnemies() {
-		fetchEnemiesInRoom(currentArea.id).then(area => {
-			console.log(area)
-		})
-	}
-
-	function fetchCreateEnemy() {
-		createEnemy(currentArea.id).then(enemy => {
-			setGameData(prev => ({
-				...prev,
-				enemies: [...prev.enemies, enemy],
-			}))
-			// setEnemies(prev => ([...prev, enemy]))
-		})
-	}
-	function retrieveCurrentArea() {
-		console.log(currentArea)
-	}
-
-	function retrieveAreaItems() {
-		fetchCurrentAreaItems(currentArea.id).then(items => {
-			console.log(items)
-		})
-	}
-	function retrieveAllItems() {
-		fetchEveryItem(currentArea.id).then(items => {
-			console.log(items)
-		})
-	}
-
-	async function attackEnemy() {
-		console.log(enemies)
-		console.log(enemies[0])
-		const enemyToAttack = enemies[0]
-		const damage = 9
-		if (!enemyToAttack) {
-			addLog('There is no enemy in the room to attack')
-			return
-		}
-		addLog(`You swing at the enemy and hit it for ${damage} damage!`)
-		enemyTakesDamage(damage, enemyToAttack.id, setGameData, addLog)
 	}
 
 	function setPlayer1() {
@@ -99,9 +55,6 @@ export const DevWindow = () => {
 			})
 			setGameData(prev => ({ ...prev, playerItems: player.items.sort() }))
 		})
-	}
-	function retrieveCurrentPlayer() {
-		console.log(player)
 	}
 
 	function spawnTwohandedSword() {
@@ -163,13 +116,10 @@ export const DevWindow = () => {
 		const experienceGain = 100
 		const playerPreviousLevel = player.level
 		console.log(playerPreviousLevel, ' playerPreviousLevel')
-		const updatedPlayer = await playerGainsExperienceRequest(ws, playerId, experienceGain)
-		// const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
+		const updatedPlayer = await fetchIncreasePlayerExperience(playerId, experienceGain)
 		if (updatedPlayer) {
 			addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
 			setGameData(prev => ({ ...prev, player: { ...prev.player, level: updatedPlayer.level, experience: updatedPlayer.experience } }))
-			// setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
-			console.log(updatedPlayer.level, ' updatedPlayer.level')
 			if (updatedPlayer.level > playerPreviousLevel) {
 				addLog('YOU LEVELED UP!')
 			}
@@ -181,14 +131,10 @@ export const DevWindow = () => {
 		const playerId = player.id
 		const experienceGain = -100
 		const playerPreviousLevel = player.level
-		console.log(playerPreviousLevel, ' playerPreviousLevel')
-		const updatedPlayer = await playerGainsExperienceRequest(ws, playerId, experienceGain)
-		// const updatedPlayer = await fetchIncreasePlayerExperience(ws, playerId, experienceGain)
+		const updatedPlayer = await fetchIncreasePlayerExperience(ws, playerId, experienceGain)
 		if (updatedPlayer) {
 			addLog(`${updatedPlayer.name} gained ${experienceGain} experience points!`)
 			setGameData(prev => ({ ...prev, player: { ...prev.player, level: updatedPlayer.level, experience: updatedPlayer.experience } }))
-			// setPlayer(prev => ({...prev, level: updatedPlayer.level, experience: updatedPlayer.experience}))
-			console.log(updatedPlayer.level, ' updatedPlayer.level')
 			if (updatedPlayer.level < playerPreviousLevel) {
 				addLog('YOU DELEVELED!')
 			}
@@ -206,58 +152,14 @@ export const DevWindow = () => {
 		addLog(data.message)
 	}
 
-	function playerCheckGameStatus() {
-		console.log(playerStatus)
-		console.log(playerStatus.isInCombat())
-	}
-
-	async function testAllFetches() {
-		const gameData = await Promise.all([fetchGameData(player.id, player.area_id)])
-		console.log(gameData, ' game data frontend')
-	}
-
-	function websocketGetTest() {
-		console.log(ws)
-		ws.send(JSON.stringify({ type: 'fetch', action: 'get', request: ['player'] }))
-	}
-	function websocketGetReadyState() {
-		console.log('ws ready state:', ws.readyState)
-	}
-
 	return (
 		<Container className="d-flex">
 			<Row className="d-flex align-content-start">
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={enemySpawnsDev}>
+				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'orange', fontWeight: 'bold' }} className="m-1" onClick={enemySpawnsDev}>
 					Spawn enemy
 				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={websocketGetTest}>
-					WEBSOCKET GET USER
-				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={websocketGetReadyState}>
-					WebSocket Get ReadyState
-				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'red', fontWeight: 'bold' }} className="m-1" onClick={fetchCreateEnemy}>
-					Create Enemy
-				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'red', fontWeight: 'bold' }} className="m-1" onClick={attackEnemy}>
-					Attack Enemy
-				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'red', fontWeight: 'bold' }} className="m-1" onClick={retrieveAllEnemies}>
-					Get Enemies
-				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'red', fontWeight: 'bold' }} className="m-1" onClick={retrieveAreaEnemies}>
-					Get Area Enemies
-				</button>
-
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={retrieveCurrentArea}>
-					Get Area
-				</button>
-
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'yellow', fontWeight: 'bold' }} className="m-1" onClick={retrieveCurrentPlayer}>
-					Get Player
-				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'yellow', fontWeight: 'bold' }} className="m-1" onClick={playerCheckGameStatus}>
-					Get Player Game Data
+				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'purple', fontWeight: 'bold' }} className="m-1" onClick={resetPlayer}>
+					Reset Player
 				</button>
 				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'yellow', fontWeight: 'bold' }} className="m-1" onClick={setPlayer1}>
 					Set Player 1
@@ -271,44 +173,20 @@ export const DevWindow = () => {
 				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'yellow', fontWeight: 'bold' }} className="m-1" onClick={experienceLoss}>
 					Lose 100 Exp
 				</button>
-
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'blue', fontWeight: 'bold' }} className="m-1" onClick={retrieveAreaItems}>
-					Get Area Items
-				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'blue', fontWeight: 'bold' }} className="m-1" onClick={retrieveAllItems}>
-					Get All Items
-				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'blue', fontWeight: 'bold' }} className="m-1" onClick={spawnTwohandedSword}>
+				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={spawnTwohandedSword}>
 					Spawn TH Sword
 				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'blue', fontWeight: 'bold' }} className="m-1" onClick={spawnOnehandedSword}>
+				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={spawnOnehandedSword}>
 					Spawn OH Sword
 				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'blue', fontWeight: 'bold' }} className="m-1" onClick={spawnDagger}>
+				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={spawnDagger}>
 					Spawn Dagger
 				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'blue', fontWeight: 'bold' }} className="m-1" onClick={spawnCrossbow}>
+				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'green', fontWeight: 'bold' }} className="m-1" onClick={spawnCrossbow}>
 					Spawn Bow
 				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'blue', fontWeight: 'bold' }} className="m-1" onClick={deleteAllItems}>
+				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'red', fontWeight: 'bold' }} className="m-1" onClick={deleteAllItems}>
 					Delete all items
-				</button>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'blue', fontWeight: 'bold' }} className="m-1" onClick={testAllFetches}>
-					Test all fetches
-				</button>
-
-				<input
-					type="text"
-					style={{ height: '50%', maxHeight: '40px', width: '100%', maxWidth: '90px', backgroundColor: 'blue', fontWeight: 'bold' }}
-					className="m-1"
-					onChange={e => {
-						console.log(e.target.value)
-						setLogState(e.target.value)
-						console.log(logState)
-					}}
-				/>
-				<button style={{ height: '100%', maxHeight: '80px', width: '100%', maxWidth: '90px', backgroundColor: 'blue', fontWeight: 'bold' }} className="m-1">
-					Submit Log
 				</button>
 			</Row>
 		</Container>

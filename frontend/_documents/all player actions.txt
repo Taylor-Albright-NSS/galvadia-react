@@ -1,0 +1,61 @@
+spells
+skills
+abilities
+stats
+experience
+help
+describe
+look
+examine
+inspect
+inventory
+revive
+get
+drop
+bet
+pack
+unpack
+swap
+macro
+clean
+show
+don/wear/equip
+unequip/remove
+buy
+spells
+train
+learn
+read
+touch
+god
+drink
+kl/kill list
+fish
+open
+forge
+tool
+weave
+increase (change for buttons?)
+speak
+quest
+offer
+cook
+stealth
+unhide
+unlock
+search
+pull
+push/press
+use (activate an item)
+pick
+mine
+eat
+recall
+cast
+target
+rest
+(all directional movement)
+attack
+advance
+retreat/retreat direction
+(all skills and spells)

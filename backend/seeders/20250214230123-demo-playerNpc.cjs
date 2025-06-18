@@ -4,6 +4,7 @@ module.exports = {
 			'PlayerNpcs',
 			[
 				{
+					name: 'Joch',
 					playerId: 1,
 					npcId: 1,
 					area_id: 1,
@@ -14,6 +15,7 @@ module.exports = {
 					updatedAt: new Date(),
 				},
 				{
+					name: 'Clyde',
 					playerId: 1,
 					npcId: 2,
 					area_id: 1,

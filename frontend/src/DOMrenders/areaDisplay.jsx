@@ -9,7 +9,7 @@ export const areaDisplay = (area, enemies, npcs, items, players) => {
 			<p>
 				{splitDescription &&
 					splitDescription.map((word, index) => {
-						if (area.Keywords?.some(keyword => keyword.refName == word)) {
+						if (area.Keywords?.some(keyword => keyword.name.toLowerCase() == word)) {
 							return (
 								<span key={index} style={{ color: 'red' }}>
 									{word + ' '}
@@ -54,7 +54,7 @@ export const areaDisplay = (area, enemies, npcs, items, players) => {
 						console.log(npc)
 						return (
 							<p className="mx-1 green" key={index}>
-								{npc.Npc.name}
+								{npc.name}
 							</p>
 						)
 					})}
