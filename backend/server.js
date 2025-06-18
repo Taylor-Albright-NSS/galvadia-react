@@ -26,10 +26,14 @@ import { app } from './websocket.js'
 import { getUser } from './controllers/userController.js'
 import { patchKeywordActivation, patchToggleKeywordFalse } from './controllers/keywordController.js'
 import { getGameData } from './controllers/gameStateController.js'
+import { postLogin, postRegister } from './controllers/authController.js'
 // import { playerSpeaksNpcUnlocksDirection } from './controllerServices/playerActionsServices.js'
 
 app.use(express.json())
 app.use(cors())
+//--------AUTH
+app.post('/register', postRegister)
+app.post('/login', postLogin)
 //--------ROUTE TESTING
 app.get('/npcquest/:npcId/:playerId', getNpcQuest)
 app.patch(`/dialoguestage/:playerId/:npcId/decrement`, patchPlayerNpcDecrementDialogueStage)

@@ -1,7 +1,7 @@
 import { npcMoves } from "../DOMrenders/npcActions"
 
 export const npcMovesSetter  = (data, setGameData, addLog) => {
-    const { npcId, npcName, eventText } = data
+    const { npcId, npcName, eventText } = data.payload
     console.log(data, " npcMovesSetter Data")
     setGameData(prev => ({
         ...prev,

@@ -1,4 +1,4 @@
 {
-	"prettier.enable": false,
-	"editor.formatOnSave": false
+"editor.parameterHints.enabled": false,
+"editor.hover.enabled": false
 }

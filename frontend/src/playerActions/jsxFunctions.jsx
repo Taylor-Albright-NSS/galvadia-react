@@ -11,6 +11,10 @@ export const playerPicksUpAllItemsJSX = function () {
     return (<span>You pick up all items in the room and <span className='yellow'>X</span> gold</span>)
 }
 
+export const playerReceivesItemJSX = function (item) {
+    return (<span>You receive a <span className={ item.color ? item.color : 'green'}>{item.name}</span></span>)
+}
+
 
 export const playerEquipsArmorJSX = function (equippedItem) {
     return (<span>You equip your <span className={equippedItem?.color || "green"}>{equippedItem.name}</span></span>)

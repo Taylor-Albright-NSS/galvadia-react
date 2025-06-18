@@ -1,5 +1,7 @@
 // export const playerLooksSetter = (data, setGameData, addLog) => {
 
+import { playerReceivesItemJSX } from "../playerActions/jsxFunctions"
+
 
 export const areaCurrentAreaItemsSetter = (data, setGameData, addLog) => {
     const { items } = data
@@ -15,13 +17,28 @@ export const areaCurrentAreaItemsSetter = (data, setGameData, addLog) => {
     // addLog(areaDisplay(currentArea, [], [], items, []))
 }
 export const itemToPlayerSetter = (data, setGameData, addLog) => {
-    const { item } = data
-    console.log(data, " SETTER DATA")
-    console.log(item, " Item from setter data")
-    setGameData(prev => {
-       return ({
+    const { questItem } = data
+    console.log(data, ' item to player data')
+    setGameData(prev => ({
         ...prev,
-        playerItems:[...prev.playerItems, item]
-    })})
+        playerItems: [...prev.playerItems, questItem]
+    }))
+    const eventText = playerReceivesItemJSX(questItem)
+    addLog(eventText)
     // addLog(areaDisplay(currentArea, [], [], items, []))
+}
+
+export const areaEnableDirection = (data, setGameData, addLog) => {
+    const { enabledDirection } = data
+    console.log(data, ' ENABLED DIRECTION DATA')
+    setGameData(prev => ({
+        ...prev,
+        currentArea: {
+            ...prev.currentArea,
+            exitsBool: {
+                ...prev.currentArea.exitsBool,
+                ...enabledDirection
+            }
+        }
+    }))
 }

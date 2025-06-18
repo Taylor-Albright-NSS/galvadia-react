@@ -7,7 +7,6 @@
 .red {
     color: red;
 }
-
 .blue {
     color: blue;
 }
@@ -28,7 +27,9 @@
 .parchment {
     color: rgb(252, 252, 181);
 }
-
+.sign { 
+    color: rgb(136, 65, 23);
+}
 .trainingHallsBasement {
     color: brown;
 }

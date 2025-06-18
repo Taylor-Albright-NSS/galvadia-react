@@ -1,16 +1,28 @@
 const api = "http://localhost:3000"
 
-export const questRequirementCheck = async (body) => {
-    const response = await fetch(`${api}/questcomplete`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body)
-    })
-    const data = await response.json()
-    return data
-}
+// export const questRequirementCheck = async (body) => {
+//     try {
+//         console.log(1)
+//         const response = await fetch(`${api}/questcomplete`, {
+//             method: "POST",
+//             headers: {
+//                 "Content-Type": "application/json",
+//             },
+//             body: JSON.stringify(body)
+//         })
+//         console.log(2)
+        
+//         if (!response.ok) {
+//             throw new Error(`HTTP error! status: ${response.status}`)
+//         }
+        
+//         const data = await response.json()
+//         return data
+//     } catch (error) {
+//         console.error('Error checking quest requirements:', error)
+//         throw error
+//     }
+// }
 
 export const fetchCurrentAreaNpcs = async (areaId, playerId) => {
     const response = await fetch(`${api}/npcs/${areaId}/${playerId}`)
@@ -43,20 +55,15 @@ export const fetchPlayerNpcRelationship = async (playerId, npcId) => {
     return data
 }
 
-export const fetchCreatePlayerArea = async (playerId, npcId, areaId) => {
+// export const fetchCreatePlayerArea = async (playerId, npcId, areaId) => {
     
-    const response = await fetch(`${api}/createplayernpcrelationship`, {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ playerId, npcId, areaId })
-    })
-    const data = await response.json()
-    console.log(data, ' create player npc relationship')
-    return data
-}
-
-// export const fetchNpcDialogue = async (npcId, stage) => {
-//     const response = await fetch(`${api}/npcdialogue/${npcId}?stage=${stage}`)
+//     const response = await fetch(`${api}/createplayernpcrelationship`, {
+//         method: "POST",
+//         headers: {"Content-Type": "application/json"},
+//         body: JSON.stringify({ playerId, npcId, areaId })
+//     })
 //     const data = await response.json()
+//     console.log(data, ' create player npc relationship')
 //     return data
 // }
+

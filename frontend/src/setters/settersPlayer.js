@@ -93,3 +93,4 @@ export const playerUpdateAllAttributesSetter = (data, setGameData) => {
         }
     }))
 }
+

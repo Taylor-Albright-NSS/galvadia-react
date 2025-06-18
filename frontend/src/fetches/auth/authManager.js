@@ -1,39 +1,37 @@
-const _apiUrl = "/api/auth";
+const baseUrl = 'http://localhost:3000'
 
-export const login = (email, password) => {
-  return fetch(_apiUrl + "/login", {
-    method: "POST",
-    credentials: "same-origin",
-    headers: {
-      Authorization: `Basic ${btoa(`${email}:${password}`)}`,
-    },
-  }).then((res) => {
-    if (res.status !== 200) {
-      return Promise.resolve(null);
-    } else {
-      return tryGetLoggedInUser();
-    }
-  });
-};
+const retrieveToken = () => localStorage.getItem('token')
+
+export const login = async (username, password) => {
+	// const token = retrieveToken()
+	const response = await fetch(`${baseUrl}/login`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ username, password }),
+	})
+	const data = await response.json()
+	return data
+}
+export const register = async (username, password) => {
+	const response = await fetch(`${baseUrl}/register`, {
+		method: 'POST',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ username, password }),
+	})
+	const data = await response.json()
+	return data
+}
 
 export const logout = () => {
-  return fetch(_apiUrl + "/logout");
-};
+	return fetch(baseUrl + '/logout')
+}
 
 export const tryGetLoggedInUser = () => {
-  return fetch(_apiUrl + "/me").then((res) => {
-    return res.status === 401 ? Promise.resolve(null) : res.json();
-  });
-};
-
-export const register = (userProfile) => {
-  userProfile.password = btoa(userProfile.password);
-  return fetch(_apiUrl + "/register", {
-    credentials: "same-origin",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(userProfile),
-  }).then(() => tryGetLoggedInUser());
-};
+	return fetch(baseUrl + '/me').then(res => {
+		return res.status === 401 ? Promise.resolve(null) : res.json()
+	})
+}
