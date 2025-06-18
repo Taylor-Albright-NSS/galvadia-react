@@ -31,6 +31,6 @@ export const handlePlayerAction = (data, ws, wss) => {
 
 export const handlePlayerModify = (data, ws, wss) => {
 	if (data.action === 'playerGainsExperience') {
-		playerGainsExperienceService(data)
+		playerGainsExperienceService(data, ws)
 	}
 }

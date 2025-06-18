@@ -5,6 +5,26 @@ module.exports = {
 			[
 				{
 					id: 1,
+					npcId: 3, //Egbert
+					questStage: 1,
+					dialogue: [`I left my glasses somewhere in my office. Can you see if you can find them for me? My office is the room to the south.`],
+					completionDialogue: [`Ahh, there they are! Thank you for retrieving them for me.`, `Let's move on to the next task.`],
+					requirements: JSON.stringify({
+						requiredLevel: 1,
+						requiredItems: ['Pair Of Glasses'],
+					}),
+					rewards: JSON.stringify({
+						gold: 50,
+						experience: 1000,
+						skillPoints: 3,
+						attributePoints: 3,
+					}),
+					repeatable: false,
+					createdAt: new Date(),
+					updatedAt: new Date(),
+				},
+				{
+					id: 2,
 					npcId: 1, //Joch
 					questStage: 1,
 					dialogue: [`Your first task is to reach level 2.`],
@@ -24,7 +44,7 @@ module.exports = {
 					updatedAt: new Date(),
 				},
 				{
-					id: 2,
+					id: 3,
 					npcId: 1, //Joch
 					questStage: 2,
 					dialogue: [`For your next task, return to me a Dagger and Crossbow`],
@@ -39,26 +59,6 @@ module.exports = {
 						skillPoints: 2,
 						attributePoints: 2,
 						items: ['Sword'],
-					}),
-					repeatable: false,
-					createdAt: new Date(),
-					updatedAt: new Date(),
-				},
-				{
-					id: 3,
-					npcId: 3, //Egbert
-					questStage: 1,
-					dialogue: [`I lost my glasses. Can you please find them for me?`],
-					completionDialogue: [`Ahh, I can see again!`, `Thank you, young lad. Here's for your troubles.`],
-					requirements: JSON.stringify({
-						requiredLevel: 1,
-						requiredItems: ['Pair Of Glasses'],
-					}),
-					rewards: JSON.stringify({
-						gold: 50,
-						experience: 1000,
-						skillPoints: 3,
-						attributePoints: 3,
 					}),
 					repeatable: false,
 					createdAt: new Date(),

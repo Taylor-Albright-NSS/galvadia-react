@@ -3,16 +3,19 @@ import { zGameContext } from './zGameContext'
 import { WebSocketContext } from './WebSocketContext'
 import { playerAdvancesEnemySetter, playerLooksSetter, playerRetreatsSetter, playerRoomTransitionSetter, playerSpeaksToNpcSetter, playerUpdateAllAttributesSetter } from '../../setters/settersPlayer'
 import { enemyDiesSetter, enemySpawnsSetter, enemyTakesDamageSetter } from '../../setters/settersEnemy'
-import { areaCurrentAreaItemsSetter, itemToPlayerSetter } from '../../setters/settersArea'
+import { areaCurrentAreaItemsSetter, areaEnableDirection, itemToPlayerSetter } from '../../setters/settersArea'
 import { playerEquipsArmorSetter, playerPacksItemSetter, playerPicksUpAllItemsSetter, playerPicksUpItemSetter, playerRemovesArmorSetter, playerUnpacksItemSetter } from '../../setters/settersItem'
-import { keywordActivationSetter, keywordAlreadyActivated, keywordItemToPlayerSetter } from '../../setters/settersKeyword'
+import { keywordActivationSetter, keywordAlreadyActivated, keywordExamineSetter, keywordItemToPlayerSetter, readSignSetter } from '../../setters/settersKeyword'
 import { npcMovesSetter } from '../../setters/settersNpc'
+import { playerOffersQuest } from '../../services/servicesPlayer'
+import { questCompleteSetter, questFailSetter } from '../../setters/settersQuest'
+import { adminResetPlayerSetter } from '../../setters/settersAdmin'
 
 export const WebSocketProvider = ({ children }) => {
 	const wsRef = useRef(null)
 
 	const { setGameData, messages, setMessages, addLog, gameData, playerStatus, setPlayerStatus } = useContext(zGameContext)
-	const { player } = gameData
+	const player = gameData ? gameData.player : null
 
 	useEffect(() => {
 		const webSocket = new WebSocket('ws://localhost:3001')
@@ -38,41 +41,86 @@ export const WebSocketProvider = ({ children }) => {
 			// if (handler) {
 			// 	handler(data, setGameData)
 			// }
-			console.log(data, " DATA")
+			console.log(data, ' DATA')
 			if (data.type === 'playerAction') {
 				if (data.action === 'playerRoomTransition') {
-					console.log(addLog, " FIRST ADD LOG")
+					console.log(addLog, ' FIRST ADD LOG')
 					playerRoomTransitionSetter(data, setGameData, addLog)
 				}
-				if (data.action === 'playerAdvancesEnemy') {playerAdvancesEnemySetter(data, setGameData)}
-				if (data.action === 'playerRetreats') {playerRetreatsSetter(data, setGameData)}
-				if (data.action === 'playerLooks') {playerLooksSetter(data, setGameData, addLog)}
-				if (data.action === 'playerSpeaksToNpc') {playerSpeaksToNpcSetter(data, addLog)}
-				if (data.action === 'playerEquipsArmor') {playerEquipsArmorSetter(data, setGameData, addLog)}
-				if (data.action === 'playerRemovesArmor') {playerRemovesArmorSetter(data, setGameData, addLog)}
-				if (data.action === 'playerUnpacksItem') {playerUnpacksItemSetter(data, setGameData, addLog)}
-				if (data.action === 'playerPacksItem') {playerPacksItemSetter(data, setGameData, addLog)}
-				if (data.action === 'playerPicksUpItem') {playerPicksUpItemSetter(data, setGameData, addLog)}
-				if (data.action === 'playerPicksUpAllItems') {playerPicksUpAllItemsSetter(data, setGameData, addLog)}
-				if (data.action === 'playerAttackHitsEnemy') {enemyTakesDamageSetter(data, setGameData, addLog)}
+				if (data.action === 'playerAdvancesEnemy') {
+					playerAdvancesEnemySetter(data, setGameData)
+				}
+				if (data.action === 'playerRetreats') {
+					playerRetreatsSetter(data, setGameData)
+				}
+				if (data.action === 'playerLooks') {
+					playerLooksSetter(data, setGameData, addLog)
+				}
+				if (data.action === 'playerSpeaksToNpc') {
+					playerSpeaksToNpcSetter(data, addLog)
+				}
+				if (data.action === 'playerEquipsArmor') {
+					playerEquipsArmorSetter(data, setGameData, addLog)
+				}
+				if (data.action === 'playerRemovesArmor') {
+					playerRemovesArmorSetter(data, setGameData, addLog)
+				}
+				if (data.action === 'playerUnpacksItem') {
+					playerUnpacksItemSetter(data, setGameData, addLog)
+				}
+				if (data.action === 'playerPacksItem') {
+					playerPacksItemSetter(data, setGameData, addLog)
+				}
+				if (data.action === 'playerPicksUpItem') {
+					playerPicksUpItemSetter(data, setGameData, addLog)
+				}
+				if (data.action === 'playerPicksUpAllItems') {
+					playerPicksUpAllItemsSetter(data, setGameData, addLog)
+				}
+				if (data.action === 'playerAttackHitsEnemy') {
+					enemyTakesDamageSetter(data, setGameData, addLog)
+				}
 			}
+
+			if (data.type === 'quest') {
+				if (data.action === 'complete') questCompleteSetter(data, setGameData, addLog)
+				if (data.action === 'fail') questFailSetter(data, setGameData, addLog)
+			}
+			if (data.type === 'admin') {
+				if (data.action === 'resetPlayer') adminResetPlayerSetter(data, setGameData, addLog)
+			}
+
 			if (data.type === 'npcEvent') {
 				if (data.action === 'npcMoves') {
 					npcMovesSetter(data, setGameData, addLog)
 				}
 			}
+			if (data.type === 'direction') {
+				if (data.action === 'enable') {
+					areaEnableDirection(data, setGameData, addLog)
+				}
+			}
 			if (data.type === 'keyword') {
-				console.log(data.action, " DATA ACTION")
+				console.log(data.action, ' DATA ACTION')
+				//Examine uses description instead of eventText
+				if (data.action === 'examine') keywordExamineSetter(data, addLog)
+				//Activate Success uses eventText instead of description
 				if (data.action === 'activateSuccess') keywordActivationSetter(data, addLog)
 				if (data.action === 'activateFail') keywordAlreadyActivated(data, addLog)
 				if (data.action === 'itemToPlayer') keywordItemToPlayerSetter(data, setGameData, addLog)
+				//Read sign uses description instead of eventText
+				if (data.action === 'readSign') readSignSetter(data, setGameData, addLog)
 			}
 			if (data.type === 'error') {
 				console.log(data)
 			}
 			if (data.type === 'itemAction') {
-				if (data.action === 'currentAreaItems') {areaCurrentAreaItemsSetter(data, setGameData, addLog)}
-				if (data.action === 'itemToPlayer') {itemToPlayerSetter(data, setGameData, addLog)}
+				if (data.action === 'currentAreaItems') {
+					areaCurrentAreaItemsSetter(data, setGameData, addLog)
+				}
+				if (data.action === 'itemToPlayer') {
+					itemToPlayerSetter(data, setGameData, addLog)
+				}
 			}
 			if (data.type === 'playerModify') {
 				if (data.action === 'playerGainsExperience') {
@@ -81,9 +129,15 @@ export const WebSocketProvider = ({ children }) => {
 				if (data.action === 'updateAllAttributes') playerUpdateAllAttributesSetter(data, setGameData, addLog)
 			}
 			if (data.type === 'enemyAction') {
-				if (data.action === 'enemyTakesDamage') {enemyTakesDamageSetter(data, setGameData, addLog)}
-				if (data.action === 'enemyDies') {enemyDiesSetter(data, setGameData, addLog)}
-				if (data.action === 'enemySpawns') {enemySpawnsSetter(data, setGameData, addLog)}
+				if (data.action === 'enemyTakesDamage') {
+					enemyTakesDamageSetter(data, setGameData, addLog)
+				}
+				if (data.action === 'enemyDies') {
+					enemyDiesSetter(data, setGameData, addLog)
+				}
+				if (data.action === 'enemySpawns') {
+					enemySpawnsSetter(data, setGameData, addLog)
+				}
 			}
 			if (data.type === 'gamemessage') console.log(data, ' RECEIVED')
 			if (data.type === 'playerDialogue') {

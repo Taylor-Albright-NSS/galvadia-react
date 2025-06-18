@@ -11,6 +11,7 @@ import Player from './player.js'
 import { PlayerClass } from './playerClass.js'
 import { PlayerNpc } from './playerNpc.js'
 import { PlayerRace } from './playerRace.js'
+import QuestItem from './questItem.js'
 import { Weapon } from './weapon.js'
 // Define associations AFTER importing models
 Area.hasMany(Npc, { foreignKey: 'area_id' })
@@ -46,6 +47,9 @@ Keyword.belongsTo(Area, { foreignKey: 'area_id' })
 
 Item.hasOne(Weapon, { foreignKey: 'itemId' })
 Weapon.belongsTo(Item, { foreignKey: 'itemId' })
+
+Item.hasOne(QuestItem, { foreignKey: 'itemId' })
+QuestItem.belongsTo(Item, { foreignKey: 'itemId' })
 
 Item.hasOne(Armor, { foreignKey: 'itemId' })
 Armor.belongsTo(Item, { foreignKey: 'itemId' })

@@ -1,4 +1,4 @@
-import { fetchNpcQuestDialogue, fetchPlayerNpcRelationship, questRequirementCheck } from '../fetches/npcs/npcs'
+import { fetchNpcQuestDialogue } from '../fetches/npcs/npcs'
 import { npcSpeaks } from '../DOMrenders/npcActions'
 import { fetchAllItemsThatBelongToPlayer, fetchPlayerDropsItem } from '../fetches/items/items'
 import { wait } from '../utils/wait'
@@ -6,92 +6,95 @@ import { playerDropsJSX } from '../playerActions/jsxFunctions'
 import { dropItemByKeyword, findItemByLeft, findItemByNumber, findItemByRight, itemFindByKeywordUtil, playerItemFindByKeywordUtil, playerItemFindByNumberUtil, unpackItemByKeyword } from '../utils/utilsItem'
 import { enemyFindByName, enemyFindByNumber, findEnemy, findEnemyInCombatWithPlayer, findNpcByName } from '../utils/utilsEnemy'
 import { playerIsInCombatCheck, toggleStatusFalse, toggleStatusTrue } from '../utils/utilsPlayer'
-import { playerAdvancesEnemySender, playerEquipsArmorSender, playerLooksSender, playerPacksItemSender, playerPicksUpItemSender, playerRecallsSender, playerRegularAttackSender, playerRemovesArmorSender, playerRetreatsSender, playerSpeaksToNpcSender, playerUnpacksItemSender } from '../senders/sendersPlayer'
+import {
+	playerAdvancesEnemySender,
+	playerEquipsArmorSender,
+	playerLooksSender,
+	playerPacksItemSender,
+	playerPicksUpItemSender,
+	playerRecallsSender,
+	playerRegularAttackSender,
+	playerRemovesArmorSender,
+	playerRetreatsSender,
+	playerSpeaksToNpcSender,
+	playerUnpacksItemSender,
+} from '../senders/sendersPlayer'
 import { itemExamineDisplay } from '../DOMrenders/itemDescriptionDisplay'
 import { enemyExamineDisplay } from '../DOMrenders/enemyDescriptionDisplay'
-import { npcSpeakMapper } from '../objectMappers/npcMappers'
-import { keywordMapper } from '../objectMappers/keywordMappers'
+import { npcSpeechEvent } from './servicesNpc'
+import { keywordActivationSender, keywordExamineSender } from './servicesKeyword'
 
 export const playerOffersQuest = async commandObject => {
-	const { setGameData } = commandObject
+	const { command2, setGameData, addLog, ws } = commandObject
 	const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
-	const { command2, addLog } = commandObject
-	let body = {
+	let payload = {
 		npcId: 0,
 		playerId: player.id,
 		playerLevel: player.level,
 		playerInventory: playerItems,
-		//add player kill list here
+		//add player kill list here to check specific kills
 	}
+	console.log(npcs)
 	if (npcs.length === 0) {
 		return addLog('There is nobody in the room offering quests.')
 	}
 	if (npcs.length > 1 && !command2) {
 		return addLog('You must specify whose quest you wish to see.')
 	}
-	if (npcs.length === 1) {
-		body.npcId = npcs[0].id
-		const questNpc = await questRequirementCheck(body)
-		return
-	}
-	if (npcs.length > 1) {
-		const foundNpc = findNpcByName(npcs, command2)
-		console.log(foundNpc)
-		const npcName = foundNpc?.Npc.name
-		body.npcId = foundNpc.id
-		const questOffering = await questRequirementCheck(body)
-		if (questOffering.message === '404') {
-			return addLog(`${npcName} does not have a quest for you to make an offer to.`)
-		}
-		if (questOffering.message === 'level') {
-			return addLog(`You do not meet the level requirement for this quest.`)
-		}
-		if (questOffering.message === 'item') {
-			return addLog(`You have not offered the correct item(s) required for this quest.`)
-		}
-		if (questOffering.player) {
-			const dialogueJSX = npcSpeaks(foundNpc, questOffering.completionDialogue)
-			addLog(dialogueJSX)
-			const { player } = questOffering
-			setGameData(prev => ({
-				...prev,
-				player: player,
-			}))
-			// setPlayer(player)
-			const playerUpdatedItems = await fetchAllItemsThatBelongToPlayer(player.id)
-			setGameData(prev => ({
-				...prev,
-				playerItems: playerUpdatedItems,
-			}))
-			// setPlayerItems(playerUpdatedItems)
-		}
-	}
+	if (npcs.length === 1) {payload.npcId = npcs[0].npcId}
+	if (npcs.length > 1) {payload.npcId = findNpcByName(npcs, command2).npcId}
+
+	ws.send(JSON.stringify({ type: 'quest', action: 'complete', payload }))
+
 }
 
+
 export const playerSpeaksToNpcService = async commandObject => {
-	const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
+	const { player, currentArea, npcs } = commandObject.gameData
 	const { command2, addLog, ws } = commandObject
+
+	// Handle: No NPCs in the room
 	if (npcs.length === 0) {
 		return addLog('There is nobody in the room to speak with')
 	}
-	if (npcs.length === 1)
+
+	// Handle: Multiple NPCs but no specific name provided
 	if (npcs.length > 1 && !command2) {
 		return addLog('You must specify who you want to speak with')
 	}
-	if (npcs.length > 0) {
-		const foundNpc = findNpcByName(npcs, command2)
-		console.log(foundNpc)
-		playerSpeaksToNpcSender(player.id, foundNpc.Npc.id, currentArea.id, ws)
-		if (foundNpc.Npc.speakInteraction) {
-			console.log("FOUNDNP . NPC . SPEAK INTERACTION FOUND")
-			npcSpeakMapper[foundNpc.Npc.name](player.id, foundNpc.Npc.id, currentArea.id, ws)
-		}
 
-		// const npcDialogue = await fetchNpcDialogue(player.id, foundNpc.id)
-		// const dialogueJSX = npcSpeaks(foundNpc, npcDialogue)
-		// addLog(dialogueJSX)
-		return
+	// Determine the target NPC
+	let foundNpc = null
+
+	if (npcs.length === 1 && !command2) {
+		foundNpc = npcs[0]
+	} else if (command2) {
+		foundNpc = findNpcByName(npcs, command2)
+		if (!foundNpc) {
+			return addLog(`There is no one here named ${command2} to speak to`)
+		}
 	}
+
+	// If foundNpc somehow isn't set (defensive fallback)
+	if (!foundNpc) {
+		return addLog('Something went wrong. Unable to find who to speak with.')
+	}
+
+	// Notify backend that player is speaking to the NPC
+	playerSpeaksToNpcSender(player.id, foundNpc.Npc.id, currentArea.id, ws)
+
+	// Trigger interaction logic if available
+	if (foundNpc.speakInteraction) {
+		console.log('FOUNDNPC.SPEAKINTERACTION FOUND')
+		npcSpeechEvent(player.id, foundNpc.Npc.id, currentArea.id, ws)
+	}
+
+	// (Optional future: Fetch and log actual dialogue)
+	// const npcDialogue = await fetchNpcDialogue(player.id, foundNpc.id)
+	// const dialogueJSX = npcSpeaks(foundNpc, npcDialogue)
+	// addLog(dialogueJSX)
+
+	return
 }
 
 
@@ -144,36 +147,17 @@ export const playerSpeakToNpcQuest = async commandObject => {
 	toggleStatusFalse(playerStatus, 'isTalking')
 }
 
-export const playerLookService = async (commandObject) => {
+export const playerLookService = async commandObject => {
 	const { player } = commandObject.gameData
 	const { ws } = commandObject
-	console.log(player, " PLAYER")
+	console.log(player, ' PLAYER')
 	const areaId = !player.area_id ? 1 : player.area_id
 	const playerId = player.id
 	playerLooksSender(playerId, areaId, ws)
 }
 
-// export const playerLook = async commandObject => {
-// 	const { player } = commandObject.gameData
-// 	const { setGameData, addLog } = commandObject
 
-// 	let areaId = !player.area_id ? 1 : player.area_id
-// 	let playerId = player.id
-	// const [area, enemies, npcs, items, players] = await Promise.all([fetchCurrentArea(areaId), fetchEnemiesInRoom(areaId), fetchCurrentAreaNpcs(areaId, playerId), fetchCurrentAreaItems(areaId), fetchPlayersInRoom(areaId, playerId)])
-
-// 	setGameData(prev => ({
-// 		...prev,
-// 		currentArea: area,
-// 		enemies: enemies,
-// 		npcs: npcs,
-// 		items: items,
-// 		players: players,
-// 	}))
-
-// 	addLog(areaDisplay(area, enemies, npcs, items, players))
-// }
-
-export const playerInspectService = (commandObject) => {
+export const playerInspectService = commandObject => {
 	const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
 	const { command2, addLog, playerStatus, setGameData } = commandObject
 	if (!command2) {
@@ -189,33 +173,53 @@ export const playerInspectService = (commandObject) => {
 			addLog(`You do not have a ${command2} to inspect`)
 			return
 		}
-	} 
-	if (Number.isInteger(command2))
-		foundItem = playerItemFindByNumberUtil(command2, playerItems)
-		if (!foundItem) {
-			addLog(`You do not have an item in that slot to inspect`)
-			return
-		}
-	
+	}
+	if (Number.isInteger(command2)) foundItem = playerItemFindByNumberUtil(command2, playerItems)
+	if (!foundItem) {
+		addLog(`You do not have an item in that slot to inspect`)
+		return
+	}
+
 	itemExamineDisplay(foundItem, addLog)
+}
+
+export const playerReadService = async commandObject => {
+	const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
+	const { command1, command2, addLog, playerStatus, setGameData, ws } = commandObject
+	const sign = currentArea.Keywords.find(keyword => keyword.methodCode === 'sign')
+	console.log(sign, ' sign')
+	addLog(sign.description)
+
 }
 
 export const playerExamineService = async commandObject => {
 	const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
-	const { command2, addLog, playerStatus, setGameData, ws } = commandObject
-	if (!command2) {return addLog('You must specify what you want to examine')}
-	
-	const foundKeyword = currentArea?.Keywords.find(keyword => keyword.refName == command2)
+	const { command1, command2, addLog, playerStatus, setGameData, ws } = commandObject
+	console.log(commandObject, ' examine service command object')
+	if (!command2) {
+		return addLog('You must specify what you want to examine')
+	}
+
+	const foundKeyword = currentArea?.Keywords.find(keyword => keyword.name.toLowerCase() == command2)
 	let foundEnemyByNumber = enemyFindByNumber(enemies, command2)
 	let foundEnemyByName = enemyFindByName(enemies, command2)
 	let foundItem = itemFindByKeywordUtil(items, command2)
-	
-	if (foundItem) {return itemExamineDisplay(foundItem, addLog)}
-	if (foundEnemyByName) {return enemyExamineDisplay(foundEnemyByName, addLog)}
-	if (foundEnemyByNumber) {return enemyExamineDisplay(foundEnemyByNumber, addLog)}
+
+	if (foundItem) {
+		return itemExamineDisplay(foundItem, addLog)
+	}
+	if (foundEnemyByName) {
+		return enemyExamineDisplay(foundEnemyByName, addLog)
+	}
+	if (foundEnemyByNumber) {
+		return enemyExamineDisplay(foundEnemyByNumber, addLog)
+	}
 	if (foundKeyword) {
+		console.log('keyword examined')
 		if (foundKeyword?.methodCode) {
-			keywordMapper[foundKeyword.methodCode](player.id, foundKeyword.id, currentArea.id, ws)
+			console.log('foundKeyword has methodcode')
+			keywordExamineSender(player.id, foundKeyword.id, currentArea.id, command1, ws)
+			// keywordMapper[foundKeyword.methodCode](player.id, foundKeyword.id, currentArea.id, ws)
 		}
 	}
 
@@ -224,42 +228,32 @@ export const playerExamineService = async commandObject => {
 	}
 }
 
-export const playerPull = async commandObject => {
-	const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
-	const { command2, addLog, playerStatus, setGameData, ws } = commandObject
-	
+//change to playerKeywordInteraction
+export const playerPullService = async commandObject => {
+	const { player, currentArea  } = commandObject.gameData
+	const { command1, command2, addLog, ws } = commandObject
+
 	if (!command2) {
 		addLog('You must specify what you want to pull')
 		return
 	}
-	
-	const foundKeyword = currentArea.Keywords.find(keyword => keyword.refName == command2)
+
+	const foundKeyword = currentArea.Keywords.find(keyword => keyword.name.toLowerCase() == command2)
 	if (!foundKeyword) {
 		addLog(`You do not see a ${command2} to pull`)
 		return
 	}
-	if (foundKeyword) {
-		if (foundKeyword?.methodCode) {
-			keywordMapper[foundKeyword.methodCode](player.id, foundKeyword.id, currentArea.id, ws)
-		}
+	if (foundKeyword.methodCode) {
+		keywordActivationSender(player.id, foundKeyword.id, currentArea.id, command1, ws)
+		// keywordMapper[foundKeyword.refName](player.id, foundKeyword.id, currentArea.id, ws)
+		// activateKeywordSender(player.id, foundKeyword.id, currentArea.id, ws)
 	}
 
-
-
-		// if (foundKeyword?.methodCode != 'pullLever') {
-		// 	addLog(`You cannot pull the ${command2}`)
-		// 	return
-		// }
 	// if (foundKeyword) {
-	// 	console.log(foundKeyword)
-	// 	addLog(`You pull the ${foundKeyword.refName}`)
-	// 	const response = await foundKeyword[foundKeyword.methodCode](currentArea, foundKeyword)
-	// 	console.log(response)
-	// 	const updatedAreaExits = response.updatedArea.exitsBool
-	// 	setGameData(prev => ({
-	// 		...prev,
-	// 		currentArea: { ...prev.currentArea, exitsBool: updatedAreaExits },
-	// 	}))
+
+	// 	if (foundKeyword?.methodCode) {
+	// 		keywordMapper[foundKeyword.methodCode](player.id, foundKeyword.id, currentArea.id, ws)
+	// 	}
 	// }
 }
 
@@ -270,9 +264,9 @@ export const playerPicksUpItemService = commandObject => {
 		console.log(keywords.includes(command2))
 		return keywords.includes(command2)
 	})
-	
+
 	if (command2 === 'all') {
-		console.log(currentArea.id, " currentArea.id")
+		console.log(currentArea.id, ' currentArea.id')
 		playerPicksUpItemSender(player.id, null, currentArea.id, command2, ws)
 		return
 	}
@@ -283,7 +277,6 @@ export const playerPicksUpItemService = commandObject => {
 // export const playerGet = async commandObject => {
 // 	const { gameData, setGameData, addLog, command2 } = commandObject
 // 	const { player, currentArea } = gameData
-
 
 // 	if (command2 != 'all') {
 // 		addLog('Please specify all')
@@ -305,7 +298,6 @@ export const playerPicksUpItemService = commandObject => {
 // 	}
 // }
 
-
 export async function playerDropsItem(commandObject) {
 	const { addLog, command2, command3, setGameData } = commandObject
 	const areaId = commandObject.gameData.currentArea.id
@@ -314,14 +306,16 @@ export async function playerDropsItem(commandObject) {
 		return addLog(`You must specify what you want to drop`)
 	}
 	let droppedItem
-	if (command2 == 'right') {droppedItem = findItemByRight(playerItems)} 
-	else if (command2 == 'left') {droppedItem = findItemByLeft(playerItems)}
-	else if (isNaN(command2)) {droppedItem = dropItemByKeyword(playerItems, command2)}
-	else if (!isNaN(command2)) {droppedItem = findItemByNumber(playerItems, command2)}
-	if (droppedItem.location !== 'inventory' && 
-		(droppedItem.location !== 'rightHand' && 
-		droppedItem.location !== 'leftHand')
-	) return addLog('You must remove an equipped item before dropping it')
+	if (command2 == 'right') {
+		droppedItem = findItemByRight(playerItems)
+	} else if (command2 == 'left') {
+		droppedItem = findItemByLeft(playerItems)
+	} else if (isNaN(command2)) {
+		droppedItem = dropItemByKeyword(playerItems, command2)
+	} else if (!isNaN(command2)) {
+		droppedItem = findItemByNumber(playerItems, command2)
+	}
+	if (droppedItem.location !== 'inventory' && droppedItem.location !== 'rightHand' && droppedItem.location !== 'leftHand') return addLog('You must remove an equipped item before dropping it')
 	// if (droppedItem.location !== 'inventory' && (
 	// 	droppedItem.location === 'rightHand' ||
 	// 	droppedItem.location === 'leftHand'
@@ -342,18 +336,19 @@ export async function playerDropsItem(commandObject) {
 	}
 	//positive case
 	const updatedDroppedItem = await fetchPlayerDropsItem(areaId, droppedItem.id)
-	console.log(updatedDroppedItem, " updatedDroppedItem")
+	console.log(updatedDroppedItem, ' updatedDroppedItem')
 	if (!updatedDroppedItem) {
 		return addLog(`Internal server error`)
 	}
 	setGameData(prev => {
-		return ({
-		...prev,
-		items: [...prev.items, updatedDroppedItem],
-		playerItems: prev.playerItems.filter(item => {
-			return item.id != updatedDroppedItem.id
-		}),
-	})})
+		return {
+			...prev,
+			items: [...prev.items, updatedDroppedItem],
+			playerItems: prev.playerItems.filter(item => {
+				return item.id != updatedDroppedItem.id
+			}),
+		}
+	})
 	const message = playerDropsJSX(updatedDroppedItem)
 	addLog(message)
 }
@@ -386,7 +381,7 @@ export async function playerUnpacksItemService(commandObject) {
 	if (!unpackedItem && !isNaN(command2)) {
 		return addLog(`You don't have an item in that slot to unpack`)
 	}
-	console.log(unpackedItem, " UNPACKED ITEM")
+	console.log(unpackedItem, ' UNPACKED ITEM')
 	// if (unpackedItem.location == "leftHand" || unpackedItem.location == "rightHand") {return addLog(`You are wielding the only ${unpackedItem.name} that you own`)}
 
 	if ((isLeftHandFull || isRightHandFull) && unpackedItem?.isTwoHanded) {
@@ -404,7 +399,7 @@ export async function playerUnpacksItemService(commandObject) {
 	console.log(playerId)
 	console.log(unpackedItem.id)
 	console.log(unpackedItem.location)
-	console.log(ws, " ws")
+	console.log(ws, ' ws')
 	playerUnpacksItemSender(playerId, unpackedItem.id, unpackedItem.location, ws)
 }
 export async function playerPacksItemService(commandObject) {
@@ -427,7 +422,7 @@ export async function playerPacksItemService(commandObject) {
 			return item.location == 'leftHand' || item.location == 'bothHands'
 		}
 	})
-	console.log(packedItem, " PACKED ITEM")
+	console.log(packedItem, ' PACKED ITEM')
 	if (!packedItem && command2 == 'right') {
 		return addLog(`You are not holding anything in your right hand`)
 	}
@@ -459,7 +454,7 @@ export const playerAdvances = commandObject => {
 	const { addLog, command2, command3, setGameData, playerStatus, setPlayerStatus, ws } = commandObject
 	const { player, currentArea, enemies, playerItems } = commandObject.gameData
 	let targetEnemy = findEnemy(enemies, command2)
-	
+
 	if (playerIsInCombatCheck(player.id, enemies)) {
 		addLog(`You are already engaged with an enemy`)
 		return
@@ -483,18 +478,18 @@ export const playerRetreats = commandObject => {
 	const { player, enemies } = commandObject.gameData
 
 	const isPlayerInCombat = enemies.some(({ playerCombatIds }) => playerCombatIds.includes(player.id))
-	console.log(isPlayerInCombat, " IS PLAYER IN COMBAT")
+	console.log(isPlayerInCombat, ' IS PLAYER IN COMBAT')
 	if (!isPlayerInCombat) {
-		const message = "You are not in combat"
+		const message = 'You are not in combat'
 		addLog(message)
 		return
 	}
 	playerRetreatsSender(player.id, player.area_id, ws)
-	const retreatMessage = "You retreat from combat"
+	const retreatMessage = 'You retreat from combat'
 	addLog(retreatMessage)
 }
 
-export const playerExamineItemUtil = (commandObject) => {
+export const playerExamineItemUtil = commandObject => {
 	const { command2, addLog } = commandObject
 	const { playerItems } = commandObject.gameData
 	if (command2.length > 0) {
@@ -505,52 +500,48 @@ export const playerExamineItemUtil = (commandObject) => {
 	}
 }
 
-export const playerEquipsArmorService = (commandObject) => {
+export const playerEquipsArmorService = commandObject => {
 	const { player, playerItems } = commandObject.gameData
 	const { command2, addLog, ws } = commandObject
 	if (!command2) return addLog(`You must specify what you want to equip`)
 
-	const possibleItemsToEquip = playerItems.filter(item => item.location === "rightHand" || item.location === "leftHand")
-	console.log(possibleItemsToEquip, " possibleItemsToEquip")
+	const possibleItemsToEquip = playerItems.filter(item => item.location === 'rightHand' || item.location === 'leftHand')
+	console.log(possibleItemsToEquip, ' possibleItemsToEquip')
 	if (possibleItemsToEquip.length === 0) return addLog(`You must be holding a piece of armor to equip it`)
 	const chosenItem = possibleItemsToEquip.find(({ keywords }) => keywords.includes(command2))
-	console.log(chosenItem, " chosenItem")
+	console.log(chosenItem, ' chosenItem')
 	if (!chosenItem) return addLog(`You are not holding a ${command2} to equip`)
 	// eslint-disable-next-line no-prototype-builtins
-	if (chosenItem.templateType != "armor") return addLog(`You can only equip armor`)
+	if (chosenItem.templateType != 'armor') return addLog(`You can only equip armor`)
 	const allEquippedItems = playerItems.filter(item => item.location !== 'inventory' && item.location !== 'rightHand' && item.location !== 'leftHand')
-	
-	
-
-
 
 	const isSlotOccupied = allEquippedItems.some(equippedItem => equippedItem.slot === chosenItem.slot)
 	if (isSlotOccupied) return addLog(`You already have an item equipped in that slot`)
-	
+
 	// allEquippedItems.forEach(equippedItem => {
 	// 	if (equippedItem.slot === chosenItem.slot) {
 	// 		addLog(`You already have an item equipped in that slot`)
 	// 		return
 	// 	}
 	// })
-	
+
 	playerEquipsArmorSender(player.id, chosenItem.id, ws)
 }
-export const playerRemovesArmorService = (commandObject) => {
+export const playerRemovesArmorService = commandObject => {
 	const { player, playerItems } = commandObject.gameData
 	const { command2, addLog, ws } = commandObject
 	const allEquippedItems = playerItems.filter(item => item.location !== 'inventory' && item.location !== 'rightHand' && item.location !== 'leftHand')
-	const itemToRemove = 
-	allEquippedItems.find(({ keywords }) => keywords.includes(command2)) || 
-	allEquippedItems.find(({ slot }) => slot === command2)
+	const itemToRemove = allEquippedItems.find(({ keywords }) => keywords.includes(command2)) || allEquippedItems.find(({ slot }) => slot === command2)
 
-	if (!itemToRemove) {return addLog(`You do not have a ${command2} to remove`)}
+	if (!itemToRemove) {
+		return addLog(`You do not have a ${command2} to remove`)
+	}
 	if (!command2) return addLog(`You must specify what you want to remove`)
 
 	playerRemovesArmorSender(player.id, itemToRemove.id, ws)
 }
 
-export const playerRecallsService = (commandObject) => {
+export const playerRecallsService = commandObject => {
 	const { player, currentArea } = commandObject.gameData
 	const { command2, addLog, ws } = commandObject
 	if (isNaN(command2)) {
