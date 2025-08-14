@@ -16,6 +16,7 @@ Player.init(
 		level: { type: DataTypes.INTEGER },
 		raceId: { type: DataTypes.INTEGER },
 		classId: { type: DataTypes.INTEGER },
+		userId: { type: DataTypes.INTEGER },
 
 		attributes: { type: DataTypes.JSONB },
 		stats: { type: DataTypes.JSONB },

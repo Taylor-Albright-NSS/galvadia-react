@@ -1,0 +1,11 @@
+.registration-container {
+	display: flex;
+	border: 2px solid green;
+	width: 500px;
+}
+
+.sign-up-form {
+}
+
+.login-input {
+}

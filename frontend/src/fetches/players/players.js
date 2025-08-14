@@ -25,7 +25,13 @@ export const fetchIncreasePlayerExperience = async (playerId, experienceGain) =>
     }
 }
 
-export const getPlayers = async () =>{
+export const getUserCharacters = async (userId) => {
+    const response = await fetch(`${api}/user/${userId}/characters`)
+    const data = await response.json()
+    return data
+}
+
+export const getPlayers = async () => {
     const response = await fetch(`${api}/players`)
     const data = await response.json()
 }

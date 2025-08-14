@@ -2,7 +2,7 @@ import 'dotenv/config' // No need for .config()
 import express from 'express'
 // import playerRoutes from './routes/playerRoutes'
 import Area from './models/area.js'
-import { getPlayers, createPlayer, deletePlayer, putPlayer, getPlayer1API, playerRoomTransition, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem, patchPlayerDropsItem } from './controllers/playerController.js'
+import { getPlayers, createUser, deletePlayer, putPlayer, getPlayer1API, playerRoomTransition, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem, patchPlayerDropsItem, getUsersCharacters } from './controllers/playerController.js'
 import db from './models/associations.js'
 import cors from 'cors'
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js'
@@ -50,6 +50,8 @@ app.get('/npcquestdialogue/:npcId', getNpcQuestDialogue)
 app.get('/npcdialogueAll', getNpcDialogueAll)
 //--------USER
 app.get('/user/:id', getUser)
+//--------CHARACTER
+app.get(`/user/:id/characters`, getUsersCharacters)
 //--------ITEMS
 // (MULTIPLE)
 app.get('/items', getItems)
@@ -74,7 +76,7 @@ app.get('/npcs/:areaId/:playerId', getCurrentAreaNpcs)
 app.get('/npc/:id', getNpcById)
 app.get('/npc/:id/dialogue', getNpcDialogue)
 app.get('/playernpcrelationship/', getPlayerNpcRelationship)
-// app.post('/createplayernpcrelationship', playerSpeaksNpcUnlocksDirection)
+// app.post('/createUsernpcrelationship', playerSpeaksNpcUnlocksDirection)
 //--------PLAYERS
 //(SINGLE)
 // app.patch('/player/:id/coordinates', playerRoomTransition)
@@ -84,7 +86,7 @@ app.get('/player/:id', getPlayer1API)
 //(MULTIPLE)
 app.get('/players', getPlayers)
 app.get('/players/:areaId', getPlayersInRoom)
-app.post('/players', createPlayer)
+app.post('/players', createUser)
 app.put('/player/:id', putPlayer)
 app.put('/player')
 app.delete('/player/:id', deletePlayer)
