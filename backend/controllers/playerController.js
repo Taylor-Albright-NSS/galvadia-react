@@ -16,33 +16,47 @@ import { getPlayerWeapons, swingBuilderUtil } from '../utils/playerUtils.js'
 
 export let players = {}
 // prettier-ignore
-export const playerRetreats = async (data, ws, wss) => {
-  try {
-    const { playerId, areaId } = data
-    const allEnemies = await Enemy.findAll({ where: { area_id: areaId } })
-    console.log(allEnemies, " ALL ENEMIES")
-    if (!allEnemies) {
-      throw new Error("Error retrieving all enemies")
-    }
-    const playerIsInCombat = allEnemies.some(({ playerCombatIds }) => playerCombatIds.includes(playerId))
-    if (!playerIsInCombat) { 
-      console.log("Player is not in combat. No retreat happens")
-      return 
-    }
-    const updatedEnemies = await Promise.all(
-      allEnemies.map(async (enemy) => {
-      const [_, [updatedEnemy]] = await Enemy.update(
-        { playerCombatIds: enemy.playerCombatIds.filter(id => id !== playerId) },
-        { where: { id: enemy.id }, returning: true }
-      )
-      return updatedEnemy
-    }))
-    ws.send(JSON.stringify({ type: "playerAction", action: "playerRetreats", enemies: updatedEnemies }))
+export const getUsersCharacters = async (req, res) => {
+  const { id: userId } = req.params; // clearer destructuring
+  console.log("User ID:", userId);
 
-  } catch(error) {
-    ws.send(JSON.stringify({ type: "error", message: "Failed to retreat" }))
-    console.error(`Error: `, error)
+  try {
+    const characters = await Player.findAll({ where: { userId } });
+
+    if (!characters || characters.length === 0) {
+      return res.status(404).json({ error: "No characters found for this user." });
+    }
+
+    return res.status(200).json(characters);
+  } catch (err) {
+    console.error(`Error retrieving user's characters:`, err);
+    return res.status(500).json({ error: "Failed to retrieve characters." });
   }
+};
+export const playerRetreats = async (data, ws, wss) => {
+	try {
+		const { playerId, areaId } = data
+		const allEnemies = await Enemy.findAll({ where: { area_id: areaId } })
+		console.log(allEnemies, ' ALL ENEMIES')
+		if (!allEnemies) {
+			throw new Error('Error retrieving all enemies')
+		}
+		const playerIsInCombat = allEnemies.some(({ playerCombatIds }) => playerCombatIds.includes(playerId))
+		if (!playerIsInCombat) {
+			console.log('Player is not in combat. No retreat happens')
+			return
+		}
+		const updatedEnemies = await Promise.all(
+			allEnemies.map(async enemy => {
+				const [_, [updatedEnemy]] = await Enemy.update({ playerCombatIds: enemy.playerCombatIds.filter(id => id !== playerId) }, { where: { id: enemy.id }, returning: true })
+				return updatedEnemy
+			})
+		)
+		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRetreats', enemies: updatedEnemies }))
+	} catch (error) {
+		ws.send(JSON.stringify({ type: 'error', message: 'Failed to retreat' }))
+		console.error(`Error: `, error)
+	}
 }
 
 export const playerAdvancesEnemy = async (data, ws, wss) => {
@@ -170,13 +184,35 @@ export const playerRoomTransition = async (data, wss) => {
 	}
 }
 
-export const createPlayer = async (req, res) => {
-	const { name, area_id } = req.body
+export const createUser = async (req, res) => {
+	const { name, level, area_id, raceId, classId, userId, attributes, stats, offenses, defenses, resistances, progress, experience, gold, skillPoints, attributePoints } = req.body
 	try {
-		const player = await Player.create({ name, area_id })
+		console.log(req.body)
+		const player = await Player.create({
+			name,
+			level,
+			raceId,
+			classId,
+			userId,
+			area_id,
+
+			attributes,
+			stats,
+			offenses,
+			defenses,
+			resistances,
+			progress,
+
+			experience,
+			gold,
+			skillPoints,
+			attributePoints,
+		})
+		console.log(player)
 		res.status(201).json(player)
 	} catch (error) {
-		res.status(500).json({ error: 'Failed to create player' })
+		console.error(error)
+		res.status(500).json({ error: 'Failed to create player (create player endpoint)' })
 	}
 }
 

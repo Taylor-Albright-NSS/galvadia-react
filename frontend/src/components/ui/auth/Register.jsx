@@ -1,6 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom'
 import { register } from '../../../fetches/auth/authManager'
 import { useReducer } from 'react'
+import '../../../styles/register.css'
 
 export default function Register() {
 	const [state, dispatch] = useReducer(
@@ -26,7 +27,7 @@ export default function Register() {
 		}
 
 		try {
-			const data = await register(state.username, state.password)
+			const data = await register(state.username, state.email, state.password)
 			if (!data) {
 				throw new Error(`Registration failed`)
 			}
@@ -39,7 +40,7 @@ export default function Register() {
 	}
 
 	return (
-		<div className="grid-container">
+		<div className="registration-container">
 			<form className="sign-up-form" onSubmit={handleSubmit}>
 				<fieldset style={{ display: 'flex', flexDirection: 'column' }}>
 					<legend style={{ textAlign: 'center' }}>Create Account</legend>

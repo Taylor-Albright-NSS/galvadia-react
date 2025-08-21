@@ -9,6 +9,7 @@ module.exports = {
 					area_id: 1,
 					raceId: 1,
 					classId: 1,
+					userId: 1,
 
 					attributes: JSON.stringify({
 						strength: 0,
@@ -65,6 +66,7 @@ module.exports = {
 					area_id: 1,
 					raceId: 2,
 					classId: 2,
+					userId: 1,
 
 					attributes: JSON.stringify({
 						strength: 0,
