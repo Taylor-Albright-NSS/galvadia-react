@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import '../../../styles/character-select.css'
+import './characterSelect.css'
 import { useEffect } from 'react'
 import { getUserCharacters } from '../../../fetches/players/players'
 

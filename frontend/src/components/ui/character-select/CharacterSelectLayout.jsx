@@ -1,12 +1,12 @@
 import { Banner } from './Banner'
 import { CharacterSelect } from './CharacterSelect'
-import '../../../styles/character-select.css'
+import './characterSelect.css'
 
-export const CharacterSelectLayout = () => {
+export const CharacterSelectLayout = ({ children }) => {
 	return (
 		<div className="character-select-layout">
 			<Banner />
-			<CharacterSelect />
+			{children}
 		</div>
 	)
 }

@@ -1,7 +1,8 @@
 import { CharacterCard } from './CharacterCard'
-import '../../../styles/character-select.css'
+import './characterSelect.css'
 import { useEffect, useState } from 'react'
 import { getUserCharacters } from '../../../fetches/players/players'
+import { Link } from 'react-router-dom'
 
 export const CharacterSelect = () => {
 	const [characters, setCharacters] = useState([])
@@ -29,7 +30,9 @@ export const CharacterSelect = () => {
 			<div className="character-select-heading">Select your character</div>
 			<div className="character-select-card-container">{characters.length > 0 && characters.map(c => <CharacterCard key={c.id} c={c} />)}</div>
 			<div className="character-select-create">
-				<button>Create New Character</button>
+				<Link to="/character-creation">
+					<button>Create New Character</button>
+				</Link>
 			</div>
 		</div>
 	)

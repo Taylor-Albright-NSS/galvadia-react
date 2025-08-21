@@ -6,6 +6,8 @@ import { AuthorizedRoute } from './components/ui/auth/AuthorizedRoute'
 import Register from './components/ui/auth/Register'
 import { CharacterSelectLayout } from './components/ui/character-select/CharacterSelectLayout'
 import { Layout } from './components/layout/Layout'
+import { CharacterSelect } from './components/ui/character-select/CharacterSelect'
+import { CharacterCreation } from './components/ui/character-select/CharacterCreation'
 
 export const App = () => {
 	return (
@@ -18,7 +20,15 @@ export const App = () => {
 						path="/character-select"
 						element={
 							<AuthorizedRoute>
-								<CharacterSelectLayout />
+								<CharacterSelectLayout>{<CharacterSelect />}</CharacterSelectLayout>
+							</AuthorizedRoute>
+						}
+					/>
+					<Route
+						path="/character-creation"
+						element={
+							<AuthorizedRoute>
+								<CharacterSelectLayout>{<CharacterCreation />}</CharacterSelectLayout>
 							</AuthorizedRoute>
 						}
 					/>

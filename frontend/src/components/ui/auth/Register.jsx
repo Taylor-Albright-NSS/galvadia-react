@@ -27,7 +27,7 @@ export default function Register() {
 		}
 
 		try {
-			const data = await register(state.username, state.password)
+			const data = await register(state.username, state.email, state.password)
 			if (!data) {
 				throw new Error(`Registration failed`)
 			}
