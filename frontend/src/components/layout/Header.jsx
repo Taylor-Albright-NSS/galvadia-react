@@ -2,7 +2,7 @@ import './_header.css'
 
 export const Header = () => {
 	return (
-		<div className="header-container">
+		<div className="navbar">
 			<div>Home</div>
 			<div>Game</div>
 			<div>Account</div>

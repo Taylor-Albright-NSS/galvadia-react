@@ -1,4 +1,4 @@
-.header-container {
+.navbar {
 	display: flex;
 	justify-content: space-around;
 	align-items: center;
@@ -8,12 +8,12 @@
 	height: 40px;
 }
 
-.header-container div {
+.navbar div {
 	cursor: pointer;
 	transition: transform 1s;
 }
 
-.header-container div:active {
+.navbar div:active {
 	color: green;
 	transform: scale(2);
 }

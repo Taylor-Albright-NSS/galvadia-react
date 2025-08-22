@@ -1,0 +1,5 @@
+.race-main {
+	display: flex;
+	flex: 1;
+	border: 3px solid rgb(255, 0, 255);
+}
