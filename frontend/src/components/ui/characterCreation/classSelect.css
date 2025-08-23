@@ -2,31 +2,31 @@
 	display: flex;
 	flex-direction: column;
 	border: 3px solid purple;
-	flex: 1; /* fill available space */
+	height: 400px;
 	min-height: 0;
 }
 
-.class-heading {
+.choose-class-heading {
 	text-align: center;
 }
 
 .class-select {
 	display: grid;
-	grid-template-columns: 1fr 1fr 1fr 1fr;
+	grid-template-columns: 1fr 1fr 1fr;
 	padding: 5px;
 	border: 4px solid blue;
 	justify-items: center;
 	align-items: center;
 
-	flex: 1; /* take remaining space inside class-main */
-	min-height: 0; /* critical for scroll to work inside flex */
+	flex: 1;
+	min-height: 0;
 	overflow-y: auto;
 }
 
 .class-icon {
 	margin: 8px;
-	width: 100px;
-	height: 100px;
+	width: 150px;
+	height: 150px;
 	border: 2px solid brown;
 	cursor: pointer;
 }

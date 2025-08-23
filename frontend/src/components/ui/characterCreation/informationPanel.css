@@ -1,0 +1,59 @@
+.information-panel {
+	display: flex;
+	flex-direction: column;
+}
+
+.pClass {
+	display: flex;
+	flex-direction: column;
+	border: 2px solid blue;
+	flex: 1;
+}
+.race {
+	border: 2px solid green;
+	flex: 1;
+}
+.stats {
+	border: 2px solid purple;
+	flex: 1;
+}
+
+.class-information {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+.class-heading {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	text-align: center;
+	border: 6px ridge grey;
+	height: 50px;
+}
+.class-heading p {
+	font-size: 30px !important;
+	margin-bottom: 4px;
+}
+.class-description {
+	text-align: center;
+}
+.class-details {
+	display: flex;
+	justify-content: space-around;
+	border: 2px solid blue;
+	margin-top: 40px;
+}
+
+.class-attributes {
+	display: flex;
+	flex-direction: column;
+}
+.class-skills {
+	display: flex;
+	flex-direction: column;
+}
+.class-abilities {
+	display: flex;
+	flex-direction: column;
+}

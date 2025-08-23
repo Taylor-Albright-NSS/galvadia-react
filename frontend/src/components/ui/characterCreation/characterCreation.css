@@ -11,6 +11,7 @@
 .selection-panel {
 	display: flex;
 	flex-direction: column;
+	justify-content: space-around;
 	border: 3px solid green;
 	flex: 1;
 }

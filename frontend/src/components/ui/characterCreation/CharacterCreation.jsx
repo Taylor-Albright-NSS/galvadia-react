@@ -6,16 +6,18 @@ import { InformationPanel } from './InformationPanel'
 import { useState } from 'react'
 
 export const CharacterCreation = () => {
-	const [characterClass, setCharacterClass] = useState()
+	const [characterClass, setCharacterClass] = useState(null)
+	const [characterRace, setCharacterRace] = useState(null)
+	console.log(characterRace, ' character race')
 	return (
 		<div className="character-creation">
 			<div className="panels-wrapper">
 				<div className="selection-panel">
 					<ClassSelect characterClass={characterClass} setCharacterClass={setCharacterClass} />
-					<RaceSelect />
+					<RaceSelect characterRace={characterRace} setCharacterRace={setCharacterRace} />
 				</div>
 				<div className="information-panel">
-					<InformationPanel characterClass={characterClass} />
+					<InformationPanel characterClass={characterClass} characterRace={characterRace} />
 				</div>
 			</div>
 
