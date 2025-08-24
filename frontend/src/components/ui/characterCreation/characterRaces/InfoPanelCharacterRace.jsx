@@ -1,6 +1,6 @@
 export const InfoPanelCharacterRace = ({ characterRace }) => {
 	const { name, attributes, skills, description } = characterRace || {}
-	const { str, dex, agi, con, int, wis, mys } = attributes
+	const { str, dex, agi, con, int, wis, mys } = characterRace && attributes ? attributes : {}
 	return (
 		<div className="pClass">
 			<div className="class-heading">
