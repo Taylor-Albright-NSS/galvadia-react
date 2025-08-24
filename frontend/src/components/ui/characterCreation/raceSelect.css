@@ -1,0 +1,30 @@
+.race-main {
+	display: flex;
+	flex-direction: column;
+	border: 3px solid purple;
+	height: 400px;
+	min-height: 0;
+}
+
+.race-heading {
+	text-align: center;
+}
+
+.race-select {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	padding: 5px;
+	border: 4px solid blue;
+	justify-items: center;
+	align-items: center;
+	overflow-y: auto;
+	flex: 1;
+}
+
+.race-icon {
+	margin: 8px;
+	width: 150px;
+	height: 150px;
+	border: 2px solid brown;
+	cursor: pointer;
+}

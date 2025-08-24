@@ -4,10 +4,10 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import Login from './components/ui/auth/Login'
 import { AuthorizedRoute } from './components/ui/auth/AuthorizedRoute'
 import Register from './components/ui/auth/Register'
-import { CharacterSelectLayout } from './components/ui/character-select/CharacterSelectLayout'
+import { CharacterSelectLayout } from './components/ui/characterSelect/CharacterSelectLayout'
 import { Layout } from './components/layout/Layout'
-import { CharacterSelect } from './components/ui/character-select/CharacterSelect'
-import { CharacterCreation } from './components/ui/character-select/CharacterCreation'
+import { CharacterSelect } from './components/ui/characterSelect/CharacterSelect'
+import { CharacterCreation } from './components/ui/characterCreation/CharacterCreation'
 
 export const App = () => {
 	return (
@@ -28,7 +28,7 @@ export const App = () => {
 						path="/character-creation"
 						element={
 							<AuthorizedRoute>
-								<CharacterSelectLayout>{<CharacterCreation />}</CharacterSelectLayout>
+								<CharacterCreation />
 							</AuthorizedRoute>
 						}
 					/>

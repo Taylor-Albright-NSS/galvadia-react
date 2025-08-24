@@ -1,0 +1,26 @@
+.character-creation {
+	display: flex;
+	flex-direction: column;
+	border: 6px solid white;
+	height: 100%;
+}
+.panels-wrapper {
+	display: flex;
+	flex: 1;
+}
+.selection-panel {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-around;
+	border: 3px solid green;
+	flex: 1;
+}
+.information-panel {
+	border: 3px solid pink;
+	flex: 1;
+}
+
+.footer {
+	padding: 10px;
+	text-align: center;
+}

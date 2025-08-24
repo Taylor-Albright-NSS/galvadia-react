@@ -6,7 +6,7 @@ export const Layout = ({ children }) => {
 	return (
 		// <div className="layout-wrapper">
 		// 	<NavigationBar />
-		// 	<div className="under-navbar">
+		// 	<div className="main">
 		// 		{loggedInUser && <SideBar />}
 		// 		<div className="main-content">
 		// 			<Outlet />
@@ -15,7 +15,7 @@ export const Layout = ({ children }) => {
 		// </div>
 		<div className="app">
 			<Header />
-			<div className="under-navbar">{children}</div>
+			<div className="main">{children}</div>
 			{/* <Footer /> */}
 		</div>
 	)
