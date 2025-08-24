@@ -6,7 +6,7 @@ module.exports = {
 			'Users',
 			[
 				{
-					name: 'Taylor',
+					// name: 'Taylor',
 					username: 'mudfobby',
 					email: 't@gmail.com',
 					passwordHash: hash,
@@ -14,7 +14,7 @@ module.exports = {
 					updatedAt: new Date(),
 				},
 				{
-					name: 'Kyle',
+					// name: 'Kyle',
 					username: 'carcass',
 					email: 'k@gmail.com',
 					passwordHash: hash,

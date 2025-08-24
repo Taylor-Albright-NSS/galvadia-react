@@ -20,13 +20,13 @@ import {
 	patchPlayerNpcDecrementDialogueStage,
 	patchPlayerNpcIncrementDialogueStage,
 } from './controllers/npcController.js'
-import { createEnemy, deleteEnemy, enemySpawns, enemyTakesDamage, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './controllers/enemyController.js'
-import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, postOnehandedSword, postSpawnItemToPlayer, postTwohandedSword, putCurrentAreaItemsToPlayer } from './controllers/itemController.js'
+import { deleteEnemy, enemySpawns, enemyTakesDamage, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './controllers/enemyController.js'
+import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, postOnehandedSword, postSpawnItemToPlayer, putCurrentAreaItemsToPlayer } from './controllers/itemController.js'
 import { app } from './websocket.js'
-import { getUser } from './controllers/userController.js'
-import { patchKeywordActivation, patchToggleKeywordFalse } from './controllers/keywordController.js'
+import { getAllUsers, getUser } from './controllers/userController.js'
 import { getGameData } from './controllers/gameStateController.js'
 import { postLogin, postRegister } from './controllers/authController.js'
+import { getAllCharacterClasses, getAllCharacterRaces, getCharacterClassById, getCharacterRaceById } from './controllers/characterCreationController.js'
 // import { playerSpeaksNpcUnlocksDirection } from './controllerServices/playerActionsServices.js'
 
 app.use(express.json())
@@ -38,6 +38,12 @@ app.post('/login', postLogin)
 app.get('/npcquest/:npcId/:playerId', getNpcQuest)
 app.patch(`/dialoguestage/:playerId/:npcId/decrement`, patchPlayerNpcDecrementDialogueStage)
 app.patch(`/dialoguestage/:playerId/:npcId/increment`, patchPlayerNpcIncrementDialogueStage)
+//--------CLASS VALUES
+app.get('/character-class/:id', getCharacterClassById)
+app.get('/character-classes', getAllCharacterClasses)
+//--------RACE VALUES
+app.get('/character-race/:id', getCharacterRaceById)
+app.get('/character-races', getAllCharacterRaces)
 //--------GAME DATA
 app.get('/gamedata/:playerId/:areaId', getGameData)
 //--------NPC QUEST
@@ -50,6 +56,7 @@ app.get('/npcquestdialogue/:npcId', getNpcQuestDialogue)
 app.get('/npcdialogueAll', getNpcDialogueAll)
 //--------USER
 app.get('/user/:id', getUser)
+app.get('/users', getAllUsers)
 //--------CHARACTER
 app.get(`/user/:id/characters`, getUsersCharacters)
 //--------ITEMS

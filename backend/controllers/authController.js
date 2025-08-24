@@ -10,9 +10,10 @@ const authRouter = express.Router()
 
 // authRouter.post('/signup', async (req, res) => {
 export const postRegister = async (req, res) => {
-	const { username, password } = req.body
+	const { username, email, password } = req.body
 	const usernameExists = await User.findOne({ where: { username } })
 	console.log(username, ' username')
+	console.log(email, ' email')
 	console.log(password, ' password')
 	console.log(usernameExists, ' usernameExists')
 	if (usernameExists) {
@@ -22,6 +23,7 @@ export const postRegister = async (req, res) => {
 	const passwordHash = await bcrypt.hash(password, 10)
 	const user = await User.create({
 		username,
+		email,
 		passwordHash,
 	})
 	console.log(user, ' created user')

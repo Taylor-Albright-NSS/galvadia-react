@@ -4,7 +4,6 @@ module.exports = {
 			'Players',
 			[
 				{
-					id: 1,
 					name: 'John Doe',
 					area_id: 1,
 					raceId: 1,
@@ -61,7 +60,6 @@ module.exports = {
 					updatedAt: new Date(),
 				},
 				{
-					id: 2,
 					name: 'Jane Smith',
 					area_id: 1,
 					raceId: 2,
