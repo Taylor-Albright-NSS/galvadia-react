@@ -1,76 +1,45 @@
+import { useEffect, useState } from 'react'
 import { allRaces } from './characterRaces/characterRaces'
 import './raceSelect.css'
 
 export const RaceSelect = ({ setCharacterRace }) => {
+	const [allRaces, setAllRaces] = useState(null)
 	function handleSelection(selectedRace) {
 		setCharacterRace(selectedRace)
 	}
-	const { human, elf } = allRaces
+	useEffect(() => {
+		async function retrieveRaces() {
+			try {
+				const response = await fetch(`http://localhost:3000/character-races`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				})
+				const data = await response.json()
+				console.log(data, ' RACE DATA')
+				if (!data) throw Error(`Error retrieving character races`)
+				setAllRaces(data)
+			} catch (error) {
+				console.log(`Error: `, error)
+			}
+		}
+		retrieveRaces()
+	}, [])
 
 	return (
-		<div className="class-main">
-			<div className="choose-class-heading">Choose a Class</div>
-			<div className="class-select">
-				<div id="berserker" className="class-icon" onClick={() => handleSelection(human)}>
-					Human
-				</div>
-				<div id="fighter" className="class-icon" onClick={() => handleSelection(elf)}>
-					Elf
-				</div>
-				<div id="knight" className="class-icon" onClick={() => handleSelection()}>
-					race 3
-				</div>
-				<div id="assassin" className="class-icon" onClick={() => handleSelection()}>
-					race 4
-				</div>
-				<div id="thief" className="class-icon" onClick={() => handleSelection()}>
-					race 5
-				</div>
-				<div id="shadowblade" className="class-icon" onClick={() => handleSelection()}>
-					race 6
-				</div>
-				<div id="martial-monk" className="class-icon" onClick={() => handleSelection()}>
-					race 7
-				</div>
-				<div id="mystic-monk" className="class-icon" onClick={() => handleSelection()}>
-					race 8
-				</div>
-				<div id="elemental-monk" className="class-icon" onClick={() => handleSelection()}>
-					race 9
-				</div>
-				<div id="pyromancer" className="class-icon" onClick={() => handleSelection()}>
-					race 10
-				</div>
-				<div id="cryo-mage" className="class-icon" onClick={() => handleSelection()}>
-					race 11
-				</div>
-				<div id="lightning-magus" className="class-icon" onClick={() => handleSelection()}>
-					race 12
-				</div>
-				<div id="ranger" className="class-icon" onClick={() => handleSelection()}>
-					race 13
-				</div>
-				<div className="class-icon" onClick={() => handleSelection()}>
-					test
-				</div>
-				<div className="class-icon" onClick={() => handleSelection()}>
-					test
-				</div>
-				<div className="class-icon" onClick={() => handleSelection()}>
-					test
-				</div>
-				<div className="class-icon" onClick={() => handleSelection()}>
-					test
-				</div>
-				<div className="class-icon" onClick={() => handleSelection()}>
-					test
-				</div>
-				<div className="class-icon" onClick={() => handleSelection()}>
-					test
-				</div>
-				<div className="class-icon" onClick={() => handleSelection()}>
-					test
-				</div>
+		<div className="race-main">
+			<div className="race-heading">Choose a Race</div>
+			<div className="race-select">
+				{allRaces &&
+					allRaces.map(race => {
+						console.log(race, ' race')
+						return (
+							<div key={race.id} className="race-icon" onClick={() => handleSelection(race)}>
+								{race.name}
+							</div>
+						)
+					})}
 			</div>
 		</div>
 	)

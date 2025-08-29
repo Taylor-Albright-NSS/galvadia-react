@@ -17,8 +17,9 @@
 	border: 4px solid blue;
 	justify-items: center;
 	align-items: center;
-	overflow-y: auto;
 	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
 }
 
 .race-icon {

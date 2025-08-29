@@ -1,6 +1,6 @@
 export const InfoPanelCharacterClass = ({ characterClass }) => {
-	const { name, attributes, skills, abilities, description } = characterClass || {}
-	const { str, dex, agi, con, int, wis, mys } = characterClass && attributes ? attributes : {}
+	const { name, strength, dexterity, agility, constitution, intellegence, wisdom, mysticism, skills, abilities, description } = characterClass || {}
+	console.log(characterClass, ' CHARACTER CLASS')
 	return (
 		<div className="pClass">
 			{characterClass && (
@@ -14,24 +14,16 @@ export const InfoPanelCharacterClass = ({ characterClass }) => {
 						</div>
 						<div className="class-details">
 							<div className="class-attributes">
-								<div>Str: {str}</div>
-								<div>Dex: {dex}</div>
-								<div>Agi: {agi}</div>
-								<div>Con: {con}</div>
-								<div>Int: {int}</div>
-								<div>Wis: {wis}</div>
-								<div>Mys: {mys}</div>
+								<div>Str: {strength}</div>
+								<div>Dex: {dexterity}</div>
+								<div>Agi: {agility}</div>
+								<div>Con: {constitution}</div>
+								<div>Int: {intellegence}</div>
+								<div>Wis: {wisdom}</div>
+								<div>Mys: {mysticism}</div>
 							</div>
-							<div className="class-skills">
-								<p>skills 1</p>
-								<p>skills 2</p>
-								<p>skills 3</p>
-							</div>
-							<div className="class-abilities">
-								<p>abilities 1</p>
-								<p>abilities 2</p>
-								<p>abilities 3</p>
-							</div>
+							<div className="class-skills">{skills && skills.map(skill => <p key={skill.id}>{skill}</p>)}</div>
+							<div className="class-abilities">{abilities && abilities.map(ability => <p key={ability.id}>{ability}</p>)}</div>
 						</div>
 					</div>
 				</>
