@@ -13,6 +13,7 @@ module.exports = {
 					intelligence: 2,
 					wisdom: 2,
 					mysticism: 4,
+					skills: ['Human Language'],
 					createdAt: new Date(),
 					updatedAt: new Date(),
 				},

@@ -51,3 +51,18 @@ export const postLogin = async (req, res) => {
 
 	return res.status(200).json({ token, user: { id: user.id, name: user.name, username: user.username } })
 }
+
+export function authenticateJWT(req, res, next) {
+	const auth = req.headers.authorization || ''
+	const token = auth.startsWith('Bearer ') ? auth.slice(7) : null
+	if (!token) return res.status(401).json({ error: 'Missing token' })
+
+	try {
+		const payload = jwt.verify(token, process.env.JWT_SECRET)
+		// Convention: put user id in `sub` or `id`
+		req.user = { id: payload.sub || payload.id, roles: payload.roles || [] }
+		next()
+	} catch {
+		return res.status(401).json({ error: 'Invalid token' })
+	}
+}

@@ -26,8 +26,8 @@ module.exports = {
 			x: { type: Sequelize.INTEGER, defaultValue: 0 },
 			y: { type: Sequelize.INTEGER, defaultValue: 0 },
 			z: { type: Sequelize.INTEGER, defaultValue: 0 },
-			s: { type: Sequelize.STRING },
-			area_id: { type: Sequelize.INTEGER, allowNull: false },
+			s: { type: Sequelize.STRING, defaultValue: 'tutorial' },
+			area_id: { type: Sequelize.INTEGER, allowNull: false, defaultValue: 1 },
 			createdAt: { type: Sequelize.DATE, allowNull: false },
 			updatedAt: { type: Sequelize.DATE, allowNull: false },
 		})

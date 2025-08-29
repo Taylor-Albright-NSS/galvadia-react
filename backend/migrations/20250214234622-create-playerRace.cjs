@@ -12,7 +12,8 @@ module.exports = {
 			intelligence: { type: Sequelize.INTEGER },
 			wisdom: { type: Sequelize.INTEGER },
 			mysticism: { type: Sequelize.INTEGER },
-
+			skills: { type: Sequelize.ARRAY(Sequelize.STRING) },
+			description: { type: Sequelize.STRING },
 			createdAt: { type: Sequelize.DATE, allowNull: false },
 			updatedAt: { type: Sequelize.DATE, allowNull: false },
 		})

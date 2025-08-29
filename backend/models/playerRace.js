@@ -14,6 +14,8 @@ PlayerRace.init(
 		intelligence: { type: DataTypes.INTEGER },
 		wisdom: { type: DataTypes.INTEGER },
 		mysticism: { type: DataTypes.INTEGER },
+		skills: { type: DataTypes.ARRAY(DataTypes.STRING) },
+		description: { type: DataTypes.STRING },
 	},
 	{
 		sequelize,

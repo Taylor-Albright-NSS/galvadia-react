@@ -184,35 +184,24 @@ export const playerRoomTransition = async (data, wss) => {
 	}
 }
 
-export const createUser = async (req, res) => {
-	const { name, level, area_id, raceId, classId, userId, attributes, stats, offenses, defenses, resistances, progress, experience, gold, skillPoints, attributePoints } = req.body
+export const createCharacter = async (req, res) => {
+	const { name, raceId, classId } = req.body
 	try {
-		console.log(req.body)
+		if (!name) throw new Error('Your character must have a name.')
+		if (!classId) throw new Error('Your character must have a class.')
+		if (!raceId) throw new Error('Your character must have a race.')
 		const player = await Player.create({
 			name,
-			level,
 			raceId,
 			classId,
-			userId,
-			area_id,
-
-			attributes,
-			stats,
-			offenses,
-			defenses,
-			resistances,
-			progress,
-
-			experience,
-			gold,
-			skillPoints,
-			attributePoints,
+			userId: req.user.id,
 		})
 		console.log(player)
+
 		res.status(201).json(player)
 	} catch (error) {
 		console.error(error)
-		res.status(500).json({ error: 'Failed to create player (create player endpoint)' })
+		res.status(500).json({ message: error.message })
 	}
 }
 
