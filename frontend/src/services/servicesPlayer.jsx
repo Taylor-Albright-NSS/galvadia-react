@@ -41,13 +41,15 @@ export const playerOffersQuest = async commandObject => {
 	if (npcs.length > 1 && !command2) {
 		return addLog('You must specify whose quest you wish to see.')
 	}
-	if (npcs.length === 1) {payload.npcId = npcs[0].npcId}
-	if (npcs.length > 1) {payload.npcId = findNpcByName(npcs, command2).npcId}
+	if (npcs.length === 1) {
+		payload.npcId = npcs[0].npcId
+	}
+	if (npcs.length > 1) {
+		payload.npcId = findNpcByName(npcs, command2).npcId
+	}
 
 	ws.send(JSON.stringify({ type: 'quest', action: 'complete', payload }))
-
 }
-
 
 export const playerSpeaksToNpcService = async commandObject => {
 	const { player, currentArea, npcs } = commandObject.gameData
@@ -96,7 +98,6 @@ export const playerSpeaksToNpcService = async commandObject => {
 
 	return
 }
-
 
 export const playerSpeakToNpcQuest = async commandObject => {
 	const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
@@ -156,7 +157,6 @@ export const playerLookService = async commandObject => {
 	playerLooksSender(playerId, areaId, ws)
 }
 
-
 export const playerInspectService = commandObject => {
 	const { player, players, playerItems, currentArea, npcs, enemies, items } = commandObject.gameData
 	const { command2, addLog, playerStatus, setGameData } = commandObject
@@ -189,7 +189,6 @@ export const playerReadService = async commandObject => {
 	const sign = currentArea.Keywords.find(keyword => keyword.methodCode === 'sign')
 	console.log(sign, ' sign')
 	addLog(sign.description)
-
 }
 
 export const playerExamineService = async commandObject => {
@@ -230,7 +229,7 @@ export const playerExamineService = async commandObject => {
 
 //change to playerKeywordInteraction
 export const playerPullService = async commandObject => {
-	const { player, currentArea  } = commandObject.gameData
+	const { player, currentArea } = commandObject.gameData
 	const { command1, command2, addLog, ws } = commandObject
 
 	if (!command2) {

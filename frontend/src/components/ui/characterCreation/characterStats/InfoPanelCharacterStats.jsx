@@ -19,8 +19,10 @@ export const InfoPanelCharacterStats = ({ characterClass, characterRace }) => {
 	function aggregateAttributes() {
 		if (characterClass && characterRace) {
 			console.log(characterClass)
-			let { strength, dexterity, agility, constitution, intelligence, wisdom, mysticism } = characterClass
+			let { health, mana, strength, dexterity, agility, constitution, intelligence, wisdom, mysticism } = characterClass
 			const attributes = {
+				health: health + characterRace.health,
+				mana: mana + characterRace.mana,
 				strength: strength + characterRace.strength,
 				dexterity: dexterity + characterRace.dexterity,
 				agility: agility + characterRace.agility,
@@ -38,8 +40,8 @@ export const InfoPanelCharacterStats = ({ characterClass, characterRace }) => {
 			<div className="stats-heading">Heading</div>
 			<div className="stats-details">
 				<div className="stats-resources">
-					<div>health</div>
-					<div>mana</div>
+					<div>Health: {attributes?.health}</div>
+					<div>Mana: {attributes?.mana}</div>
 					<div>class resources</div>
 				</div>
 				<div className="stats-attributes">

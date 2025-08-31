@@ -1,21 +1,24 @@
-import { useState } from 'react'
+import { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { login } from '../../../fetches/auth/authManager'
 import { Button, FormFeedback, FormGroup, Input, Label } from 'reactstrap'
 import { zGameContext } from '../zGameContext'
 import './login.css'
+import { WebSocketContext } from '../WebSocketContext'
 
 export default function Login() {
 	const navigate = useNavigate()
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [failedLogin, setFailedLogin] = useState(false)
+	const { setToken } = useContext(WebSocketContext)
 
 	const handleSubmit = e => {
 		e.preventDefault()
 		login(username, password).then(data => {
 			try {
 				const { token, user } = data
+				setToken(token)
 				localStorage.setItem('token', token)
 				localStorage.setItem('user', JSON.stringify(user))
 				navigate('/character-select')
