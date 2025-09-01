@@ -8,6 +8,7 @@ import { Op } from 'sequelize'
 import { PlayerNpc } from '../models/playerNpc.js'
 import { PlayerArea } from '../models/playerArea.js'
 import { applyPlayerArea } from '../utils/areaUtils.js'
+import { helpGetAllConnectedPlayerIds } from '../helpers/helpers.js'
 
 export const getGameData = async data => {
 	try {
@@ -24,9 +25,10 @@ export const getGameData = async data => {
 			modifiedArea = area.toJSON()
 		}
 		console.log('Inside game data', 1)
+		const allPlayerIds = helpGetAllConnectedPlayerIds()
 		const enemies = await Enemy.findAll({ where: { area_id: areaId } })
 		const itemsInArea = await Item.findAll({ where: { ownerId: areaId, ownerType: 'area' } })
-		const players = await Player.findAll({ where: { area_id: areaId, id: { [Op.ne]: playerId } } })
+		const players = await Player.findAll({ where: { area_id: areaId, id: { [Op.in]: allPlayerIds, [Op.ne]: playerId } } })
 		const playerNpcs = await PlayerNpc.findAll({ where: { playerId } })
 		const allNpcs = await Npc.findAll({ where: { area_id: areaId } })
 		const missingNpcs = allNpcs.filter(npc => !playerNpcs.some(playerNpc => playerNpc.npcId === npc.id))

@@ -16,6 +16,7 @@ import { NpcDialogue } from '../models/npcDialogue.js'
 import Armor from '../models/armor.js'
 import { playerUpdateAllAttributes } from '../utils/calculations/calculationsPlayer.js'
 import { npcMapper } from '../utils/npcUtils.js'
+import { helpGetAllConnectedPlayerIds, helpGetAllPlayersInSameRoom } from '../helpers/helpers.js'
 
 export const playerRoomTransitionService = async (data, ws, wss) => {
 	console.log('WEBSOCKET PLAYER ROOM TRANSITION')
@@ -208,9 +209,14 @@ export const playerSpeaksToNpcService = async (data, ws) => {
 export const playerLooksService = async (data, ws) => {
 	try {
 		const { playerId, areaId } = data
+		console.log(111)
+		const onlineIds = await helpGetAllConnectedPlayerIds(playerId)
+		console.log(onlineIds, ' onlineIds')
+		console.log(222)
 
 		const area = await Area.findOne({ where: { id: areaId }, include: { model: Keyword } })
 		const playerArea = await PlayerArea.findOne({ where: { playerId, area_id: areaId } })
+		console.log(3)
 		let modifiedArea
 		if (playerArea) {
 			modifiedArea = applyPlayerArea(playerArea, area)
@@ -223,11 +229,11 @@ export const playerLooksService = async (data, ws) => {
 			Enemy.findAll({ where: { area_id: areaId } }),
 			Npc.findAll({ where: { area_id: areaId } }),
 			Item.findAll({ where: { ownerId: areaId, ownerType: 'area' }, include: [{ model: Weapon }] }),
-			Player.findAll({ where: { area_id: areaId, id: { [Op.ne]: playerId } } }),
+			Player.findAll({ where: { area_id: areaId, id: { [Op.in]: onlineIds, [Op.ne]: playerId } } }),
 			PlayerNpc.findAll({ where: { playerId } }),
 		])
 		const missingNpcs = baseNpcs.filter(npc => !playerNpcs.some(playerNpc => playerNpc.npcId === npc.id))
-		console.log(7)
+		console.log(3)
 		await Promise.all(
 			missingNpcs.map(async npc => {
 				console.log(npc, ' this is the missing npc to add')
@@ -241,12 +247,12 @@ export const playerLooksService = async (data, ws) => {
 				console.log(playerNpc, ' newly created playerNpc')
 			})
 		)
-
+		console.log(2)
 		const npcs = await PlayerNpc.findAll({
 			where: { area_id: areaId, playerId },
 			include: [{ model: Npc }], // Include master NPC reference for name, etc.
 		})
-
+		console.log(1)
 		const gameData = { currentArea: modifiedArea, enemies, npcs, items, players }
 		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerLooks', gameData }))
 	} catch (error) {

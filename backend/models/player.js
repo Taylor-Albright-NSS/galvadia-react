@@ -10,6 +10,56 @@ class Player extends Model {
 		return level
 	}
 }
+Player.prototype.getAttributes = async function () {
+	const playerClass = await this.getPlayerClass()
+	const playerRace = await this.getPlayerRace()
+	const classRaceAttributes = {}
+	// console.log(playerClass.dataValues)
+	for (const att in playerClass.dataValues) {
+		const validAtts = ['strength', 'dexterity', 'agility', 'constitution', 'intelligence', 'wisdom', 'mysticism']
+		if (validAtts.includes(att)) {
+			classRaceAttributes[att] = playerClass[att] + playerRace[att] + 100 || 0
+		}
+	}
+	console.log(classRaceAttributes, ' CLASS RACE ATTRIBUTES')
+	return classRaceAttributes
+}
+Player.prototype.getMaxHealth = async function () {
+	const playerClass = await this.getPlayerClass()
+	const playerRace = await this.getPlayerRace()
+	console.log(playerClass.health, ' player class from getMaxHealth')
+
+	const base = playerClass.health + playerRace.health
+	const con = this.attributes?.constitution || 0
+	// const vigor = this.attributes?.vigor || 0
+	const fromCon = con * 4
+	// const fromLevel = this.level * 10
+	// const fromVigor = vigor * 2
+
+	// const fromEquipment = (await this.getEquippedItems()).reduce((sum, item) => sum + (item.bonuses?.hp || 0), 0)
+
+	// const fromBuffs = (this.buffs || []).reduce((sum, buff) => sum + (buff.hpBonus || 0), 0)
+
+	// return base + fromCon + fromLevel + fromVigor + fromEquipment + fromBuffs
+	return base + fromCon
+}
+Player.prototype.getMaxMana = async function () {
+	const playerClass = await this.getPlayerClass()
+	const playerRace = await this.getPlayerRace()
+
+	const base = playerClass.mana + playerRace.mana
+	const wis = this.attributes?.wisdom || 0
+	// const vigor = this.attributes?.vigor || 0
+	const fromWis = wis * 4
+
+	// const fromLevel = this.level * 10
+	// const fromVigor = vigor * 2
+	// const fromEquipment = (await this.getEquippedItems()).reduce((sum, item) => sum + (item.bonuses?.hp || 0), 0)
+	// const fromBuffs = (this.buffs || []).reduce((sum, buff) => sum + (buff.hpBonus || 0), 0)
+	// return base + fromCon + fromLevel + fromVigor + fromEquipment + fromBuffs
+
+	return base + fromWis
+}
 
 Player.init(
 	{
@@ -45,39 +95,35 @@ Player.init(
 		modelName: 'Player',
 		hooks: {
 			beforeSave(player) {
-				player.level = player.levelCalc // Set the level based on the experience
+				player.level = player.levelCalc
 			},
-			async beforeCreate(player) {
-				// if (!player.raceId || !player.classId) throw new Error('Player must have race and class selected')
+			// async beforeCreate(player) {
+			// 	const race = await PlayerRace.findByPk(player.raceId)
+			// 	const charClass = await PlayerClass.findByPk(player.classId)
 
-				const race = await PlayerRace.findByPk(player.raceId)
-				const charClass = await PlayerClass.findByPk(player.classId)
+			// 	if (!race || !charClass) throw new Error('Invalid race or class')
 
-				console.log(race.toJSON(), ' ++++++++++++++++RACE')
-				console.log(charClass.toJSON(), ' ++++++++++++++++CLASS')
+			// 	const keys = new Set([...Object.keys(race.toJSON()), ...Object.keys(charClass.toJSON())])
 
-				if (!race || !charClass) throw new Error('Invalid race or class')
+			// 	const aggregatedAttributes = {}
 
-				// Get all possible attribute keys from both models
-				const keys = new Set([...Object.keys(race.toJSON()), ...Object.keys(charClass.toJSON())])
+			// 	keys.forEach(key => {
+			// 		if (['id', 'name', 'createdAt', 'updatedAt', 'skills', 'description', 'abilities', 'health', 'mana'].includes(key)) return
 
-				const aggregatedAttributes = {}
+			// 		const raceVal = race[key] || 0
+			// 		const classVal = charClass[key] || 0
 
-				keys.forEach(key => {
-					// Only consider actual attribute fields (not id, name, createdAt, etc.)
-					if (['id', 'name', 'createdAt', 'updatedAt'].includes(key)) return
+			// 		if (typeof raceVal === 'number' || typeof classVal === 'number') {
+			// 			aggregatedAttributes[key] = (raceVal || 0) + (classVal || 0)
+			// 		}
+			// 	})
+			// 	player.stats = {
+			// 		health: charClass.health + race.health,
+			// 		mana: charClass.mana + race.mana,
+			// 	}
 
-					const raceVal = race[key] || 0
-					const classVal = charClass[key] || 0
-
-					// Only aggregate numeric fields
-					if (typeof raceVal === 'number' || typeof classVal === 'number') {
-						aggregatedAttributes[key] = (raceVal || 0) + (classVal || 0)
-					}
-				})
-				console.log(aggregatedAttributes, ' AGGREGATED ATTRIBUTES')
-				player.attributes = aggregatedAttributes
-			},
+			// 	player.attributes = aggregatedAttributes
+			// },
 		},
 	}
 )

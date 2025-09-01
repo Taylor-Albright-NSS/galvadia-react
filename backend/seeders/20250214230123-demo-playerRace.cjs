@@ -6,6 +6,8 @@ module.exports = {
 				{
 					id: 1,
 					name: 'Human',
+					health: 4,
+					mana: 4,
 					strength: 2,
 					dexterity: 3,
 					agility: 4,
@@ -20,6 +22,8 @@ module.exports = {
 				{
 					id: 2,
 					name: 'Dwarf',
+					health: 8,
+					mana: 1,
 					strength: 3,
 					dexterity: 2,
 					agility: 3,
@@ -33,6 +37,8 @@ module.exports = {
 				{
 					id: 3,
 					name: 'Elf',
+					health: 2,
+					mana: 7,
 					strength: 1,
 					dexterity: 2,
 					agility: 4,

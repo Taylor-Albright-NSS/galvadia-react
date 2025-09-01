@@ -13,26 +13,28 @@ import { PlayerClass } from '../models/playerClass.js'
 import Armor from '../models/armor.js'
 import { playerUpdateAllAttributes } from '../utils/calculations/calculationsPlayer.js'
 import { getPlayerWeapons, swingBuilderUtil } from '../utils/playerUtils.js'
+import { helpGetAllPlayersInSameRoom } from '../helpers/helpers.js'
 
 export let players = {}
 // prettier-ignore
+
 export const getUsersCharacters = async (req, res) => {
-  const { id: userId } = req.params; // clearer destructuring
-  console.log("User ID:", userId);
+	const { id: userId } = req.params
+	console.log('User ID:', userId)
 
-  try {
-    const characters = await Player.findAll({ where: { userId } });
+	try {
+		const characters = await Player.findAll({ where: { userId } })
 
-    if (!characters || characters.length === 0) {
-      return res.status(404).json({ error: "No characters found for this user." });
-    }
+		if (!characters || characters.length === 0) {
+			return res.status(404).json({ error: 'No characters found for this user.' })
+		}
 
-    return res.status(200).json(characters);
-  } catch (err) {
-    console.error(`Error retrieving user's characters:`, err);
-    return res.status(500).json({ error: "Failed to retrieve characters." });
-  }
-};
+		return res.status(200).json(characters)
+	} catch (err) {
+		console.error(`Error retrieving user's characters:`, err)
+		return res.status(500).json({ error: 'Failed to retrieve characters.' })
+	}
+}
 export const playerRetreats = async (data, ws, wss) => {
 	try {
 		const { playerId, areaId } = data
@@ -149,34 +151,36 @@ export const playerRegularAttack = async (data, ws, wss) => {
 export const playerRoomTransition = async (data, wss) => {
 	try {
 		const { x, y, areaId, previousAreaId, playerId } = data
-
+		console.log(x, 'x', y, 'y', areaId, 'areaId', previousAreaId, 'previousAreaId', playerId, 'playerId')
 		let counter = 1
-		wss.clients.forEach(client => {
-			if (!players?.[counter]?.name) return
-			let player = players[counter]
-			if (player.id != parseInt(playerId)) {
-				if (player.areaId === areaId) {
-					client.send(JSON.stringify({ type: 'playerMoves', message: 'Player enters the room' }))
-				}
-			}
-			counter++
-		})
+		//REWRITE THE BELOW CODE TO CONSIDER THE NEW CONNECTEDCHARACTERS MAP
+		// wss.clients.forEach(client => {
+		// 	if (!players?.[counter]?.name) return
+		// 	let player = players[counter]
+		// 	if (player.id != parseInt(playerId)) {
+		// 		if (player.areaId === areaId) {
+		// 			client.send(JSON.stringify({ type: 'playerMoves', message: 'Player enters the room' }))
+		// 		}
+		// 	}
+		// 	counter++
+		// })
 		const player = await Player.findOne({ where: { id: playerId } })
+		console.log(players, ' PLAYERS')
 		player.x = x
 		player.y = y
 		player.area_id = areaId
-
-		players[playerId].areaId = areaId
-		counter = 1
-		wss.clients.forEach(client => {
-			if (!players?.[counter]?.name) return
-			if (players[counter].id != parseInt(playerId)) {
-				if (previousAreaId === players[counter].areaId) {
-					client.send(JSON.stringify({ type: 'playerMoves', message: 'Player leaves the room' }))
-				}
-			}
-			counter++
-		})
+		//REWRITE THE BELOW CODE TO CONSIDER THE NEW CONNECTEDCHARACTERS MAP
+		// players[playerId].areaId = areaId
+		// counter = 1
+		// wss.clients.forEach(client => {
+		// 	if (!players?.[counter]?.name) return
+		// 	if (players[counter].id != parseInt(playerId)) {
+		// 		if (previousAreaId === players[counter].areaId) {
+		// 			client.send(JSON.stringify({ type: 'playerMoves', message: 'Player leaves the room' }))
+		// 		}
+		// 	}
+		// 	counter++
+		// })
 		await player.save()
 		return player
 	} catch (error) {
@@ -244,6 +248,35 @@ export const getPlayer1API = async (req, res) => {
 	}
 }
 
+export const getSelectedCharacter = async (req, res) => {
+	const characterId = req.params.characterId
+	const userId = req.user.id
+	console.log(userId, ' userId')
+	console.log(characterId, ' characterId')
+	try {
+		const character = await Player.findOne({
+			where: { id: characterId, userId: userId },
+			include: [{ model: Area }, { model: PlayerRace }, { model: PlayerClass }],
+		})
+		if (!character) {
+			return res.status(404).json({ message: 'Player not found or someone is trying to log into a character that does not belong to them' })
+		}
+		const playerItems = await Item.findAll({
+			where: { ownerId: characterId, ownerType: 'player' },
+			include: [Weapon, Armor],
+		})
+		if (!playerItems) {
+			return res.status(404).json({ message: 'Player items not found' })
+		}
+		character.dataValues.items = playerItems
+
+		res.status(200).json(character) // Send player data to the frontend
+	} catch (error) {
+		console.error('Error fetching player:', error)
+		res.status(500).json({ message: 'Internal server error' })
+	}
+}
+
 export const getPlayers = async (req, res) => {
 	try {
 		const players = await Player.findAll()
@@ -256,10 +289,16 @@ export const getPlayersInRoom = async (req, res) => {
 	const { playerId } = req.query
 	const { areaId } = req.params
 	try {
+		const onlineIds = helpGetAllPlayersInSameRoom()
+		if (onlineIds.length === 0) {
+			return res.status(200).json([])
+		}
+
 		const players = await Player.findAll({
 			where: {
 				area_id: areaId,
 				id: {
+					[Op.in]: onlineIds,
 					[Op.ne]: playerId,
 				},
 			},

@@ -7,6 +7,8 @@ PlayerClass.init(
 	{
 		id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 		name: { type: DataTypes.STRING },
+		health: { type: DataTypes.INTEGER },
+		mana: { type: DataTypes.INTEGER },
 		strength: { type: DataTypes.INTEGER },
 		dexterity: { type: DataTypes.INTEGER },
 		agility: { type: DataTypes.INTEGER },

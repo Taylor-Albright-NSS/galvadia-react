@@ -21,9 +21,7 @@ module.exports = {
 					}),
 					stats: JSON.stringify({
 						currentHealth: 0,
-						maxHealth: 0,
 						currentMana: 0,
-						maxMana: 0,
 						burden: 0,
 						weight: 0,
 					}),

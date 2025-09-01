@@ -9,15 +9,39 @@ import { handleKeywordActions } from './controllerHandlers/keywordActionsHandler
 import { handleItemAction } from './controllerHandlers/itemActionsHandler.js'
 import { handleAdminActions } from './controllerHandlers/adminActionsHandler.js'
 import { handleQuestActions } from './controllerHandlers/questActionsHandler.js'
+import { parse } from 'url'
+import jwt from 'jsonwebtoken'
+import Player from './models/player.js'
+import { User } from './models/user.js'
 
 export const app = express()
 export const server = http.createServer(app)
 export const wss = new WebSocketServer({ server })
 
-let playersWS = {}
+export const connectedSockets = new Map()
+export const connectedCharacters = new Map()
 
-wss.on('connection', ws => {
-	ws.on('message', message => {
+wss.on('connection', (ws, req) => {
+	const { query } = parse(req.url, true)
+	const token = query.token
+
+	try {
+		const decoded = jwt.verify(token, process.env.JWT_SECRET)
+		if (!decoded) throw Error(`Failed to verify JWT. Decoded object is undefined`)
+		const userId = decoded.id
+		connectedSockets.set(userId, { ws, ...decoded })
+		ws.id = userId
+		console.log(`Player ${userId} connected`)
+		console.log(`Websocket: Player ${ws.id} connected`)
+	} catch (err) {
+		console.error(`Invalid token. Closing socket. Full error: ${err}`)
+		ws.send(JSON.stringify({ error: 'Invalid token' }))
+		ws.close()
+		return
+	}
+
+	ws.on('message', async message => {
+		console.log(ws.id, ' websocket id of user sending the message')
 		let data
 		try {
 			data = JSON.parse(message)
@@ -26,6 +50,21 @@ wss.on('connection', ws => {
 		}
 		if (data.type === 'admin') {
 			handleAdminActions(data, ws)
+		}
+		if (data.type === 'join') {
+			const [character, user] = await Promise.all([Player.findOne({ where: { id: data.playerId, userId: ws.id } }), User.findOne({ where: { id: ws.id } })])
+			connectedCharacters.set(ws.id, { user, character })
+			console.log(`connectedCharacters set`)
+			broadcast({ type: 'playerJoined', playerId: data.playerId })
+		}
+		if (data.type === 'quit') {
+			console.log(`quit websocket endpoint hit`)
+			console.log(ws.id, ' ws.id for quitting')
+			if (connectedCharacters.has(ws.id)) {
+				console.log(true, ` connected socket does have ${ws.id}`)
+				connectedCharacters.delete(ws.id)
+			}
+			ws.close()
 		}
 		if (data.type === 'quest') {
 			handleQuestActions(data, ws)
@@ -67,17 +106,6 @@ wss.on('connection', ws => {
 				}
 				counter++
 			})
-		}
-		if (data.type === 'join') {
-			console.log('data.type === join DATA')
-			console.log('CLIENT HAS JOINED')
-			playersWS[data.playerId] = ws
-			players[data.playerId] = {}
-			players[data.playerId].areaId = data.areaId
-			players[data.playerId].id = data.playerId
-			players[data.playerId].name = data.name
-			console.log(players)
-			broadcast({ type: 'playerJoined', playerId: data.playerId, player: playersWS })
 		}
 		if (data.type === 'playerDialogue') {
 			const playerName = data.playerName

@@ -2,7 +2,7 @@ import 'dotenv/config' // No need for .config()
 import express from 'express'
 // import playerRoutes from './routes/playerRoutes'
 import Area from './models/area.js'
-import { getPlayers, deletePlayer, putPlayer, getPlayer1API, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem, patchPlayerDropsItem, getUsersCharacters, createCharacter } from './controllers/playerController.js'
+import { getPlayers, deletePlayer, putPlayer, getPlayer1API, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem, patchPlayerDropsItem, getUsersCharacters, createCharacter, getSelectedCharacter } from './controllers/playerController.js'
 import db from './models/associations.js'
 import cors from 'cors'
 import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js'
@@ -27,6 +27,9 @@ import { getAllUsers, getUser } from './controllers/userController.js'
 import { getGameData } from './controllers/gameStateController.js'
 import { authenticateJWT, postLogin, postRegister } from './controllers/authController.js'
 import { getAllCharacterClasses, getAllCharacterRaces, getCharacterClassById, getCharacterRaceById } from './controllers/characterCreationController.js'
+import { retrieveCharMaxHealth } from './controllerHandlers/playerMethods.js'
+import { serializePlayer } from './helpers/helpers.js'
+import { getAllConnectedPlayers, getAllConnectedSockets, getAllConnectedUsersMap, getAllConnectedWebSockets } from './controllers/adminController.js'
 // import { playerSpeaksNpcUnlocksDirection } from './controllerServices/playerActionsServices.js'
 
 app.use(express.json())
@@ -39,7 +42,9 @@ app.get('/npcquest/:npcId/:playerId', getNpcQuest)
 app.patch(`/dialoguestage/:playerId/:npcId/decrement`, patchPlayerNpcDecrementDialogueStage)
 app.patch(`/dialoguestage/:playerId/:npcId/increment`, patchPlayerNpcIncrementDialogueStage)
 //--------CHARACTER CREATION
-app.post('/create-character/', authenticateJWT, createCharacter)
+app.post('/create-character', authenticateJWT, createCharacter)
+//--------CHARACTER SELECTION
+app.get('/character-select/:characterId', authenticateJWT, getSelectedCharacter)
 //--------CLASS VALUES
 app.get('/character-class/:id', getCharacterClassById)
 app.get('/character-classes', getAllCharacterClasses)
@@ -132,6 +137,14 @@ app.get('/enemies/', getAllEnemiesInDatabase)
 app.get('/enemy/:id', getEnemyById)
 
 app.patch('/enemy/:id', enemyTakesDamage)
+
+//--------TESTING
+app.get(`/character-health/:id`, retrieveCharMaxHealth)
+app.get(`/serialized-character/:id`, serializePlayer)
+app.get(`/connected-players`, getAllConnectedPlayers)
+app.get(`/connected-users`, getAllConnectedSockets)
+app.get(`/connected-websockets`, getAllConnectedWebSockets)
+app.get(`/connected-users-map`, getAllConnectedUsersMap)
 
 db.sequelize
 	.sync() // Sync the models with the database (create tables)

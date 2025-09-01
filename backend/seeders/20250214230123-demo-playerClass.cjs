@@ -6,6 +6,8 @@ module.exports = {
 				{
 					id: 1,
 					name: 'Berserker',
+					health: 10,
+					mana: 0,
 					strength: 4,
 					dexterity: 1,
 					agility: 1,
@@ -22,6 +24,8 @@ module.exports = {
 				{
 					id: 2,
 					name: 'Fighter',
+					health: 8,
+					mana: 2,
 					strength: 3,
 					dexterity: 3,
 					agility: 1,

@@ -5,6 +5,8 @@ module.exports = {
 		await queryInterface.createTable('Players', {
 			id: { type: Sequelize.INTEGER, autoIncrement: true, primaryKey: true, allowNull: false },
 			name: { type: Sequelize.STRING },
+			health: { type: Sequelize.INTEGER },
+			mana: { type: Sequelize.INTEGER },
 			level: { type: Sequelize.INTEGER, defaultValue: 1 },
 			raceId: { type: Sequelize.INTEGER },
 			classId: { type: Sequelize.INTEGER },
