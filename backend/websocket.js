@@ -32,7 +32,6 @@ wss.on('connection', (ws, req) => {
 		connectedSockets.set(userId, { ws, ...decoded })
 		ws.id = userId
 		console.log(`Player ${userId} connected`)
-		console.log(`Websocket: Player ${ws.id} connected`)
 	} catch (err) {
 		console.error(`Invalid token. Closing socket. Full error: ${err}`)
 		ws.send(JSON.stringify({ error: 'Invalid token' }))
@@ -54,7 +53,6 @@ wss.on('connection', (ws, req) => {
 		if (data.type === 'join') {
 			const [character, user] = await Promise.all([Player.findOne({ where: { id: data.playerId, userId: ws.id } }), User.findOne({ where: { id: ws.id } })])
 			connectedCharacters.set(ws.id, { user, character })
-			console.log(`connectedCharacters set`)
 			broadcast({ type: 'playerJoined', playerId: data.playerId })
 		}
 		if (data.type === 'quit') {

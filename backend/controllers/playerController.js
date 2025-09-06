@@ -14,6 +14,8 @@ import Armor from '../models/armor.js'
 import { playerUpdateAllAttributes } from '../utils/calculations/calculationsPlayer.js'
 import { getPlayerWeapons, swingBuilderUtil } from '../utils/playerUtils.js'
 import { helpGetAllPlayersInSameRoom } from '../helpers/helpers.js'
+import { helperRetrieveCharacterFull } from '../helpers/player.js'
+import { serializePlayerFull } from '../models/dtos/serializerPlayer.js'
 
 export let players = {}
 // prettier-ignore
@@ -254,25 +256,15 @@ export const getSelectedCharacter = async (req, res) => {
 	console.log(userId, ' userId')
 	console.log(characterId, ' characterId')
 	try {
-		const character = await Player.findOne({
-			where: { id: characterId, userId: userId },
-			include: [{ model: Area }, { model: PlayerRace }, { model: PlayerClass }],
-		})
+		const character = await serializePlayerFull(characterId)
+		console.log(character, ' getSelectedCharacter (should be the serialized version)')
 		if (!character) {
 			return res.status(404).json({ message: 'Player not found or someone is trying to log into a character that does not belong to them' })
 		}
-		const playerItems = await Item.findAll({
-			where: { ownerId: characterId, ownerType: 'player' },
-			include: [Weapon, Armor],
-		})
-		if (!playerItems) {
-			return res.status(404).json({ message: 'Player items not found' })
-		}
-		character.dataValues.items = playerItems
 
 		res.status(200).json(character) // Send player data to the frontend
 	} catch (error) {
-		console.error('Error fetching player:', error)
+		console.error('Error fetching character:', error)
 		res.status(500).json({ message: 'Internal server error' })
 	}
 }
@@ -374,9 +366,9 @@ export const patchPlayerPacksItem = async (req, res) => {
 			return res.status(404).json({ message: 'Player has nothing in that hand to pack' })
 		}
 
-		if (packedItem.templateType === 'weapon') {
-			await playerUpdateAllAttributes(playerId, ws)
-		}
+		// if (packedItem.templateType === 'weapon') {
+		// 	await playerUpdateAllAttributes(playerId, ws)
+		// }
 		await packedItem.update({ location: 'inventory' })
 		return res.status(200).json({ packedItem, message: 'You unpack your item' })
 	} catch (error) {
@@ -427,9 +419,9 @@ export const patchPlayerUnpacksItem = async (req, res) => {
 			await unpackedItem.update({ location: 'leftHand' })
 			return res.status(200).json({ unpackedItem, message: 'Item unpacked to left hand' })
 		}
-		if (unpackedItem.templateType === 'weapon') {
-			await playerUpdateAllAttributes(playerId, ws)
-		}
+		// if (unpackedItem.templateType === 'weapon') {
+		// 	await playerUpdateAllAttributes(playerId, ws)
+		// }
 		// return res.status(200).json(unpackedItem)
 	} catch (error) {
 		console.error(`Error unpacking item: `, error)

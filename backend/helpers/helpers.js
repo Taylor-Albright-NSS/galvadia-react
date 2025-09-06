@@ -47,28 +47,3 @@ export const helpGetAllPlayersInSameRoom = async characterId => {
 		return err
 	}
 }
-
-export async function serializePlayer(req, res) {
-	const characterId = req.params.id
-	const player = await Player.findByPk(characterId, {
-		include: [{ model: Area }, { model: PlayerRace }, { model: PlayerClass }],
-	})
-	const playerItems = await Item.findAll({
-		where: { ownerId: characterId, ownerType: 'player' },
-		include: [Weapon, Armor],
-	})
-	const serializedPlayer = {
-		id: player.id,
-		area_id: player.area_id,
-		name: player.name,
-		level: player.level,
-		attributes: player.attributes,
-		stats: await player.getAttributes(),
-		maxHealth: await player.getMaxHealth(),
-		// attackPower: await player.getAttackPower(),
-		class: player.PlayerClass.name,
-		race: player.PlayerRace.name,
-		inventory: playerItems,
-	}
-	return res.status(200).json(serializedPlayer)
-}

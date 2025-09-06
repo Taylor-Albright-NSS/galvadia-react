@@ -28,8 +28,8 @@ import { getGameData } from './controllers/gameStateController.js'
 import { authenticateJWT, postLogin, postRegister } from './controllers/authController.js'
 import { getAllCharacterClasses, getAllCharacterRaces, getCharacterClassById, getCharacterRaceById } from './controllers/characterCreationController.js'
 import { retrieveCharMaxHealth } from './controllerHandlers/playerMethods.js'
-import { serializePlayer } from './helpers/helpers.js'
 import { getAllConnectedPlayers, getAllConnectedSockets, getAllConnectedUsersMap, getAllConnectedWebSockets } from './controllers/adminController.js'
+import { serializePlayerFull, serializePlayerTest } from './models/dtos/serializerPlayer.js'
 // import { playerSpeaksNpcUnlocksDirection } from './controllerServices/playerActionsServices.js'
 
 app.use(express.json())
@@ -52,7 +52,7 @@ app.get('/character-classes', getAllCharacterClasses)
 app.get('/character-race/:id', getCharacterRaceById)
 app.get('/character-races', getAllCharacterRaces)
 //--------GAME DATA
-app.get('/gamedata/:playerId/:areaId', getGameData)
+app.get('/gamedata/:playerId/:areaId', getGameData) //REFACTOR THIS TO AUTHENTICATE THE JWT
 //--------NPC QUEST
 // app.post('/questcomplete', postNpcRequirements)
 app.patch('/queststage/decrement/:npcId/:playerId', patchDecrementQuestStage)
@@ -140,7 +140,7 @@ app.patch('/enemy/:id', enemyTakesDamage)
 
 //--------TESTING
 app.get(`/character-health/:id`, retrieveCharMaxHealth)
-app.get(`/serialized-character/:id`, serializePlayer)
+app.get(`/serialized-character/:id`, serializePlayerTest)
 app.get(`/connected-players`, getAllConnectedPlayers)
 app.get(`/connected-users`, getAllConnectedSockets)
 app.get(`/connected-websockets`, getAllConnectedWebSockets)

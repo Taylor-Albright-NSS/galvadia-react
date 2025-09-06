@@ -12,8 +12,24 @@ module.exports = {
 			classId: { type: Sequelize.INTEGER },
 			userId: { type: Sequelize.INTEGER },
 
-			attributes: { type: Sequelize.JSONB },
-			stats: { type: Sequelize.JSONB },
+			baseAttributes: { type: Sequelize.JSONB },
+			allocatedAttributes: { type: Sequelize.JSONB },
+
+			// strength: { type: Sequelize.INTEGER },
+			// dexterity: { type: Sequelize.INTEGER },
+			// agility: { type: Sequelize.INTEGER },
+			// constitution: { type: Sequelize.INTEGER },
+			// intelligence: { type: Sequelize.INTEGER },
+			// wisdom: { type: Sequelize.INTEGER },
+			// mysticism: { type: Sequelize.INTEGER },
+
+			healthMax: { type: Sequelize.INTEGER },
+			healthCurrent: { type: Sequelize.INTEGER },
+			manaMax: { type: Sequelize.INTEGER },
+			manaCurrent: { type: Sequelize.INTEGER },
+			burden: { type: Sequelize.INTEGER },
+			weight: { type: Sequelize.INTEGER },
+
 			offenses: { type: Sequelize.JSONB },
 			defenses: { type: Sequelize.JSONB },
 			resistances: { type: Sequelize.JSONB },

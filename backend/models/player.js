@@ -60,6 +60,13 @@ Player.prototype.getMaxMana = async function () {
 
 	return base + fromWis
 }
+Player.prototype.getStats = async function () {
+	const maxMana = await this.getMaxMana()
+	const maxHealth = await this.getMaxHealth()
+	const currentHealth = this.currentHealth
+	const currentMana = this.currentMana
+	return { maxHealth, maxMana, currentHealth, currentMana }
+}
 
 Player.init(
 	{
@@ -70,8 +77,16 @@ Player.init(
 		classId: { type: DataTypes.INTEGER },
 		userId: { type: DataTypes.INTEGER },
 
-		attributes: { type: DataTypes.JSONB },
-		stats: { type: DataTypes.JSONB },
+		baseAttributes: { type: DataTypes.JSONB },
+		allocatedAttributes: { type: DataTypes.JSONB },
+
+		healthMax: { type: DataTypes.INTEGER },
+		healthCurrent: { type: DataTypes.INTEGER },
+		manaMax: { type: DataTypes.INTEGER },
+		manaCurrent: { type: DataTypes.INTEGER },
+		burden: { type: DataTypes.INTEGER },
+		weight: { type: DataTypes.INTEGER },
+
 		offenses: { type: DataTypes.JSONB },
 		defenses: { type: DataTypes.JSONB },
 		resistances: { type: DataTypes.JSONB },
@@ -97,33 +112,38 @@ Player.init(
 			beforeSave(player) {
 				player.level = player.levelCalc
 			},
-			// async beforeCreate(player) {
-			// 	const race = await PlayerRace.findByPk(player.raceId)
-			// 	const charClass = await PlayerClass.findByPk(player.classId)
+			async beforeCreate(player) {
+				const race = await PlayerRace.findByPk(player.raceId)
+				const charClass = await PlayerClass.findByPk(player.classId)
 
-			// 	if (!race || !charClass) throw new Error('Invalid race or class')
+				if (!race || !charClass) throw new Error('Invalid race or class')
 
-			// 	const keys = new Set([...Object.keys(race.toJSON()), ...Object.keys(charClass.toJSON())])
+				const keys = new Set([...Object.keys(race.toJSON()), ...Object.keys(charClass.toJSON())])
 
-			// 	const aggregatedAttributes = {}
+				const aggregatedAttributes = {}
+				const aggregatedStats = {}
 
-			// 	keys.forEach(key => {
-			// 		if (['id', 'name', 'createdAt', 'updatedAt', 'skills', 'description', 'abilities', 'health', 'mana'].includes(key)) return
+				keys.forEach(key => {
+					if (['strength', 'dexterity', 'agility', 'constitution', 'intelligence', 'wisdom', 'mysticism'].includes(key)) {
+						const raceVal = race[key] || 0
+						const classVal = charClass[key] || 0
 
-			// 		const raceVal = race[key] || 0
-			// 		const classVal = charClass[key] || 0
-
-			// 		if (typeof raceVal === 'number' || typeof classVal === 'number') {
-			// 			aggregatedAttributes[key] = (raceVal || 0) + (classVal || 0)
-			// 		}
-			// 	})
-			// 	player.stats = {
-			// 		health: charClass.health + race.health,
-			// 		mana: charClass.mana + race.mana,
-			// 	}
-
-			// 	player.attributes = aggregatedAttributes
-			// },
+						if (typeof raceVal === 'number' || typeof classVal === 'number') {
+							aggregatedAttributes[key] = (raceVal || 0) + (classVal || 0)
+						}
+					}
+				})
+				player.baseAttributes = aggregatedAttributes
+				player.allocatedAttributes = { strength: 0, dexterity: 0, agility: 0, constitution: 0, intelligence: 0, wisdom: 0, mysticism: 0 }
+				const health = await player.getMaxHealth()
+				const mana = await player.getMaxMana()
+				player.healthMax = health
+				player.manaMax = mana
+				player.healthCurrent = health
+				player.manaCurrent = mana
+				player.burden = 0
+				player.weight = 0
+			},
 		},
 	}
 )

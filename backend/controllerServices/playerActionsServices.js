@@ -17,6 +17,7 @@ import Armor from '../models/armor.js'
 import { playerUpdateAllAttributes } from '../utils/calculations/calculationsPlayer.js'
 import { npcMapper } from '../utils/npcUtils.js'
 import { helpGetAllConnectedPlayerIds, helpGetAllPlayersInSameRoom } from '../helpers/helpers.js'
+import { serializePlayerFull } from '../models/dtos/serializerPlayer.js'
 
 export const playerRoomTransitionService = async (data, ws, wss) => {
 	console.log('WEBSOCKET PLAYER ROOM TRANSITION')
@@ -83,7 +84,7 @@ export const playerEquipsArmorService = async (data, ws) => {
 	})
 	console.log(item.Armor.slot, ' item.Armor.slot')
 	console.log(item.location, ' item.location')
-	await playerUpdateAllAttributes(playerId, ws)
+	// await playerUpdateAllAttributes(playerId, ws)
 	ws.send(JSON.stringify({ type: 'playerAction', action: 'playerEquipsArmor', item }))
 }
 
@@ -120,7 +121,7 @@ export const playerRemovesArmorService = async (data, ws) => {
 
 		if (!item.hasOwnProperty('Armor')) throw new Error('Item is not a type that can be equipped')
 
-		await playerUpdateAllAttributes(playerId, ws)
+		// await playerUpdateAllAttributes(playerId, ws)
 		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRemovesArmor', item }))
 	} catch (error) {
 		console.error(error)
@@ -209,14 +210,10 @@ export const playerSpeaksToNpcService = async (data, ws) => {
 export const playerLooksService = async (data, ws) => {
 	try {
 		const { playerId, areaId } = data
-		console.log(111)
 		const onlineIds = await helpGetAllConnectedPlayerIds(playerId)
-		console.log(onlineIds, ' onlineIds')
-		console.log(222)
 
 		const area = await Area.findOne({ where: { id: areaId }, include: { model: Keyword } })
 		const playerArea = await PlayerArea.findOne({ where: { playerId, area_id: areaId } })
-		console.log(3)
 		let modifiedArea
 		if (playerArea) {
 			modifiedArea = applyPlayerArea(playerArea, area)
@@ -233,7 +230,6 @@ export const playerLooksService = async (data, ws) => {
 			PlayerNpc.findAll({ where: { playerId } }),
 		])
 		const missingNpcs = baseNpcs.filter(npc => !playerNpcs.some(playerNpc => playerNpc.npcId === npc.id))
-		console.log(3)
 		await Promise.all(
 			missingNpcs.map(async npc => {
 				console.log(npc, ' this is the missing npc to add')
@@ -247,12 +243,10 @@ export const playerLooksService = async (data, ws) => {
 				console.log(playerNpc, ' newly created playerNpc')
 			})
 		)
-		console.log(2)
 		const npcs = await PlayerNpc.findAll({
 			where: { area_id: areaId, playerId },
 			include: [{ model: Npc }], // Include master NPC reference for name, etc.
 		})
-		console.log(1)
 		const gameData = { currentArea: modifiedArea, enemies, npcs, items, players }
 		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerLooks', gameData }))
 	} catch (error) {
@@ -278,8 +272,8 @@ export const playerPacksItemService = async (data, ws) => {
 		if (itemToPack.location !== 'rightHand' && itemToPack.location !== 'leftHand') throw new Error(`Item must be in hand to pack`)
 
 		await itemToPack.update({ location: 'inventory' })
-		if (itemToPack.templateType === 'weapon') await playerUpdateAllAttributes(playerId, ws)
-		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerPacksItem', item: itemToPack }))
+		const player = await serializePlayerFull(playerId)
+		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerPacksItem', item: itemToPack, player }))
 	} catch (error) {
 		console.error(error)
 		ws.send(JSON.stringify({ type: 'error', message: error }))
@@ -310,8 +304,8 @@ export const playerUnpacksItemService = async (data, ws) => {
 		if (rightHandOpen && leftHandOpen && itemToUnpack.weaponSkill === 'twohanded') await itemToUnpack.update({ location: 'bothHands' })
 		if (rightHandOpen) await itemToUnpack.update({ location: 'rightHand' })
 		else if (leftHandOpen) await itemToUnpack.update({ location: 'leftHand' })
-		if (itemToUnpack.templateType === 'weapon') await playerUpdateAllAttributes(playerId, ws)
-		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerUnpacksItem', item: itemToUnpack }))
+		const updatedPlayer = await serializePlayerFull(playerId)
+		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerUnpacksItem', item: itemToUnpack, player: updatedPlayer }))
 	} catch (error) {
 		console.error(error)
 		ws.send(JSON.stringify({ type: 'error', error }))

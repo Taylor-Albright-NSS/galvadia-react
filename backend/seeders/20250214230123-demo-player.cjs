@@ -10,7 +10,7 @@ module.exports = {
 					classId: 1,
 					userId: 1,
 
-					attributes: JSON.stringify({
+					baseAttributes: JSON.stringify({
 						strength: 0,
 						dexterity: 0,
 						agility: 0,
@@ -19,12 +19,31 @@ module.exports = {
 						wisdom: 0,
 						mysticism: 0,
 					}),
-					stats: JSON.stringify({
-						currentHealth: 0,
-						currentMana: 0,
-						burden: 0,
-						weight: 0,
+					allocatedAttributes: JSON.stringify({
+						strength: 0,
+						dexterity: 0,
+						agility: 0,
+						constitution: 0,
+						intelligence: 0,
+						wisdom: 0,
+						mysticism: 0,
 					}),
+
+					// strength: 0,
+					// dexterity: 0,
+					// agility: 0,
+					// constitution: 0,
+					// intelligence: 0,
+					// wisdom: 0,
+					// mysticism: 0,
+
+					healthMax: 0,
+					healthCurrent: 0,
+					manaMax: 0,
+					manaCurrent: 0,
+					burden: 0,
+					weight: 0,
+
 					offenses: JSON.stringify({
 						attackPower: 0,
 						attackSpeed: 0,
@@ -64,7 +83,7 @@ module.exports = {
 					classId: 2,
 					userId: 1,
 
-					attributes: JSON.stringify({
+					baseAttributes: JSON.stringify({
 						strength: 0,
 						dexterity: 0,
 						agility: 0,
@@ -73,14 +92,31 @@ module.exports = {
 						wisdom: 0,
 						mysticism: 0,
 					}),
-					stats: JSON.stringify({
-						currentHealth: 0,
-						maxHealth: 0,
-						currentMana: 0,
-						maxMana: 0,
-						burden: 0,
-						weight: 0,
+					allocatedAttributes: JSON.stringify({
+						strength: 0,
+						dexterity: 0,
+						agility: 0,
+						constitution: 0,
+						intelligence: 0,
+						wisdom: 0,
+						mysticism: 0,
 					}),
+
+					// strength: 0,
+					// dexterity: 0,
+					// agility: 0,
+					// constitution: 0,
+					// intelligence: 0,
+					// wisdom: 0,
+					// mysticism: 0,
+
+					healthMax: 0,
+					healthCurrent: 0,
+					manaMax: 0,
+					manaCurrent: 0,
+					burden: 0,
+					weight: 0,
+
 					offenses: JSON.stringify({
 						attackPower: 0,
 						attackSpeed: 0,
