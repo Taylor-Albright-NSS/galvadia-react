@@ -1,4 +1,4 @@
-import { players } from '../controllers/playerController.js'
+import { players } from '../_controllers/playerController.js'
 
 function broadcast(message) {
 	//change to broadcastToWorld

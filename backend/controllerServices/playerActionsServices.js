@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 import { broadcastToRoom } from '../broadcasts/broadcast.js'
-import { getGameData } from '../controllers/gameStateController.js'
-import { playerAdvancesEnemy, playerItemInHandsCheck, playerRegularAttack, playerRetreats, playerRoomTransition } from '../controllers/playerController.js'
+import { getGameData } from '../_controllers/gameStateController.js'
+import { playerAdvancesEnemy, playerItemInHandsCheck, playerRegularAttack, playerRetreats, playerRoomTransition } from '../_controllers/playerController.js'
 import Area from '../models/area.js'
 import Enemy from '../models/enemy.js'
 import Item from '../models/item.js'
@@ -20,34 +20,25 @@ import { helpGetAllConnectedPlayerIds, helpGetAllPlayersInSameRoom } from '../he
 import { serializePlayerFull } from '../models/dtos/serializerPlayer.js'
 
 export const playerRoomTransitionService = async (data, ws, wss) => {
-	console.log('WEBSOCKET PLAYER ROOM TRANSITION')
-	try {
-		const { futureX, futureY, player } = data
-		const newArea = await Area.findOne({ where: { x: futureX, y: futureY } })
-		if (!newArea) {
-			ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRoomTransition', updatedGameData: null }))
-			throw new Error(`Anticipated area not found`)
-		}
-
-		const newData = {
-			playerId: player.id,
-			areaId: newArea.id,
-			previousAreaId: player.area_id,
-			x: futureX,
-			y: futureY,
-		}
-		console.log('Before playerRoomTransition')
-		const updatedPlayer = await playerRoomTransition(newData, wss)
-		const gameData = { playerId: updatedPlayer.id, areaId: updatedPlayer.area_id }
-		console.log('Before updatedGameData')
-		const updatedGameData = await getGameData(gameData)
-		console.log(updatedGameData, 'updated game data')
-		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRoomTransition', updatedPlayer, updatedGameData }))
-		broadcastToRoom(wss, updatedPlayer, newData.areaId)
-	} catch (error) {
-		console.error(error)
-		ws.send(JSON.stringify({ type: 'error', message: error }))
+	const { futureX, futureY, player } = data
+	const newArea = await Area.findOne({ where: { x: futureX, y: futureY } })
+	if (!newArea) {
+		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRoomTransition', updatedGameData: null }))
+		throw new Error(`Anticipated area not found`)
 	}
+
+	const newData = {
+		playerId: player.id,
+		areaId: newArea.id,
+		previousAreaId: player.area_id,
+		x: futureX,
+		y: futureY,
+	}
+	const updatedPlayer = await playerRoomTransition(newData, wss)
+	const gameData = { playerId: updatedPlayer.id, areaId: updatedPlayer.area_id }
+	const updatedGameData = await getGameData(gameData)
+	ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRoomTransition', updatedPlayer, updatedGameData }))
+	broadcastToRoom(wss, updatedPlayer, newData.areaId)
 }
 
 export const playerRegularAttackService = async (data, ws, wss) => {

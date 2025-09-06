@@ -1,5 +1,5 @@
-import { unlockDirection } from '../controllers/areaController.js'
-import { postSpawnItemToPlayer } from '../controllers/itemController.js'
+import { unlockDirection } from '../_controllers/areaController.js'
+import { postSpawnItemToPlayer } from '../_controllers/itemController.js'
 import Item from '../models/item.js'
 import { Keyword } from '../models/keyword.js'
 import { PlayerArea } from '../models/playerArea.js'

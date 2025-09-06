@@ -15,7 +15,6 @@ import { playerGainsExperienceService } from '../controllerServices/playerModify
 
 //prettier-ignore
 export const handlePlayerAction = (data, ws, wss) => {
-    console.log(data.action, " data.action")
 	if (data.action === 'playerRoomTransition') {playerRoomTransitionService(data, ws, wss)}
     if (data.action === 'playerRegularAttack') {playerRegularAttackService(data, ws, wss)}
     if (data.action === 'playerAdvancesEnemy') {playerAdvancesEnemyService(data, ws, wss)}
