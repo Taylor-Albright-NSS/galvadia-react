@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 import { broadcastToRoom } from '../broadcasts/broadcast.js'
 import { getGameData } from '../_controllers/gameStateController.js'
-import { playerAdvancesEnemy, playerItemInHandsCheck, playerRegularAttack, playerRetreats, playerRoomTransition } from '../_controllers/playerController.js'
+import { playerItemInHandsCheck, playerRoomTransition } from '../_controllers/playerController.js'
 import Area from '../models/area.js'
 import Enemy from '../models/enemy.js'
 import Item from '../models/item.js'
@@ -14,10 +14,12 @@ import { applyPlayerArea } from '../utils/areaUtils.js'
 import Weapon from '../models/weapon.js'
 import { NpcDialogue } from '../models/npcDialogue.js'
 import Armor from '../models/armor.js'
-import { playerUpdateAllAttributes } from '../utils/calculations/calculationsPlayer.js'
 import { npcMapper } from '../utils/npcUtils.js'
-import { helpGetAllConnectedPlayerIds, helpGetAllPlayersInSameRoom } from '../helpers/helpers.js'
+import { helpGetAllConnectedPlayerIds } from '../helpers/helpers.js'
 import { serializePlayerFull } from '../models/dtos/serializerPlayer.js'
+import { getPlayerWeapons, swingBuilderUtil } from '../utils/playerUtils.js'
+import { GamePlayer } from '../services/GamePlayer.js'
+import { generateEnemyDrops } from '../utils/itemUtils.js'
 
 export const playerRoomTransitionService = async (data, ws, wss) => {
 	const { futureX, futureY, player } = data
@@ -42,18 +44,116 @@ export const playerRoomTransitionService = async (data, ws, wss) => {
 }
 
 export const playerRegularAttackService = async (data, ws, wss) => {
-	console.log(data, ' DATA')
-	await playerRegularAttack(data, ws, wss)
+	try {
+		const { playerId, enemyId } = data
+		console.log(1)
+		const player = await Player.findByPk(playerId)
+		if (!player) throw new Error(`Error finding player by id`)
+		console.log(2)
+
+		const enemy = await Enemy.findByPk(enemyId)
+		if (!enemy) throw new Error(`Error finding enemy by id`)
+		console.log(3)
+
+		const weapons = await getPlayerWeapons(player.id)
+		console.log(4)
+		const swingBuilder = await swingBuilderUtil(player, weapons)
+		console.log(5)
+
+		const gamePlayer = new GamePlayer(player, { weapons })
+		if (!gamePlayer) throw new Error(`Error creating GamePlayer`)
+
+		const weaponsByLocation = {}
+		for (const weapon of weapons) {
+			weaponsByLocation[weapon.location] = weapon
+		}
+
+		for (const swing of swingBuilder) {
+			const weaponSwung = weaponsByLocation[swing] || weapons[0]
+			const damageObject = gamePlayer.calculateDamageAgainstEnemy(enemy, weaponSwung)
+			const { actualDamage } = damageObject
+			enemy.health = Math.max(enemy.health - actualDamage, 0)
+			await enemy.save()
+			ws.send(JSON.stringify({ type: 'playerAction', action: 'playerAttackHitsEnemy', enemy, damageObject }))
+			if (enemy.health <= 0) break
+		}
+
+		if (enemy.health <= 0) {
+			const loot = (await generateEnemyDrops(enemy)) || []
+			if (!loot) {
+				throw new Error(`Error generating loot`)
+			}
+			// console.log(loot, ' loot')
+			if (enemy.loot.length > 0) {
+				loot.push(...enemy.loot)
+			}
+
+			const gainedExperience = enemy.experience || 0
+			await enemy.destroy()
+			await player.update({
+				experience: player.experience + gainedExperience,
+			})
+			console.log(loot, ' LOOT')
+			ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyDies', enemy, experience: gainedExperience, loot }))
+		} else {
+			//BATCH SEND HERE INSTEAD OF INDIVIDUAL SENDS IN THE FOR LOOP
+			// await enemy.save()
+			// ws.send(JSON.stringify({ type: 'enemyAction', action: 'enemyTakesDamage', enemy, damage: playerDamage }))
+		}
+	} catch (error) {
+		console.error(error)
+		ws.send(JSON.stringify({ type: 'error', message: error.message }))
+	}
 }
 
 export const playerAdvancesEnemyService = async (data, ws, wss) => {
-	console.log(data, ' DATA')
-	await playerAdvancesEnemy(data, ws, wss)
+	try {
+		const { playerId, enemyId } = data
+		const player = await Player.findByPk(playerId)
+		const enemy = await Enemy.findByPk(enemyId)
+
+		if (!player) {
+			throw new Error(`Cannot find player`)
+		}
+		if (!enemy) {
+			throw new Error(`Cannot find enemy`)
+		}
+
+		if (!enemy.playerCombatIds.some(id => id === playerId)) {
+			enemy.playerCombatIds = [...enemy.playerCombatIds, playerId]
+			enemy.save()
+			ws.send(JSON.stringify({ type: 'playerAction', action: 'playerAdvancesEnemy', enemy }))
+		}
+	} catch (error) {
+		ws.send(JSON.stringify({ type: 'error', message: 'Error advancing the enemy' }))
+		console.error(`Backend error: `, error)
+	}
 }
 
 export const playerRetreatsService = async (data, ws, wss) => {
-	console.log(data, ' DATA')
-	await playerRetreats(data, ws, wss)
+	try {
+		const { playerId, areaId } = data
+		const allEnemies = await Enemy.findAll({ where: { area_id: areaId } })
+		console.log(allEnemies, ' ALL ENEMIES')
+		if (!allEnemies) {
+			throw new Error('Error retrieving all enemies')
+		}
+		const playerIsInCombat = allEnemies.some(({ playerCombatIds }) => playerCombatIds.includes(playerId))
+		if (!playerIsInCombat) {
+			console.log('Player is not in combat. No retreat happens')
+			return
+		}
+		const updatedEnemies = await Promise.all(
+			allEnemies.map(async enemy => {
+				const [_, [updatedEnemy]] = await Enemy.update({ playerCombatIds: enemy.playerCombatIds.filter(id => id !== playerId) }, { where: { id: enemy.id }, returning: true })
+				return updatedEnemy
+			})
+		)
+		ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRetreats', enemies: updatedEnemies }))
+	} catch (error) {
+		ws.send(JSON.stringify({ type: 'error', message: 'Failed to retreat' }))
+		console.error(`Error: `, error)
+	}
 }
 
 export const playerEquipsArmorService = async (data, ws) => {

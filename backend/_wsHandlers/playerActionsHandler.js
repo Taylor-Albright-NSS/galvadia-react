@@ -10,8 +10,8 @@ import {
 	playerRoomTransitionService,
 	playerSpeaksToNpcService,
 	playerUnpacksItemService,
-} from '../controllerServices/playerActionsServices.js'
-import { playerGainsExperienceService } from '../controllerServices/playerModifyServices.js'
+} from '../_wsSenders/playerActionsServices.js'
+import { playerGainsExperienceService } from '../_wsSenders/playerModifyServices.js'
 
 //prettier-ignore
 export const handlePlayerAction = (data, ws, wss) => {

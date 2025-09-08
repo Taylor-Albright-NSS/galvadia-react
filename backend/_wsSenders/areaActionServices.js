@@ -3,7 +3,7 @@ import { Npc } from '../models/npc.js'
 import Player from '../models/player.js'
 import Area from '../models/area.js'
 
-export const areaAnticipatedService = async (data, ws) => {
+export const senderAnticipatedArea = async (data, ws) => {
 	try {
 		const { x, y } = data
 		const area = await Area.findOne({

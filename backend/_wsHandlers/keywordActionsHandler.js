@@ -1,4 +1,4 @@
-import { keywordActivationService, keywordExamineService, readSignService } from '../controllerServices/keywordServices.js'
+import { keywordActivationService, keywordExamineService, readSignService } from '../_wsSenders/keywordServices.js'
 
 //prettier-ignore
 export const handleKeywordActions = (data, ws, wss) => {

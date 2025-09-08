@@ -3,7 +3,7 @@ import Item from '../models/item.js'
 import QuestItem from '../models/questItem.js'
 import QuestItemTemplate from '../models/questItemTemplate.js'
 
-export const createQuestItem = async (ownerId, ownerType, name) => {
+export const serviceCreateQuestItem = async (ownerId, ownerType, name) => {
 	const transaction = await sequelize.transaction()
 	try {
 		const template = await QuestItemTemplate.findOne({ where: { name } })

@@ -2,7 +2,7 @@ import 'dotenv/config' // No need for .config()
 import express from 'express'
 // import playerRoutes from './routes/playerRoutes'
 import Area from './models/area.js'
-import { getPlayers, deletePlayer, putPlayer, getPlayer1API, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem, patchPlayerDropsItem, getUsersCharacters, createCharacter, getSelectedCharacter } from './_controllers/playerController.js'
+import { getPlayers, deletePlayer, putPlayer, getPlayer1API, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerDropsItem, getUsersCharacters, createCharacter, getSelectedCharacter } from './_controllers/playerController.js'
 import db from './models/associations.js'
 import cors from 'cors'
 import { getArea, getAreaByCoords, unlockDirection } from './_controllers/areaController.js'
@@ -20,8 +20,8 @@ import {
 	patchPlayerNpcDecrementDialogueStage,
 	patchPlayerNpcIncrementDialogueStage,
 } from './_controllers/npcController.js'
-import { deleteEnemy, enemyTakesDamage, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './_controllers/enemyController.js'
-import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, postOnehandedSword, postSpawnItemToPlayer, putCurrentAreaItemsToPlayer } from './_controllers/itemController.js'
+import { deleteEnemy, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './_controllers/enemyController.js'
+import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, postOnehandedSword, putCurrentAreaItemsToPlayer } from './_controllers/itemController.js'
 import { app } from './websocket.js'
 import { getAllUsers, getUser } from './_controllers/userController.js'
 import { getGameData } from './_controllers/gameStateController.js'
@@ -29,7 +29,8 @@ import { authenticateJWT, postLogin, postRegister } from './_controllers/authCon
 import { getAllCharacterClasses, getAllCharacterRaces, getCharacterClassById, getCharacterRaceById } from './_controllers/characterCreationController.js'
 import { retrieveCharMaxHealth } from './_controllers/playerMethods.js'
 import { getAllConnectedPlayers, getAllConnectedSockets, getAllConnectedUsersMap, getAllConnectedWebSockets } from './_controllers/adminController.js'
-import { serializePlayerFull, serializePlayerTest } from './models/dtos/serializerPlayer.js'
+import { serializePlayerTest } from './models/dtos/serializerPlayer.js'
+import { senderEnemyTakesDamage } from './_wsSenders/enemyActionServices.js'
 // import { playerSpeaksNpcUnlocksDirection } from './controllerServices/playerActionsServices.js'
 
 app.use(express.json())
@@ -83,7 +84,7 @@ app.post('/item/onehandedsword/:areaId', postOnehandedSword)
 // app.patch('/item/unpack/:playerId/:itemId', patchPlayerUnpacksItem)
 app.patch('/item/drop/:areaId/:itemId', patchPlayerDropsItem)
 app.post(`/area/:areaId/spawnItem`, postAreaKeywordSpawn)
-app.post(`/spawnToPlayer/:playerId`, postSpawnItemToPlayer)
+// app.post(`/spawnToPlayer/:playerId`, senderSpawnItemToPlayer)
 //--------NPCS
 app.get('/npcs', getEveryNpc)
 app.get('/npcs/:areaId/:playerId', getCurrentAreaNpcs)
@@ -135,7 +136,7 @@ app.get('/enemies/:areaId', getAllEnemiesInRoom)
 app.get('/enemies/', getAllEnemiesInDatabase)
 app.get('/enemy/:id', getEnemyById)
 
-app.patch('/enemy/:id', enemyTakesDamage)
+app.patch('/enemy/:id', senderEnemyTakesDamage)
 
 //--------TESTING
 app.get(`/character-health/:id`, retrieveCharMaxHealth)
