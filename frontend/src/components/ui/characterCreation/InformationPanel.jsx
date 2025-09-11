@@ -4,8 +4,6 @@ import { InfoPanelCharacterStats } from './characterStats/InfoPanelCharacterStat
 import './informationPanel.css'
 
 export const InformationPanel = ({ characterClass, characterRace }) => {
-	console.log(characterClass)
-	console.log(characterRace)
 	return (
 		<div className="information-panel">
 			<InfoPanelCharacterClass characterClass={characterClass} />

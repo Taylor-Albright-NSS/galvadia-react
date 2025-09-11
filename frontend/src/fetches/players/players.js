@@ -1,48 +1,61 @@
-const api = "http://localhost:3000"
+const api = 'http://localhost:3000'
 
 export const fetchPlayersInRoom = async (areaId, playerId) => {
-    const response = await fetch(`${api}/players/${areaId}?playerId=${playerId}`)
-    const data = await response.json()
-    return data
+	const response = await fetch(`${api}/players/${areaId}?playerId=${playerId}`)
+	const data = await response.json()
+	return data
 }
 
 export const fetchIncreasePlayerExperience = async (playerId, experienceGain) => {
-    try {
-        const response = await fetch(`${api}/player/${playerId}/experience`, {
-            method: "PATCH",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ experienceGain })
-        })
-        const player = await response.json()
-        if (!response.ok) {
-            throw new Error({message: "Response was not ok"})
-        }
-        return player
-    } catch(err) {
-        console.error(`Error message: ${err.message}`)
-    }
+	try {
+		const response = await fetch(`${api}/player/${playerId}/experience`, {
+			method: 'PATCH',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({ experienceGain }),
+		})
+		const player = await response.json()
+		if (!response.ok) {
+			throw new Error({ message: 'Response was not ok' })
+		}
+		return player
+	} catch (err) {
+		console.error(`Error message: ${err.message}`)
+	}
 }
 
-export const getUserCharacters = async (userId) => {
-    const response = await fetch(`${api}/user/${userId}/characters`)
-    const data = await response.json()
-    return data
+export const getUserCharacters = async userId => {
+	const response = await fetch(`${api}/user/${userId}/characters`)
+	const data = await response.json()
+	return data
 }
 
 export const getPlayers = async () => {
-    const response = await fetch(`${api}/players`)
-    const data = await response.json()
+	const response = await fetch(`${api}/players`)
+	const data = await response.json()
 }
 
 export const getPlayer1 = async () => {
-    const response = await fetch(`${api}/player/1`)
-    const data = await response.json()
-    return data
+	const response = await fetch(`${api}/player/1`)
+	const data = await response.json()
+	return data
 }
 export const getPlayer2 = async () => {
-    const response = await fetch(`${api}/player/2`)
-    const data = await response.json()
-    return data
+	const response = await fetch(`${api}/player/2`)
+	const data = await response.json()
+	return data
+}
+
+export const getSelectedCharacter = async characterId => {
+	const token = localStorage.getItem('token')
+	const response = await fetch(`${api}/character-select/${characterId}`, {
+		method: 'GET',
+		headers: {
+			Authorization: `Bearer ${token}`,
+			'Content-Type': 'application/json',
+		},
+	})
+	const data = await response.json()
+	return data
 }

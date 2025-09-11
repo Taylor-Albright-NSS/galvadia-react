@@ -1,4 +1,4 @@
-import { createQuestItem } from '../controllerServices/itemServices.js'
+import { createQuestItem } from '../_xservices/servicesItem.js'
 import { Npc } from '../models/npc.js'
 import { PlayerArea } from '../models/playerArea.js'
 import { PlayerNpc } from '../models/playerNpc.js'

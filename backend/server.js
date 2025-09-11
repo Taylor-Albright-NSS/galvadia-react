@@ -2,10 +2,10 @@ import 'dotenv/config' // No need for .config()
 import express from 'express'
 // import playerRoutes from './routes/playerRoutes'
 import Area from './models/area.js'
-import { getPlayers, createUser, deletePlayer, putPlayer, getPlayer1API, playerRoomTransition, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerPacksItem, patchPlayerUnpacksItem, patchPlayerDropsItem, getUsersCharacters } from './controllers/playerController.js'
+import { getPlayers, deletePlayer, putPlayer, getPlayer1API, getAllPlayerItems, getPlayersInRoom, playerGainsExperience, patchPlayerDropsItem, getUsersCharacters, createCharacter, getSelectedCharacter } from './_controllers/playerController.js'
 import db from './models/associations.js'
 import cors from 'cors'
-import { getArea, getAreaByCoords, unlockDirection } from './controllers/areaController.js'
+import { getArea, getAreaByCoords, unlockDirection } from './_controllers/areaController.js'
 import {
 	getCurrentAreaNpcs,
 	getNpcById,
@@ -19,14 +19,18 @@ import {
 	getPlayerNpcRelationship,
 	patchPlayerNpcDecrementDialogueStage,
 	patchPlayerNpcIncrementDialogueStage,
-} from './controllers/npcController.js'
-import { createEnemy, deleteEnemy, enemySpawns, enemyTakesDamage, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './controllers/enemyController.js'
-import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, postOnehandedSword, postSpawnItemToPlayer, postTwohandedSword, putCurrentAreaItemsToPlayer } from './controllers/itemController.js'
+} from './_controllers/npcController.js'
+import { deleteEnemy, getAllEnemiesInDatabase, getAllEnemiesInRoom, getEnemyById } from './_controllers/enemyController.js'
+import { deleteAllItems, getCurrentAreaItems, getItems, postAreaKeywordSpawn, postOnehandedSword, putCurrentAreaItemsToPlayer } from './_controllers/itemController.js'
 import { app } from './websocket.js'
-import { getUser } from './controllers/userController.js'
-import { patchKeywordActivation, patchToggleKeywordFalse } from './controllers/keywordController.js'
-import { getGameData } from './controllers/gameStateController.js'
-import { postLogin, postRegister } from './controllers/authController.js'
+import { getAllUsers, getUser } from './_controllers/userController.js'
+import { getGameData } from './_controllers/gameStateController.js'
+import { authenticateJWT, postLogin, postRegister } from './_controllers/authController.js'
+import { getAllCharacterClasses, getAllCharacterRaces, getCharacterClassById, getCharacterRaceById } from './_controllers/characterCreationController.js'
+import { retrieveCharMaxHealth } from './_controllers/playerMethods.js'
+import { getAllConnectedPlayers, getAllConnectedSockets, getAllConnectedUsersMap, getAllConnectedWebSockets } from './_controllers/adminController.js'
+import { serializePlayerTest } from './models/dtos/serializerPlayer.js'
+import { senderEnemyTakesDamage } from './_wsSenders/enemyActionServices.js'
 // import { playerSpeaksNpcUnlocksDirection } from './controllerServices/playerActionsServices.js'
 
 app.use(express.json())
@@ -38,8 +42,18 @@ app.post('/login', postLogin)
 app.get('/npcquest/:npcId/:playerId', getNpcQuest)
 app.patch(`/dialoguestage/:playerId/:npcId/decrement`, patchPlayerNpcDecrementDialogueStage)
 app.patch(`/dialoguestage/:playerId/:npcId/increment`, patchPlayerNpcIncrementDialogueStage)
+//--------CHARACTER CREATION
+app.post('/create-character', authenticateJWT, createCharacter)
+//--------CHARACTER SELECTION
+app.get('/character-select/:characterId', authenticateJWT, getSelectedCharacter)
+//--------CLASS VALUES
+app.get('/character-class/:id', getCharacterClassById)
+app.get('/character-classes', getAllCharacterClasses)
+//--------RACE VALUES
+app.get('/character-race/:id', getCharacterRaceById)
+app.get('/character-races', getAllCharacterRaces)
 //--------GAME DATA
-app.get('/gamedata/:playerId/:areaId', getGameData)
+app.get('/gamedata/:playerId/:areaId', getGameData) //REFACTOR THIS TO AUTHENTICATE THE JWT
 //--------NPC QUEST
 // app.post('/questcomplete', postNpcRequirements)
 app.patch('/queststage/decrement/:npcId/:playerId', patchDecrementQuestStage)
@@ -50,6 +64,7 @@ app.get('/npcquestdialogue/:npcId', getNpcQuestDialogue)
 app.get('/npcdialogueAll', getNpcDialogueAll)
 //--------USER
 app.get('/user/:id', getUser)
+app.get('/users', getAllUsers)
 //--------CHARACTER
 app.get(`/user/:id/characters`, getUsersCharacters)
 //--------ITEMS
@@ -69,7 +84,7 @@ app.post('/item/onehandedsword/:areaId', postOnehandedSword)
 // app.patch('/item/unpack/:playerId/:itemId', patchPlayerUnpacksItem)
 app.patch('/item/drop/:areaId/:itemId', patchPlayerDropsItem)
 app.post(`/area/:areaId/spawnItem`, postAreaKeywordSpawn)
-app.post(`/spawnToPlayer/:playerId`, postSpawnItemToPlayer)
+// app.post(`/spawnToPlayer/:playerId`, senderSpawnItemToPlayer)
 //--------NPCS
 app.get('/npcs', getEveryNpc)
 app.get('/npcs/:areaId/:playerId', getCurrentAreaNpcs)
@@ -86,7 +101,6 @@ app.get('/player/:id', getPlayer1API)
 //(MULTIPLE)
 app.get('/players', getPlayers)
 app.get('/players/:areaId', getPlayersInRoom)
-app.post('/players', createUser)
 app.put('/player/:id', putPlayer)
 app.put('/player')
 app.delete('/player/:id', deletePlayer)
@@ -116,14 +130,21 @@ app.post('/areas', async (req, res) => {
 // app.patch('/keywordActivation/:keywordId', patchToggleKeywordFalse)
 //--------ENEMIES
 app.delete('/enemy/:id', deleteEnemy)
-app.post('/enemy/:areaId', enemySpawns)
 // app.post('/enemy/:areaId', createEnemy)
 
 app.get('/enemies/:areaId', getAllEnemiesInRoom)
 app.get('/enemies/', getAllEnemiesInDatabase)
 app.get('/enemy/:id', getEnemyById)
 
-app.patch('/enemy/:id', enemyTakesDamage)
+app.patch('/enemy/:id', senderEnemyTakesDamage)
+
+//--------TESTING
+app.get(`/character-health/:id`, retrieveCharMaxHealth)
+app.get(`/serialized-character/:id`, serializePlayerTest)
+app.get(`/connected-players`, getAllConnectedPlayers)
+app.get(`/connected-users`, getAllConnectedSockets)
+app.get(`/connected-websockets`, getAllConnectedWebSockets)
+app.get(`/connected-users-map`, getAllConnectedUsersMap)
 
 db.sequelize
 	.sync() // Sync the models with the database (create tables)

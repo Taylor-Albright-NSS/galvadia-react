@@ -4,6 +4,7 @@ const abilitiesFighter = ['Ripslash', 'Cyclone', 'Cataclysm']
 const descriptionFighter = 'The berserker is a battle-hardened warrior'
 
 const berserker = {
+	classId: 1,
 	name: 'Berserker',
 	attributes: { str: 10, dex: 2, agi: 2, con: 8, int: 1, wis: 1, mys: 1 },
 	skills: ['Two Handed', 'Toughness'],
@@ -11,6 +12,7 @@ const berserker = {
 	description: 'The berserker is a battle-hardened warrior',
 }
 const fighter = {
+	classId: 2,
 	name: 'Fighter',
 	attributes: { str: 7, dex: 4, agi: 4, con: 5, int: 2, wis: 2, mys: 2 },
 	skills: ['Two Handed', 'Toughness'],

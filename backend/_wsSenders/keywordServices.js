@@ -1,12 +1,6 @@
-import { unlockDirection } from '../controllers/areaController.js'
-import { postSpawnItemToPlayer } from '../controllers/itemController.js'
-import Item from '../models/item.js'
 import { Keyword } from '../models/keyword.js'
-import { PlayerArea } from '../models/playerArea.js'
 import { PlayerKeywordActivation } from '../models/playerKeywordActivation.js'
-import { PlayerNpc } from '../models/playerNpc.js'
 import { tutorialGlasses, tutorialLever, tutorialWall } from '../utils/keywordUtils.js'
-import { createQuestItem } from './itemServices.js'
 
 export const keywordExamineService = async (data, ws, wss) => {
 	try {

@@ -87,7 +87,7 @@ export const generateArmor = async (armorTemplate, enemyAreaId) => {
 			},
 			{ transaction }
 		)
-		const generatedWeapon = await Armor.create(
+		const generatedArmor = await Armor.create(
 			{
 				itemId: item.id,
 				name,
@@ -102,9 +102,9 @@ export const generateArmor = async (armorTemplate, enemyAreaId) => {
 			},
 			{ transaction }
 		)
-		console.log(generatedWeapon, ' gen weapon')
-		item.dataValues.weapon = generatedWeapon
-		item.setDataValue('armor', generatedWeapon)
+		console.log(generatedArmor, ' gen weapon')
+		item.dataValues.weapon = generatedArmor
+		item.setDataValue('armor', generatedArmor)
 
 		await transaction.commit()
 		return item

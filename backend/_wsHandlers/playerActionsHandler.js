@@ -10,12 +10,11 @@ import {
 	playerRoomTransitionService,
 	playerSpeaksToNpcService,
 	playerUnpacksItemService,
-} from '../controllerServices/playerActionsServices.js'
-import { playerGainsExperienceService } from '../controllerServices/playerModifyServices.js'
+} from '../_wsSenders/playerActionsServices.js'
+import { playerGainsExperienceService } from '../_wsSenders/playerModifyServices.js'
 
 //prettier-ignore
 export const handlePlayerAction = (data, ws, wss) => {
-    console.log(data.action, " data.action")
 	if (data.action === 'playerRoomTransition') {playerRoomTransitionService(data, ws, wss)}
     if (data.action === 'playerRegularAttack') {playerRegularAttackService(data, ws, wss)}
     if (data.action === 'playerAdvancesEnemy') {playerAdvancesEnemyService(data, ws, wss)}

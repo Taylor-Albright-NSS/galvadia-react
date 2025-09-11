@@ -6,7 +6,6 @@ module.exports = {
 			'Enemies',
 			[
 				{
-					id: 1,
 					enemyTypeId: 1,
 					area_id: 1,
 
@@ -33,7 +32,6 @@ module.exports = {
 					updatedAt: new Date(),
 				},
 				{
-					id: 2,
 					enemyTypeId: 1,
 					area_id: 12,
 

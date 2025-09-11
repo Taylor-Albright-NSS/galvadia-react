@@ -66,19 +66,19 @@ export const putCurrentAreaItemsToPlayer = async (req, res) => {
 	}
 }
 
-export const postSpawnItemToPlayer = async (playerId, name, keywords, ws) => {
-	try {
-		const item = await Item.create({ name, ownerId: playerId, ownerType: 'player', keywords, location: 'inventory' })
-		console.log(item, ' item')
-		if (!item) {
-			throw new Error(`Item failed to be created`)
-		}
-		return ws.send(JSON.stringify({ type: 'itemAction', action: 'itemToPlayer', item }))
-	} catch (error) {
-		console.error(`Error: `, error)
-		return ws.send(JSON.stringify({ type: 'error', message: "Internal server error. I think it's because of the unique ID contraint" }))
-	}
-}
+// export const senderSpawnItemToPlayer = async (playerId, name, keywords, ws) => {
+// 	try {
+// 		const item = await Item.create({ name, ownerId: playerId, ownerType: 'player', keywords, location: 'inventory' })
+// 		console.log(item, ' item')
+// 		if (!item) {
+// 			throw new Error(`Item failed to be created`)
+// 		}
+// 		return ws.send(JSON.stringify({ type: 'itemAction', action: 'itemToPlayer', item }))
+// 	} catch (error) {
+// 		console.error(`Error: `, error)
+// 		return ws.send(JSON.stringify({ type: 'error', message: "Internal server error. I think it's because of the unique ID contraint" }))
+// 	}
+// }
 export const postAreaKeywordSpawn = async (req, res) => {
 	const { areaId } = req.params
 	const { keywordSpecial } = req.body
@@ -166,3 +166,5 @@ export const deleteAllItems = async (req, res) => {
 		return res.status(500).json({ message: 'Internal server error' })
 	}
 }
+
+export const adminSpawnItemToPlayer = async (req, res) => {}

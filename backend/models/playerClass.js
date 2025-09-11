@@ -7,6 +7,8 @@ PlayerClass.init(
 	{
 		id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
 		name: { type: DataTypes.STRING },
+		health: { type: DataTypes.INTEGER },
+		mana: { type: DataTypes.INTEGER },
 		strength: { type: DataTypes.INTEGER },
 		dexterity: { type: DataTypes.INTEGER },
 		agility: { type: DataTypes.INTEGER },
@@ -14,6 +16,9 @@ PlayerClass.init(
 		intelligence: { type: DataTypes.INTEGER },
 		wisdom: { type: DataTypes.INTEGER },
 		mysticism: { type: DataTypes.INTEGER },
+		skills: { type: DataTypes.ARRAY(DataTypes.STRING) },
+		abilities: { type: DataTypes.ARRAY(DataTypes.STRING) },
+		description: { type: DataTypes.STRING },
 	},
 	{
 		sequelize,

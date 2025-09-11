@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import { zGameContext } from './zGameContext'
 import { WebSocketContext } from './WebSocketContext'
 import { playerAdvancesEnemySetter, playerLooksSetter, playerRetreatsSetter, playerRoomTransitionSetter, playerSpeaksToNpcSetter, playerUpdateAllAttributesSetter } from '../../setters/settersPlayer'
@@ -10,30 +10,48 @@ import { npcMovesSetter } from '../../setters/settersNpc'
 import { playerOffersQuest } from '../../services/servicesPlayer'
 import { questCompleteSetter, questFailSetter } from '../../setters/settersQuest'
 import { adminResetPlayerSetter } from '../../setters/settersAdmin'
+import { useNavigate } from 'react-router-dom'
 
 export const WebSocketProvider = ({ children }) => {
-	const wsRef = useRef(null)
-
+	const [token, setToken] = useState(null)
+	const socketRef = useRef(null)
+	const navigate = useNavigate()
 	const { setGameData, messages, setMessages, addLog, gameData, playerStatus, setPlayerStatus } = useContext(zGameContext)
 	const player = gameData ? gameData.player : null
 
-	useEffect(() => {
-		const webSocket = new WebSocket('ws://localhost:3001')
-		wsRef.current = webSocket
-		const ws = wsRef.current
-		console.log(ws)
-		if (!ws) return
+	const sendMessage = message => {
+		const ws = socketRef.current
+		if (ws && ws.readyState === WebSocket.OPEN) {
+			ws.send(JSON.stringify(message))
+		} else {
+			console.error('WebSocket is not connected')
+		}
+	}
+	function joinWorld() {
+		const ws = socketRef.current
+		console.log(ws, ' WEBSOCKET')
 		if (ws.readyState === WebSocket.CONNECTING) {
 			ws.onopen = () => {
 				console.log('WebSocket is now open, readState: ', ws.readyState)
 				addLog('WebSocket Connected!')
-				ws.send(JSON.stringify({ type: 'join', playerId: 1, areaId: 1, name: 'John Doe' }))
+				ws.send(JSON.stringify({ type: 'join', playerId: player.id, areaId: player.area_id, name: player.name }))
 			}
 		} else if (ws.readyState === WebSocket.OPEN) {
 			console.log('WebSocket is already open')
 			addLog('WebSocket is already open')
 			ws.send(JSON.stringify({ type: 'join', playerId: player.id, areaId: player.area_id, name: player.name }))
 		}
+		navigate('/game')
+	}
+
+	useEffect(() => {
+		if (!token) return
+		console.log(`ESTABLISHED CONNECTION`)
+		const webSocket = new WebSocket(`ws://localhost:3001?token=${token}`)
+		socketRef.current = webSocket
+		const ws = socketRef.current
+		if (!ws) return
+
 		ws.onmessage = event => {
 			const data = JSON.parse(event.data)
 			// Will need to make a new module to house the messageHandlers
@@ -159,18 +177,12 @@ export const WebSocketProvider = ({ children }) => {
 		}
 
 		return () => {
-			ws.close()
+			if (socketRef.current) {
+				socketRef.current.close()
+				socketRef.current = null
+			}
 		}
-	}, [])
+	}, [token])
 
-	const sendMessage = message => {
-		const ws = wsRef.current
-		if (ws && ws.readyState === WebSocket.OPEN) {
-			ws.send(JSON.stringify(message))
-		} else {
-			console.error('WebSocket is not connected')
-		}
-	}
-
-	return <WebSocketContext.Provider value={{ sendMessage, messages, ws: wsRef.current }}>{children}</WebSocketContext.Provider>
+	return <WebSocketContext.Provider value={{ token, setToken, joinWorld, sendMessage, messages, ws: socketRef.current }}>{children}</WebSocketContext.Provider>
 }

@@ -1,6 +1,5 @@
 export const InfoPanelCharacterRace = ({ characterRace }) => {
-	const { name, attributes, skills, description } = characterRace || {}
-	const { str, dex, agi, con, int, wis, mys } = characterRace && attributes ? attributes : {}
+	const { name, strength, dexterity, agility, constitution, intelligence, wisdom, mysticism, skills, description } = characterRace || {}
 	return (
 		<div className="pClass">
 			<div className="class-heading">
@@ -12,24 +11,15 @@ export const InfoPanelCharacterRace = ({ characterRace }) => {
 				</div>
 				<div className="class-details">
 					<div className="class-attributes">
-						<div>Str: {str}</div>
-						<div>Dex: {dex}</div>
-						<div>Agi: {agi}</div>
-						<div>Con: {con}</div>
-						<div>Int: {int}</div>
-						<div>Wis: {wis}</div>
-						<div>Mys: {mys}</div>
+						<div>Str: {strength}</div>
+						<div>Dex: {dexterity}</div>
+						<div>Agi: {agility}</div>
+						<div>Con: {constitution}</div>
+						<div>Int: {intelligence}</div>
+						<div>Wis: {wisdom}</div>
+						<div>Mys: {mysticism}</div>
 					</div>
-					<div className="class-skills">
-						<p>skills 1</p>
-						<p>skills 2</p>
-						<p>skills 3</p>
-					</div>
-					<div className="class-abilities">
-						<p>abilities 1</p>
-						<p>abilities 2</p>
-						<p>abilities 3</p>
-					</div>
+					<div className="class-skills">{skills && skills.map(skill => <p key={skill.id}>{skill}</p>)}</div>
 				</div>
 			</div>
 		</div>

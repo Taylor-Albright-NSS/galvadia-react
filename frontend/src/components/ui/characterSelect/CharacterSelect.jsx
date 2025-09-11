@@ -1,12 +1,13 @@
 import { CharacterCard } from './CharacterCard'
 import './characterSelect.css'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { getUserCharacters } from '../../../fetches/players/players'
 import { Link } from 'react-router-dom'
+import { WebSocketContext } from '../WebSocketContext'
 
 export const CharacterSelect = () => {
 	const [characters, setCharacters] = useState([])
-
+	const { joinWorld } = useContext(WebSocketContext)
 	useEffect(() => {
 		// Get user's characters based on user.id
 		const storedUser = localStorage.getItem('user')
@@ -33,6 +34,7 @@ export const CharacterSelect = () => {
 				<Link to="/character-creation">
 					<button>Create New Character</button>
 				</Link>
+				<button onClick={joinWorld}>Join World</button>
 			</div>
 		</div>
 	)
