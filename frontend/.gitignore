@@ -1,1 +1,16 @@
+#*.log       # ignores all files ending with .log (error.log, debug.log)
+#*.tmp       # ignores all files ending with .tmp
+
+#/.env       # ignores .env file only in the root, not in subfolders
+#/node_modules/  # ignores node_modules only in the root
+
+#dist/       # ignores the dist folder and all its contents anywhere
+#logs/       # ignores logs folder and contents anywhere
+
+#node_modules    # ignores any folder named node_modules anywhere, including subfolders
+#build           # ignores any folder named build anywhere
+#config.js       # ignores any file named config.js anywhere
+
+#.*              # ignores all hidden files like .DS_Store, .env, .vscode
+
 .vercel
