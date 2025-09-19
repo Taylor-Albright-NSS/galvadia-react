@@ -1,7 +1,7 @@
-export const playerRoomTransitionSend = async (socket, player, futureX, futureY) => {
-    socket.send(JSON.stringify({type: "playerAction", action: "playerRoomTransition", player, futureX, futureY}))
+export const playerRoomTransitionSend = async (ws, inputDirection) => {
+	ws.send(JSON.stringify({ type: 'playerAction', action: 'playerRoomTransition', inputDirection }))
 }
 
 export const areaGetByCoordinates = (ws, coords) => {
-    ws.send(JSON.stringify({ type: "areaAction", action: "anticipatedArea", coords }))
+	ws.send(JSON.stringify({ type: 'areaAction', action: 'anticipatedArea', coords }))
 }

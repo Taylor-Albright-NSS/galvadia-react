@@ -7,7 +7,8 @@ import { WebSocketContext } from '../WebSocketContext'
 
 export const CharacterSelect = () => {
 	const [characters, setCharacters] = useState([])
-	const { joinWorld } = useContext(WebSocketContext)
+	const { setToken } = useContext(WebSocketContext)
+	const token = localStorage.getItem('token')
 	useEffect(() => {
 		// Get user's characters based on user.id
 		const storedUser = localStorage.getItem('user')
@@ -34,7 +35,7 @@ export const CharacterSelect = () => {
 				<Link to="/character-creation">
 					<button>Create New Character</button>
 				</Link>
-				<button onClick={joinWorld}>Join World</button>
+				<button onClick={() => setToken(token)}>Join World</button>
 			</div>
 		</div>
 	)

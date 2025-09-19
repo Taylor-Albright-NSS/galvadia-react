@@ -20,7 +20,7 @@ export const CharacterCard = ({ c }) => {
 			return {
 				...prev,
 				player: character,
-				playerItems: character?.items?.sort(),
+				playerItems: character?.inventory?.sort(),
 			}
 		})
 		// navigate('/game')

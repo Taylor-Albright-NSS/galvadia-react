@@ -505,24 +505,16 @@ export const playerEquipsArmorService = commandObject => {
 	if (!command2) return addLog(`You must specify what you want to equip`)
 
 	const possibleItemsToEquip = playerItems.filter(item => item.location === 'rightHand' || item.location === 'leftHand')
-	console.log(possibleItemsToEquip, ' possibleItemsToEquip')
 	if (possibleItemsToEquip.length === 0) return addLog(`You must be holding a piece of armor to equip it`)
+
 	const chosenItem = possibleItemsToEquip.find(({ keywords }) => keywords.includes(command2))
-	console.log(chosenItem, ' chosenItem')
 	if (!chosenItem) return addLog(`You are not holding a ${command2} to equip`)
-	// eslint-disable-next-line no-prototype-builtins
+
 	if (chosenItem.templateType != 'armor') return addLog(`You can only equip armor`)
 	const allEquippedItems = playerItems.filter(item => item.location !== 'inventory' && item.location !== 'rightHand' && item.location !== 'leftHand')
 
 	const isSlotOccupied = allEquippedItems.some(equippedItem => equippedItem.slot === chosenItem.slot)
 	if (isSlotOccupied) return addLog(`You already have an item equipped in that slot`)
-
-	// allEquippedItems.forEach(equippedItem => {
-	// 	if (equippedItem.slot === chosenItem.slot) {
-	// 		addLog(`You already have an item equipped in that slot`)
-	// 		return
-	// 	}
-	// })
 
 	playerEquipsArmorSender(player.id, chosenItem.id, ws)
 }
