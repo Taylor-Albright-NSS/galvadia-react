@@ -27,12 +27,18 @@ export const WebSocketProvider = ({ children }) => {
 			console.error('WebSocket is not connected')
 		}
 	}
-	function joinWorld() {
+
+	useEffect(() => {
+		if (!token) return
+		console.log(`ESTABLISHED CONNECTION`)
+		const webSocket = new WebSocket(`ws://localhost:3001?token=${token}&characterId=${player.id}`)
+		socketRef.current = webSocket
 		const ws = socketRef.current
-		console.log(ws, ' WEBSOCKET')
+		if (!ws) return
+		navigate('/game')
 		if (ws.readyState === WebSocket.CONNECTING) {
 			ws.onopen = () => {
-				console.log('WebSocket is now open, readState: ', ws.readyState)
+				console.log('WebSocket is now open, readyState: ', ws.readyState)
 				addLog('WebSocket Connected!')
 				ws.send(JSON.stringify({ type: 'join', playerId: player.id, areaId: player.area_id, name: player.name }))
 			}
@@ -41,16 +47,6 @@ export const WebSocketProvider = ({ children }) => {
 			addLog('WebSocket is already open')
 			ws.send(JSON.stringify({ type: 'join', playerId: player.id, areaId: player.area_id, name: player.name }))
 		}
-		navigate('/game')
-	}
-
-	useEffect(() => {
-		if (!token) return
-		console.log(`ESTABLISHED CONNECTION`)
-		const webSocket = new WebSocket(`ws://localhost:3001?token=${token}`)
-		socketRef.current = webSocket
-		const ws = socketRef.current
-		if (!ws) return
 
 		ws.onmessage = event => {
 			const data = JSON.parse(event.data)
@@ -174,6 +170,7 @@ export const WebSocketProvider = ({ children }) => {
 		ws.onclose = () => {
 			console.log('WebSocket closed')
 			addLog(`Websocket closed`)
+			navigate('/character-select')
 		}
 
 		return () => {
@@ -184,5 +181,5 @@ export const WebSocketProvider = ({ children }) => {
 		}
 	}, [token])
 
-	return <WebSocketContext.Provider value={{ token, setToken, joinWorld, sendMessage, messages, ws: socketRef.current }}>{children}</WebSocketContext.Provider>
+	return <WebSocketContext.Provider value={{ token, setToken, sendMessage, messages, ws: socketRef.current }}>{children}</WebSocketContext.Provider>
 }

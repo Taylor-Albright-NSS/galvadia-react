@@ -11,14 +11,12 @@ export default function Login() {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [failedLogin, setFailedLogin] = useState(false)
-	const { setToken } = useContext(WebSocketContext)
 
 	const handleSubmit = e => {
 		e.preventDefault()
 		login(username, password).then(data => {
 			try {
 				const { token, user } = data
-				setToken(token)
 				localStorage.setItem('token', token)
 				localStorage.setItem('user', JSON.stringify(user))
 				navigate('/character-select')
